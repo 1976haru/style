@@ -170,6 +170,7 @@ class App(tk.Tk):
         self.output=tk.Text(self.output_tab,wrap='word',font=('Consolas',9)); self.output.pack(fill='both',expand=True,pady=(8,0))
 
     def _build_feedback(self):
+        print('[FEEDBACK-UI 1/8] toolbar', flush=True)
         top=ttk.Frame(self.feedback_tab); top.pack(fill='x')
         ttk.Label(top,text='실제 Suno 생성 결과를 평가하면 최소 3개 표본부터 시장/레시피 추천과 다음 컴파일에 반영됩니다.').pack(side='left')
         ttk.Button(top,text='현재 Track Plan 가져오기',command=self.feedback_from_plan).pack(side='left',padx=(14,4))
@@ -178,19 +179,23 @@ class App(tk.Tk):
         ttk.Button(top,text='JSON 백업',command=self.export_feedback_json_ui).pack(side='right',padx=4)
         ttk.Button(top,text='CSV 내보내기',command=self.export_feedback_csv_ui).pack(side='right',padx=4)
 
+        print('[FEEDBACK-UI 2/8] evaluation frame', flush=True)
         entry=ttk.Labelframe(self.feedback_tab,text='선택 트랙 평가',padding=7); entry.pack(fill='x',pady=(8,6))
+        print('[FEEDBACK-UI 3/8] track controls', flush=True)
         r1=ttk.Frame(entry); r1.pack(fill='x')
         ttk.Label(r1,text='트랙').pack(side='left'); self.fb_track_var=tk.StringVar(); self.fb_track_cb=ttk.Combobox(r1,textvariable=self.fb_track_var,state='readonly',width=42); self.fb_track_cb.pack(side='left',padx=5); self.fb_track_cb.bind('<<ComboboxSelected>>',lambda e:self.feedback_track_selected())
         ttk.Label(r1,text='판정').pack(side='left',padx=(12,3)); self.fb_decision=tk.StringVar(value='KEEP'); ttk.Combobox(r1,textvariable=self.fb_decision,state='readonly',width=9,values=['KEEP','MAYBE','REGEN']).pack(side='left')
         ttk.Label(r1,text='Runtime sec').pack(side='left',padx=(12,3)); self.fb_runtime=tk.StringVar(); ttk.Entry(r1,textvariable=self.fb_runtime,width=8).pack(side='left')
         ttk.Label(r1,text='Session').pack(side='left',padx=(12,3)); self.fb_session=tk.StringVar(); ttk.Entry(r1,textvariable=self.fb_session,width=18).pack(side='left')
 
+        print('[FEEDBACK-UI 4/8] ratings', flush=True)
         r2=ttk.Frame(entry); r2.pack(fill='x',pady=(6,0))
         self.fb_overall=tk.IntVar(value=4); self.fb_vocal=tk.IntVar(value=4); self.fb_hook=tk.IntVar(value=4); self.fb_groove=tk.IntVar(value=4); self.fb_adherence=tk.IntVar(value=4)
         for label,var in [('전체',self.fb_overall),('보컬고유성',self.fb_vocal),('훅',self.fb_hook),('그루브',self.fb_groove),('프롬프트준수',self.fb_adherence)]:
             ttk.Label(r2,text=label).pack(side='left',padx=(8,2)); ttk.Spinbox(r2,from_=1,to=5,textvariable=var,width=3).pack(side='left')
         ttk.Button(r2,text='평가 저장',command=self.save_feedback).pack(side='right',padx=4)
 
+        print('[FEEDBACK-UI 5/8] issue tags', flush=True)
         r3=ttk.Frame(entry); r3.pack(fill='x',pady=(6,0)); ttk.Label(r3,text='문제태그').pack(side='left')
         self.fb_tag_vars={}
         labels={x['id']:x['label'] for x in FEEDBACK_TAG_DATA.get('tags',[])}
@@ -200,8 +205,10 @@ class App(tk.Tk):
             ttk.Checkbutton(tag_box,text=labels.get(tag,tag),variable=v).grid(row=i//6,column=i%6,sticky='w',padx=3)
         ttk.Label(r3,text='메모').pack(side='left',padx=(10,3)); self.fb_notes=tk.StringVar(); ttk.Entry(r3,textvariable=self.fb_notes,width=38).pack(side='left')
 
+        print('[FEEDBACK-UI 6/8] split panes', flush=True)
         split=ttk.Panedwindow(self.feedback_tab,orient='vertical'); split.pack(fill='both',expand=True,pady=(4,0))
         a=ttk.Labelframe(split,text='최근 평가',padding=5); b=ttk.Labelframe(split,text='Recipe Ranking / 학습 요약',padding=5); split.add(a,weight=3); split.add(b,weight=2)
+        print('[FEEDBACK-UI 7/8] recent feedback tree', flush=True)
         cols=('id','date','decision','arm','axis','track','title','recipe','role','bpm','overall','vocal','hook','groove','adh')
         self.fb_tree=ttk.Treeview(a,columns=cols,show='headings',height=10)
         heads={'id':'ID','date':'날짜','decision':'판정','arm':'A/B','axis':'실험축','track':'#','title':'제목','recipe':'Market Recipe','role':'Role','bpm':'BPM','overall':'전체','vocal':'보컬','hook':'훅','groove':'그루브','adh':'준수'}
@@ -210,6 +217,7 @@ class App(tk.Tk):
         self.fb_tree.pack(fill='both',expand=True); self.fb_tree.bind('<<TreeviewSelect>>',self.feedback_record_selected)
         row=ttk.Frame(a); row.pack(fill='x',pady=(4,0)); ttk.Button(row,text='선택 평가 삭제',command=self.delete_feedback_ui).pack(side='left')
         self.fb_summary=tk.Text(b,wrap='word',font=('Consolas',9),height=10); self.fb_summary.pack(fill='both',expand=True)
+        print('[FEEDBACK-UI 8/8] feedback tab built', flush=True)
 
     def _build_learning(self):
         top=ttk.Frame(self.learning_tab); top.pack(fill='x')
