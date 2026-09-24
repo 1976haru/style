@@ -40,23 +40,24 @@ class App(tk.Tk):
         self.track_plan=[]; self.track_plan_meta={}; self.selected_track_no=None
 
         self.feedback_db=ROOT/'user_data'/'feedback.sqlite3'
-        print(f'[APP-INIT 3/6] opening feedback DB: {self.feedback_db}', flush=True)
-        init_feedback_db(self.feedback_db)
-        print('[APP-INIT 4/6] feedback DB ready', flush=True)
+        print(f'[APP-INIT 3/6] feedback DB scheduled after UI paint: {self.feedback_db}', flush=True)
 
         self.feedback_tracks=[]; self.feedback_track_map={}; self.feedback_selected_id=None
         self.learning_analysis={}; self.learning_scope={}; self.experiment_plan=[]; self.experiment_manifest={}; self.ab_results={}
 
-        print('[APP-INIT 5/6] building UI...', flush=True)
+        print('[APP-INIT 4/6] building UI...', flush=True)
         self._build()
-        print('[APP-INIT 6/6] UI widgets built', flush=True)
+        print('[APP-INIT 5/6] UI widgets built', flush=True)
         self.update_idletasks()
+        print('[APP-INIT 6/6] initial UI paint complete', flush=True)
         self.after(50, self._startup_initialize)
 
     def _startup_initialize(self):
         """Paint the Tk window first, then run data-heavy startup work."""
         try:
             print('[STARTUP] UI ready', flush=True)
+            init_feedback_db(self.feedback_db)
+            print('[STARTUP] feedback DB ready', flush=True)
             self.run_recommendations()
             print('[STARTUP] market recommendations ready', flush=True)
             self.refresh_feedback_view()
@@ -163,14 +164,17 @@ class App(tk.Tk):
         row=ttk.Frame(self.master_tab); row.pack(fill='x',pady=(8,0)); ttk.Button(row,text='현재 마스터 TXT 불러오기',command=self.load_master).pack(side='left'); ttk.Button(row,text='마스터 반영 Track Plan 재계산',command=self.recompute_plan).pack(side='left',padx=5)
         ttk.Label(row,text='현재 제작 지시(최우선)').pack(side='left',padx=(15,5)); self.episode=tk.Entry(row); self.episode.pack(side='left',fill='x',expand=True)
         pw=ttk.Panedwindow(self.master_tab,orient='vertical'); pw.pack(fill='both',expand=True,pady=(8,0)); a=ttk.Labelframe(pw,text='현재 마스터(선택)',padding=5); b=ttk.Labelframe(pw,text='프리셋 미리보기',padding=5); pw.add(a,weight=3); pw.add(b,weight=2)
-        self.master=tk.Text(a,wrap='word',font=('Consolas',9)); self.master.pack(fill='both',expand=True); self.preset_preview=tk.Text(b,wrap='word',font=('Consolas',9)); self.preset_preview.pack(fill='both',expand=True); self.refresh_preset()
+        # Tk uses ``master`` internally for its parent-widget chain. Replacing
+        # self.master here creates a cycle and makes later Variable creation
+        # loop forever while resolving the default root.
+        self.master_text=tk.Text(a,wrap='word',font=('Consolas',9)); self.master_text.pack(fill='both',expand=True); self.preset_preview=tk.Text(b,wrap='word',font=('Consolas',9)); self.preset_preview.pack(fill='both',expand=True); self.refresh_preset()
 
     def _build_output(self):
         bar=ttk.Frame(self.output_tab); bar.pack(fill='x'); ttk.Button(bar,text='Track Plan 포함 컴파일',command=self.compile).pack(side='left'); ttk.Button(bar,text='클립보드 복사',command=self.copy_output).pack(side='left',padx=5); ttk.Button(bar,text='TXT 저장',command=self.save_instruction).pack(side='left'); ttk.Button(bar,text='패키지 저장',command=self.save_package).pack(side='left',padx=5)
         self.output=tk.Text(self.output_tab,wrap='word',font=('Consolas',9)); self.output.pack(fill='both',expand=True,pady=(8,0))
 
     def _build_feedback(self):
-        print('[FEEDBACK-UI 1/8] toolbar', flush=True)
+        print('[FEEDBACK-UI 1] top controls start', flush=True)
         top=ttk.Frame(self.feedback_tab); top.pack(fill='x')
         ttk.Label(top,text='실제 Suno 생성 결과를 평가하면 최소 3개 표본부터 시장/레시피 추천과 다음 컴파일에 반영됩니다.').pack(side='left')
         ttk.Button(top,text='현재 Track Plan 가져오기',command=self.feedback_from_plan).pack(side='left',padx=(14,4))
@@ -179,23 +183,22 @@ class App(tk.Tk):
         ttk.Button(top,text='JSON 백업',command=self.export_feedback_json_ui).pack(side='right',padx=4)
         ttk.Button(top,text='CSV 내보내기',command=self.export_feedback_csv_ui).pack(side='right',padx=4)
 
-        print('[FEEDBACK-UI 2/8] evaluation frame', flush=True)
+        print('[FEEDBACK-UI 2] top controls done; entry start', flush=True)
         entry=ttk.Labelframe(self.feedback_tab,text='선택 트랙 평가',padding=7); entry.pack(fill='x',pady=(8,6))
-        print('[FEEDBACK-UI 3/8] track controls', flush=True)
         r1=ttk.Frame(entry); r1.pack(fill='x')
         ttk.Label(r1,text='트랙').pack(side='left'); self.fb_track_var=tk.StringVar(); self.fb_track_cb=ttk.Combobox(r1,textvariable=self.fb_track_var,state='readonly',width=42); self.fb_track_cb.pack(side='left',padx=5); self.fb_track_cb.bind('<<ComboboxSelected>>',lambda e:self.feedback_track_selected())
         ttk.Label(r1,text='판정').pack(side='left',padx=(12,3)); self.fb_decision=tk.StringVar(value='KEEP'); ttk.Combobox(r1,textvariable=self.fb_decision,state='readonly',width=9,values=['KEEP','MAYBE','REGEN']).pack(side='left')
         ttk.Label(r1,text='Runtime sec').pack(side='left',padx=(12,3)); self.fb_runtime=tk.StringVar(); ttk.Entry(r1,textvariable=self.fb_runtime,width=8).pack(side='left')
         ttk.Label(r1,text='Session').pack(side='left',padx=(12,3)); self.fb_session=tk.StringVar(); ttk.Entry(r1,textvariable=self.fb_session,width=18).pack(side='left')
 
-        print('[FEEDBACK-UI 4/8] ratings', flush=True)
+        print('[FEEDBACK-UI 3] entry row 1 done; ratings start', flush=True)
         r2=ttk.Frame(entry); r2.pack(fill='x',pady=(6,0))
         self.fb_overall=tk.IntVar(value=4); self.fb_vocal=tk.IntVar(value=4); self.fb_hook=tk.IntVar(value=4); self.fb_groove=tk.IntVar(value=4); self.fb_adherence=tk.IntVar(value=4)
         for label,var in [('전체',self.fb_overall),('보컬고유성',self.fb_vocal),('훅',self.fb_hook),('그루브',self.fb_groove),('프롬프트준수',self.fb_adherence)]:
             ttk.Label(r2,text=label).pack(side='left',padx=(8,2)); ttk.Spinbox(r2,from_=1,to=5,textvariable=var,width=3).pack(side='left')
         ttk.Button(r2,text='평가 저장',command=self.save_feedback).pack(side='right',padx=4)
 
-        print('[FEEDBACK-UI 5/8] issue tags', flush=True)
+        print('[FEEDBACK-UI 4] ratings done; tags start', flush=True)
         r3=ttk.Frame(entry); r3.pack(fill='x',pady=(6,0)); ttk.Label(r3,text='문제태그').pack(side='left')
         self.fb_tag_vars={}
         labels={x['id']:x['label'] for x in FEEDBACK_TAG_DATA.get('tags',[])}
@@ -203,21 +206,24 @@ class App(tk.Tk):
         for i,tag in enumerate(ISSUE_TAGS):
             v=tk.BooleanVar(value=False); self.fb_tag_vars[tag]=v
             ttk.Checkbutton(tag_box,text=labels.get(tag,tag),variable=v).grid(row=i//6,column=i%6,sticky='w',padx=3)
+        print(f'[FEEDBACK-UI 5] {len(ISSUE_TAGS)} tag checkbuttons done', flush=True)
         ttk.Label(r3,text='메모').pack(side='left',padx=(10,3)); self.fb_notes=tk.StringVar(); ttk.Entry(r3,textvariable=self.fb_notes,width=38).pack(side='left')
 
-        print('[FEEDBACK-UI 6/8] split panes', flush=True)
+        print('[FEEDBACK-UI 6] tags done; paned window start', flush=True)
         split=ttk.Panedwindow(self.feedback_tab,orient='vertical'); split.pack(fill='both',expand=True,pady=(4,0))
+        print('[FEEDBACK-UI 7] paned window created; panes start', flush=True)
         a=ttk.Labelframe(split,text='최근 평가',padding=5); b=ttk.Labelframe(split,text='Recipe Ranking / 학습 요약',padding=5); split.add(a,weight=3); split.add(b,weight=2)
-        print('[FEEDBACK-UI 7/8] recent feedback tree', flush=True)
+        print('[FEEDBACK-UI 8] panes done; tree start', flush=True)
         cols=('id','date','decision','arm','axis','track','title','recipe','role','bpm','overall','vocal','hook','groove','adh')
         self.fb_tree=ttk.Treeview(a,columns=cols,show='headings',height=10)
         heads={'id':'ID','date':'날짜','decision':'판정','arm':'A/B','axis':'실험축','track':'#','title':'제목','recipe':'Market Recipe','role':'Role','bpm':'BPM','overall':'전체','vocal':'보컬','hook':'훅','groove':'그루브','adh':'준수'}
         widths={'id':45,'date':120,'decision':65,'arm':42,'axis':105,'track':38,'title':170,'recipe':160,'role':60,'bpm':52,'overall':45,'vocal':45,'hook':45,'groove':45,'adh':45}
         for c in cols: self.fb_tree.heading(c,text=heads[c]); self.fb_tree.column(c,width=widths[c],anchor='center' if c not in ('title','recipe') else 'w')
+        print('[FEEDBACK-UI 9] tree columns done; final widgets start', flush=True)
         self.fb_tree.pack(fill='both',expand=True); self.fb_tree.bind('<<TreeviewSelect>>',self.feedback_record_selected)
         row=ttk.Frame(a); row.pack(fill='x',pady=(4,0)); ttk.Button(row,text='선택 평가 삭제',command=self.delete_feedback_ui).pack(side='left')
         self.fb_summary=tk.Text(b,wrap='word',font=('Consolas',9),height=10); self.fb_summary.pack(fill='both',expand=True)
-        print('[FEEDBACK-UI 8/8] feedback tab built', flush=True)
+        print('[FEEDBACK-UI 10] feedback UI done', flush=True)
 
     def _build_learning(self):
         top=ttk.Frame(self.learning_tab); top.pack(fill='x')
@@ -273,7 +279,7 @@ class App(tk.Tk):
         self.directive.delete('1.0','end'); self.track_plan=[]; self.track_plan_meta={}; self.render_track_plan()
     def load_master(self):
         p=filedialog.askopenfilename(filetypes=[('Text/JSON','*.txt *.json'),('All','*.*')])
-        if p: self.master.delete('1.0','end'); self.master.insert('1.0',read_text(p))
+        if p: self.master_text.delete('1.0','end'); self.master_text.insert('1.0',read_text(p))
     def refresh_preset(self):
         p=PRESETS[self.preset_var.get()]; self.preset_preview.delete('1.0','end'); self.preset_preview.insert('1.0',json.dumps(p,ensure_ascii=False,indent=2))
 
@@ -285,7 +291,7 @@ class App(tk.Tk):
     def recompute_plan(self):
         if not self.track_plan: self.parse_track_plan()
         if not self.selected_market_recipe: self.run_recommendations()
-        pid=self.preset_var.get(); master=self.master.get('1.0','end').strip()
+        pid=self.preset_var.get(); master=self.master_text.get('1.0','end').strip()
         self.track_plan, recmeta=recompute_track_plan(self.track_plan,pid,PRESETS[pid],self.selected_market_recipe,master)
         self.track_plan_meta.update(recmeta); self.refresh_learning_analysis(); self.nb.select(self.plan_tab)
         self.plan_status.set(f"재계산 완료: {len(self.track_plan)}곡 / BPM·Genre·Vocal·Role·Structure 갱신 / Story·Scene LOCK 유지")
@@ -387,7 +393,7 @@ class App(tk.Tk):
         if not self.selected_market_recipe: self.run_recommendations()
         if not self.track_plan and self.directive.get('1.0','end').strip(): self.parse_track_plan()
         if self.track_plan: self.recompute_plan()
-        raw=self.directive.get('1.0','end').strip(); master=self.master.get('1.0','end').strip(); ep=self.episode.get().strip(); ref=self.reference.get('1.0','end').strip(); pid=self.preset_var.get(); rid=self.recipe_var.get()
+        raw=self.directive.get('1.0','end').strip(); master=self.master_text.get('1.0','end').strip(); ep=self.episode.get().strip(); ref=self.reference.get('1.0','end').strip(); pid=self.preset_var.get(); rid=self.recipe_var.get()
         feedback_insights=build_feedback_insights(self.feedback_db,pid,self.selected_market_recipe.get('id',''),min_samples=3)
         self.compiled,self.manifest,self.qa=compile_instruction(raw,pid,PRESETS[pid],RECIPES[rid],PUBLIC,self.model_var.get(),self.mode_var.get(),master,ep,self.selected_market_recipe,self.market_var.get(),self.goal_var.get(),ref,self.ownership_var.get(),int(self.song_count.get()),self.output_mode.get(),self.track_plan,self.track_plan_meta,feedback_insights)
         self.refresh_learning_analysis()
