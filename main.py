@@ -30,16 +30,26 @@ FEEDBACK_TAG_DATA = load_json(ROOT/'data'/'feedback_issue_tags.json')
 
 class App(tk.Tk):
     def __init__(self):
+        print('[APP-INIT 1/6] creating Tk root...', flush=True)
         super().__init__()
+        print('[APP-INIT 2/6] Tk root created', flush=True)
         self.title('Suno Master Prompt Studio v0.5-dev — Evidence-guided A/B Learning')
         self.geometry('1540x960')
         self.minsize(1220,780)
         self.compiled=''; self.manifest={}; self.qa=[]; self.market_rows=[]; self.selected_market_recipe={}
         self.track_plan=[]; self.track_plan_meta={}; self.selected_track_no=None
-        self.feedback_db=ROOT/'user_data'/'feedback.sqlite3'; init_feedback_db(self.feedback_db)
+
+        self.feedback_db=ROOT/'user_data'/'feedback.sqlite3'
+        print(f'[APP-INIT 3/6] opening feedback DB: {self.feedback_db}', flush=True)
+        init_feedback_db(self.feedback_db)
+        print('[APP-INIT 4/6] feedback DB ready', flush=True)
+
         self.feedback_tracks=[]; self.feedback_track_map={}; self.feedback_selected_id=None
         self.learning_analysis={}; self.learning_scope={}; self.experiment_plan=[]; self.experiment_manifest={}; self.ab_results={}
+
+        print('[APP-INIT 5/6] building UI...', flush=True)
         self._build()
+        print('[APP-INIT 6/6] UI widgets built', flush=True)
         self.update_idletasks()
         self.after(50, self._startup_initialize)
 
@@ -60,6 +70,7 @@ class App(tk.Tk):
                 pass
 
     def _build(self):
+        print('[UI 1/10] header/notebook', flush=True)
         hdr=ttk.Frame(self,padding=(10,8)); hdr.pack(fill='x')
         ttk.Label(hdr,text='Suno Master Prompt Studio v0.5-dev',font=('Segoe UI',16,'bold')).pack(side='left')
         ttk.Label(hdr,text='  Track Plan LOCK + Feedback Learning + 15곡 A/B 실험 제안(PROPOSAL ONLY)',font=('Segoe UI',10)).pack(side='left',padx=8)
@@ -68,7 +79,15 @@ class App(tk.Tk):
         self.plan_tab=ttk.Frame(nb,padding=8); self.master_tab=ttk.Frame(nb,padding=8); self.output_tab=ttk.Frame(nb,padding=8); self.feedback_tab=ttk.Frame(nb,padding=8); self.learning_tab=ttk.Frame(nb,padding=8); self.qa_tab=ttk.Frame(nb,padding=8)
         for tab,label in [(self.market_tab,'1. 시장/장르 추천'),(self.ref_tab,'2. Reference DNA'),(self.directive_tab,'3. 사용자 지시문'),(self.plan_tab,'4. 15곡 Track Plan'),(self.master_tab,'5. 마스터/현재 지시'),(self.output_tab,'6. ChatGPT 최종지시문'),(self.feedback_tab,'7. Suno 결과 Feedback'),(self.learning_tab,'8. 학습/A-B 실험'),(self.qa_tab,'9. QA / 결과검증')]: nb.add(tab,text=label)
         self.nb=nb
-        self._build_market(); self._build_reference(); self._build_directive(); self._build_plan(); self._build_master(); self._build_output(); self._build_feedback(); self._build_learning(); self._build_qa()
+        print('[UI 2/10] market tab', flush=True); self._build_market()
+        print('[UI 3/10] reference tab', flush=True); self._build_reference()
+        print('[UI 4/10] directive tab', flush=True); self._build_directive()
+        print('[UI 5/10] track plan tab', flush=True); self._build_plan()
+        print('[UI 6/10] master tab', flush=True); self._build_master()
+        print('[UI 7/10] output tab', flush=True); self._build_output()
+        print('[UI 8/10] feedback tab', flush=True); self._build_feedback()
+        print('[UI 9/10] learning tab', flush=True); self._build_learning()
+        print('[UI 10/10] QA tab', flush=True); self._build_qa()
 
     def _build_market(self):
         ctrl=ttk.Frame(self.market_tab); ctrl.pack(fill='x')
@@ -503,10 +522,11 @@ if __name__=='__main__':
     args=ap.parse_args()
     if args.cli or args.directive or args.out or args.reference: raise SystemExit(cli(args))
     if args.startup_check:
-        print('[STARTUP-CHECK] imports/data OK')
+        print('[STARTUP-CHECK] imports/data OK', flush=True)
         app=App()
+        print('[STARTUP-CHECK] App() returned', flush=True)
         app.update_idletasks()
-        print('[STARTUP-CHECK] Tk App constructed OK')
+        print('[STARTUP-CHECK] Tk App constructed OK', flush=True)
         app.destroy()
         raise SystemExit(0)
     print('[STARTUP] launching GUI...', flush=True)
