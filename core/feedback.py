@@ -5,6 +5,7 @@ import json
 import math
 import sqlite3
 from collections import Counter, defaultdict
+from contextlib import closing
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
@@ -28,7 +29,7 @@ def _connect(path: str | Path) -> sqlite3.Connection:
 
 
 def init_feedback_db(path: str | Path) -> None:
-    with _connect(path) as con:
+    with closing(_connect(path)) as con:
         con.execute(
             """
             CREATE TABLE IF NOT EXISTS feedback (
@@ -105,7 +106,7 @@ def add_feedback(path: str | Path, record: Dict[str, Any]) -> int:
         float(record["runtime_sec"]) if record.get("runtime_sec") not in (None, "") else None,
         json.dumps(tags, ensure_ascii=False), str(record.get("notes") or ""),
     )
-    with _connect(path) as con:
+    with closing(_connect(path)) as con:
         cur = con.execute(
             """
             INSERT INTO feedback(
@@ -121,7 +122,7 @@ def add_feedback(path: str | Path, record: Dict[str, Any]) -> int:
 
 def list_feedback(path: str | Path, limit: int = 500) -> List[Dict[str, Any]]:
     init_feedback_db(path)
-    with _connect(path) as con:
+    with closing(_connect(path)) as con:
         rows = con.execute("SELECT * FROM feedback ORDER BY id DESC LIMIT ?", (int(limit),)).fetchall()
     out=[]
     for r in rows:
@@ -134,7 +135,7 @@ def list_feedback(path: str | Path, limit: int = 500) -> List[Dict[str, Any]]:
 
 def delete_feedback(path: str | Path, row_id: int) -> None:
     init_feedback_db(path)
-    with _connect(path) as con:
+    with closing(_connect(path)) as con:
         con.execute("DELETE FROM feedback WHERE id=?", (int(row_id),))
         con.commit()
 
