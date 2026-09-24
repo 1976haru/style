@@ -1,5 +1,6 @@
 import sys
 import sqlite3
+from contextlib import closing
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -127,7 +128,7 @@ def test_feedback_schema_migrates_experiment_columns_and_roundtrips():
     try:
         if db.exists():
             db.unlink()
-        with sqlite3.connect(db) as con:
+        with closing(sqlite3.connect(db)) as con:
             con.execute(
                 """
                 CREATE TABLE feedback (
@@ -163,7 +164,7 @@ def test_feedback_schema_migrates_experiment_columns_and_roundtrips():
             )
             con.commit()
         init_feedback_db(db)
-        with sqlite3.connect(db) as con:
+        with closing(sqlite3.connect(db)) as con:
             cols = {row[1] for row in con.execute("PRAGMA table_info(feedback)").fetchall()}
         assert {"experiment_arm", "experiment_axis", "experiment_context"} <= cols
 
