@@ -1,0 +1,1670 @@
+{
+  "KR": {
+    "revenue_balance": [
+      {
+        "id": "kr_sleep_healing_ambient",
+        "label": "KR 수면 / Healing Piano / Ambient",
+        "marketScore": 9.28,
+        "demand": 9.1,
+        "repeatability": 10.0,
+        "competitionIntensity": 8.2,
+        "aiFit": 9.8,
+        "monetizationProxy": 9.4,
+        "bpmRange": [
+          40,
+          76
+        ],
+        "vocalMode": "instrumental"
+      },
+      {
+        "id": "kr_cafe_jazz_bossa",
+        "label": "KR 카페 재즈 / Bossa / Cozy Instrumental",
+        "marketScore": 8.94,
+        "demand": 8.3,
+        "repeatability": 9.6,
+        "competitionIntensity": 7.8,
+        "aiFit": 9.5,
+        "monetizationProxy": 9.2,
+        "bpmRange": [
+          72,
+          118
+        ],
+        "vocalMode": "instrumental_or_light_vocal"
+      },
+      {
+        "id": "kr_7080_original_oldpop",
+        "label": "KR 7080 감성 Original Old Pop",
+        "marketScore": 8.7,
+        "demand": 8.2,
+        "repeatability": 9.3,
+        "competitionIntensity": 7.4,
+        "aiFit": 8.5,
+        "monetizationProxy": 9.0,
+        "bpmRange": [
+          70,
+          104
+        ],
+        "vocalMode": "vocal"
+      },
+      {
+        "id": "kr_deephouse_lounge_drive",
+        "label": "KR Deep House / Lounge / Night Drive",
+        "marketScore": 8.48,
+        "demand": 7.8,
+        "repeatability": 9.0,
+        "competitionIntensity": 8.0,
+        "aiFit": 9.2,
+        "monetizationProxy": 8.6,
+        "bpmRange": [
+          112,
+          124
+        ],
+        "vocalMode": "instrumental_or_light_vocal"
+      },
+      {
+        "id": "kr_seasonal_ballad_softpop",
+        "label": "KR 계절 감성 발라드 / Soft Pop",
+        "marketScore": 8.35,
+        "demand": 9.2,
+        "repeatability": 8.2,
+        "competitionIntensity": 9.0,
+        "aiFit": 8.2,
+        "monetizationProxy": 8.5,
+        "bpmRange": [
+          68,
+          96
+        ],
+        "vocalMode": "vocal"
+      },
+      {
+        "id": "kr_chill_rnb_neosoul",
+        "label": "KR Chill R&B / Neo-Soul / Mellow Hip-Hop",
+        "marketScore": 8.35,
+        "demand": 8.4,
+        "repeatability": 8.7,
+        "competitionIntensity": 8.1,
+        "aiFit": 8.4,
+        "monetizationProxy": 8.2,
+        "bpmRange": [
+          82,
+          108
+        ],
+        "vocalMode": "vocal"
+      },
+      {
+        "id": "kr_focus_lofi_jazzhop",
+        "label": "Universal Focus Lo-fi Jazzhop / Study Beats",
+        "marketScore": 8.02,
+        "demand": 8.0,
+        "repeatability": 9.8,
+        "competitionIntensity": 8.5,
+        "aiFit": 9.6,
+        "monetizationProxy": 8.7,
+        "bpmRange": [
+          68,
+          92
+        ],
+        "vocalMode": "instrumental"
+      },
+      {
+        "id": "global_chanson_cafe",
+        "label": "Global French Chanson / Paris Cafe",
+        "marketScore": 7.02,
+        "demand": 6.8,
+        "repeatability": 8.3,
+        "competitionIntensity": 5.8,
+        "aiFit": 7.8,
+        "monetizationProxy": 7.4,
+        "bpmRange": [
+          70,
+          112
+        ],
+        "vocalMode": "vocal"
+      }
+    ],
+    "long_watch": [
+      {
+        "id": "kr_sleep_healing_ambient",
+        "label": "KR 수면 / Healing Piano / Ambient",
+        "marketScore": 9.75,
+        "demand": 9.1,
+        "repeatability": 10.0,
+        "competitionIntensity": 8.2,
+        "aiFit": 9.8,
+        "monetizationProxy": 9.4,
+        "bpmRange": [
+          40,
+          76
+        ],
+        "vocalMode": "instrumental"
+      },
+      {
+        "id": "kr_cafe_jazz_bossa",
+        "label": "KR 카페 재즈 / Bossa / Cozy Instrumental",
+        "marketScore": 9.41,
+        "demand": 8.3,
+        "repeatability": 9.6,
+        "competitionIntensity": 7.8,
+        "aiFit": 9.5,
+        "monetizationProxy": 9.2,
+        "bpmRange": [
+          72,
+          118
+        ],
+        "vocalMode": "instrumental_or_light_vocal"
+      },
+      {
+        "id": "kr_focus_lofi_jazzhop",
+        "label": "Universal Focus Lo-fi Jazzhop / Study Beats",
+        "marketScore": 9.26,
+        "demand": 8.0,
+        "repeatability": 9.8,
+        "competitionIntensity": 8.5,
+        "aiFit": 9.6,
+        "monetizationProxy": 8.7,
+        "bpmRange": [
+          68,
+          92
+        ],
+        "vocalMode": "instrumental"
+      },
+      {
+        "id": "kr_7080_original_oldpop",
+        "label": "KR 7080 감성 Original Old Pop",
+        "marketScore": 9.13,
+        "demand": 8.2,
+        "repeatability": 9.3,
+        "competitionIntensity": 7.4,
+        "aiFit": 8.5,
+        "monetizationProxy": 9.0,
+        "bpmRange": [
+          70,
+          104
+        ],
+        "vocalMode": "vocal"
+      },
+      {
+        "id": "kr_deephouse_lounge_drive",
+        "label": "KR Deep House / Lounge / Night Drive",
+        "marketScore": 8.91,
+        "demand": 7.8,
+        "repeatability": 9.0,
+        "competitionIntensity": 8.0,
+        "aiFit": 9.2,
+        "monetizationProxy": 8.6,
+        "bpmRange": [
+          112,
+          124
+        ],
+        "vocalMode": "instrumental_or_light_vocal"
+      },
+      {
+        "id": "kr_chill_rnb_neosoul",
+        "label": "KR Chill R&B / Neo-Soul / Mellow Hip-Hop",
+        "marketScore": 8.01,
+        "demand": 8.4,
+        "repeatability": 8.7,
+        "competitionIntensity": 8.1,
+        "aiFit": 8.4,
+        "monetizationProxy": 8.2,
+        "bpmRange": [
+          82,
+          108
+        ],
+        "vocalMode": "vocal"
+      },
+      {
+        "id": "kr_seasonal_ballad_softpop",
+        "label": "KR 계절 감성 발라드 / Soft Pop",
+        "marketScore": 7.94,
+        "demand": 9.2,
+        "repeatability": 8.2,
+        "competitionIntensity": 9.0,
+        "aiFit": 8.2,
+        "monetizationProxy": 8.5,
+        "bpmRange": [
+          68,
+          96
+        ],
+        "vocalMode": "vocal"
+      },
+      {
+        "id": "global_chanson_cafe",
+        "label": "Global French Chanson / Paris Cafe",
+        "marketScore": 7.34,
+        "demand": 6.8,
+        "repeatability": 8.3,
+        "competitionIntensity": 5.8,
+        "aiFit": 7.8,
+        "monetizationProxy": 7.4,
+        "bpmRange": [
+          70,
+          112
+        ],
+        "vocalMode": "vocal"
+      }
+    ],
+    "discovery": [
+      {
+        "id": "kr_seasonal_ballad_softpop",
+        "label": "KR 계절 감성 발라드 / Soft Pop",
+        "marketScore": 7.79,
+        "demand": 9.2,
+        "repeatability": 8.2,
+        "competitionIntensity": 9.0,
+        "aiFit": 8.2,
+        "monetizationProxy": 8.5,
+        "bpmRange": [
+          68,
+          96
+        ],
+        "vocalMode": "vocal"
+      },
+      {
+        "id": "kr_sleep_healing_ambient",
+        "label": "KR 수면 / Healing Piano / Ambient",
+        "marketScore": 7.79,
+        "demand": 9.1,
+        "repeatability": 10.0,
+        "competitionIntensity": 8.2,
+        "aiFit": 9.8,
+        "monetizationProxy": 9.4,
+        "bpmRange": [
+          40,
+          76
+        ],
+        "vocalMode": "instrumental"
+      },
+      {
+        "id": "kr_chill_rnb_neosoul",
+        "label": "KR Chill R&B / Neo-Soul / Mellow Hip-Hop",
+        "marketScore": 7.75,
+        "demand": 8.4,
+        "repeatability": 8.7,
+        "competitionIntensity": 8.1,
+        "aiFit": 8.4,
+        "monetizationProxy": 8.2,
+        "bpmRange": [
+          82,
+          108
+        ],
+        "vocalMode": "vocal"
+      },
+      {
+        "id": "kr_cafe_jazz_bossa",
+        "label": "KR 카페 재즈 / Bossa / Cozy Instrumental",
+        "marketScore": 7.47,
+        "demand": 8.3,
+        "repeatability": 9.6,
+        "competitionIntensity": 7.8,
+        "aiFit": 9.5,
+        "monetizationProxy": 9.2,
+        "bpmRange": [
+          72,
+          118
+        ],
+        "vocalMode": "instrumental_or_light_vocal"
+      },
+      {
+        "id": "kr_7080_original_oldpop",
+        "label": "KR 7080 감성 Original Old Pop",
+        "marketScore": 7.33,
+        "demand": 8.2,
+        "repeatability": 9.3,
+        "competitionIntensity": 7.4,
+        "aiFit": 8.5,
+        "monetizationProxy": 9.0,
+        "bpmRange": [
+          70,
+          104
+        ],
+        "vocalMode": "vocal"
+      },
+      {
+        "id": "kr_focus_lofi_jazzhop",
+        "label": "Universal Focus Lo-fi Jazzhop / Study Beats",
+        "marketScore": 7.16,
+        "demand": 8.0,
+        "repeatability": 9.8,
+        "competitionIntensity": 8.5,
+        "aiFit": 9.6,
+        "monetizationProxy": 8.7,
+        "bpmRange": [
+          68,
+          92
+        ],
+        "vocalMode": "instrumental"
+      },
+      {
+        "id": "kr_deephouse_lounge_drive",
+        "label": "KR Deep House / Lounge / Night Drive",
+        "marketScore": 7.04,
+        "demand": 7.8,
+        "repeatability": 9.0,
+        "competitionIntensity": 8.0,
+        "aiFit": 9.2,
+        "monetizationProxy": 8.6,
+        "bpmRange": [
+          112,
+          124
+        ],
+        "vocalMode": "instrumental_or_light_vocal"
+      },
+      {
+        "id": "global_chanson_cafe",
+        "label": "Global French Chanson / Paris Cafe",
+        "marketScore": 6.57,
+        "demand": 6.8,
+        "repeatability": 8.3,
+        "competitionIntensity": 5.8,
+        "aiFit": 7.8,
+        "monetizationProxy": 7.4,
+        "bpmRange": [
+          70,
+          112
+        ],
+        "vocalMode": "vocal"
+      }
+    ],
+    "low_competition": [
+      {
+        "id": "kr_cafe_jazz_bossa",
+        "label": "KR 카페 재즈 / Bossa / Cozy Instrumental",
+        "marketScore": 7.61,
+        "demand": 8.3,
+        "repeatability": 9.6,
+        "competitionIntensity": 7.8,
+        "aiFit": 9.5,
+        "monetizationProxy": 9.2,
+        "bpmRange": [
+          72,
+          118
+        ],
+        "vocalMode": "instrumental_or_light_vocal"
+      },
+      {
+        "id": "kr_focus_lofi_jazzhop",
+        "label": "Universal Focus Lo-fi Jazzhop / Study Beats",
+        "marketScore": 7.3,
+        "demand": 8.0,
+        "repeatability": 9.8,
+        "competitionIntensity": 8.5,
+        "aiFit": 9.6,
+        "monetizationProxy": 8.7,
+        "bpmRange": [
+          68,
+          92
+        ],
+        "vocalMode": "instrumental"
+      },
+      {
+        "id": "global_chanson_cafe",
+        "label": "Global French Chanson / Paris Cafe",
+        "marketScore": 7.1,
+        "demand": 6.8,
+        "repeatability": 8.3,
+        "competitionIntensity": 5.8,
+        "aiFit": 7.8,
+        "monetizationProxy": 7.4,
+        "bpmRange": [
+          70,
+          112
+        ],
+        "vocalMode": "vocal"
+      },
+      {
+        "id": "kr_sleep_healing_ambient",
+        "label": "KR 수면 / Healing Piano / Ambient",
+        "marketScore": 7.06,
+        "demand": 9.1,
+        "repeatability": 10.0,
+        "competitionIntensity": 8.2,
+        "aiFit": 9.8,
+        "monetizationProxy": 9.4,
+        "bpmRange": [
+          40,
+          76
+        ],
+        "vocalMode": "instrumental"
+      },
+      {
+        "id": "kr_7080_original_oldpop",
+        "label": "KR 7080 감성 Original Old Pop",
+        "marketScore": 6.78,
+        "demand": 8.2,
+        "repeatability": 9.3,
+        "competitionIntensity": 7.4,
+        "aiFit": 8.5,
+        "monetizationProxy": 9.0,
+        "bpmRange": [
+          70,
+          104
+        ],
+        "vocalMode": "vocal"
+      },
+      {
+        "id": "kr_deephouse_lounge_drive",
+        "label": "KR Deep House / Lounge / Night Drive",
+        "marketScore": 6.52,
+        "demand": 7.8,
+        "repeatability": 9.0,
+        "competitionIntensity": 8.0,
+        "aiFit": 9.2,
+        "monetizationProxy": 8.6,
+        "bpmRange": [
+          112,
+          124
+        ],
+        "vocalMode": "instrumental_or_light_vocal"
+      },
+      {
+        "id": "kr_chill_rnb_neosoul",
+        "label": "KR Chill R&B / Neo-Soul / Mellow Hip-Hop",
+        "marketScore": 6.36,
+        "demand": 8.4,
+        "repeatability": 8.7,
+        "competitionIntensity": 8.1,
+        "aiFit": 8.4,
+        "monetizationProxy": 8.2,
+        "bpmRange": [
+          82,
+          108
+        ],
+        "vocalMode": "vocal"
+      },
+      {
+        "id": "kr_seasonal_ballad_softpop",
+        "label": "KR 계절 감성 발라드 / Soft Pop",
+        "marketScore": 6.1,
+        "demand": 9.2,
+        "repeatability": 8.2,
+        "competitionIntensity": 9.0,
+        "aiFit": 8.2,
+        "monetizationProxy": 8.5,
+        "bpmRange": [
+          68,
+          96
+        ],
+        "vocalMode": "vocal"
+      }
+    ],
+    "senior": [
+      {
+        "id": "kr_7080_original_oldpop",
+        "label": "KR 7080 감성 Original Old Pop",
+        "marketScore": 8.82,
+        "demand": 8.2,
+        "repeatability": 9.3,
+        "competitionIntensity": 7.4,
+        "aiFit": 8.5,
+        "monetizationProxy": 9.0,
+        "bpmRange": [
+          70,
+          104
+        ],
+        "vocalMode": "vocal"
+      },
+      {
+        "id": "kr_seasonal_ballad_softpop",
+        "label": "KR 계절 감성 발라드 / Soft Pop",
+        "marketScore": 8.41,
+        "demand": 9.2,
+        "repeatability": 8.2,
+        "competitionIntensity": 9.0,
+        "aiFit": 8.2,
+        "monetizationProxy": 8.5,
+        "bpmRange": [
+          68,
+          96
+        ],
+        "vocalMode": "vocal"
+      }
+    ],
+    "cafe_store": [
+      {
+        "id": "kr_cafe_jazz_bossa",
+        "label": "KR 카페 재즈 / Bossa / Cozy Instrumental",
+        "marketScore": 9.47,
+        "demand": 8.3,
+        "repeatability": 9.6,
+        "competitionIntensity": 7.8,
+        "aiFit": 9.5,
+        "monetizationProxy": 9.2,
+        "bpmRange": [
+          72,
+          118
+        ],
+        "vocalMode": "instrumental_or_light_vocal"
+      },
+      {
+        "id": "kr_focus_lofi_jazzhop",
+        "label": "Universal Focus Lo-fi Jazzhop / Study Beats",
+        "marketScore": 9.32,
+        "demand": 8.0,
+        "repeatability": 9.8,
+        "competitionIntensity": 8.5,
+        "aiFit": 9.6,
+        "monetizationProxy": 8.7,
+        "bpmRange": [
+          68,
+          92
+        ],
+        "vocalMode": "instrumental"
+      },
+      {
+        "id": "kr_7080_original_oldpop",
+        "label": "KR 7080 감성 Original Old Pop",
+        "marketScore": 9.17,
+        "demand": 8.2,
+        "repeatability": 9.3,
+        "competitionIntensity": 7.4,
+        "aiFit": 8.5,
+        "monetizationProxy": 9.0,
+        "bpmRange": [
+          70,
+          104
+        ],
+        "vocalMode": "vocal"
+      },
+      {
+        "id": "kr_deephouse_lounge_drive",
+        "label": "KR Deep House / Lounge / Night Drive",
+        "marketScore": 8.98,
+        "demand": 7.8,
+        "repeatability": 9.0,
+        "competitionIntensity": 8.0,
+        "aiFit": 9.2,
+        "monetizationProxy": 8.6,
+        "bpmRange": [
+          112,
+          124
+        ],
+        "vocalMode": "instrumental_or_light_vocal"
+      },
+      {
+        "id": "global_chanson_cafe",
+        "label": "Global French Chanson / Paris Cafe",
+        "marketScore": 8.05,
+        "demand": 6.8,
+        "repeatability": 8.3,
+        "competitionIntensity": 5.8,
+        "aiFit": 7.8,
+        "monetizationProxy": 7.4,
+        "bpmRange": [
+          70,
+          112
+        ],
+        "vocalMode": "vocal"
+      }
+    ],
+    "focus_work": [
+      {
+        "id": "kr_sleep_healing_ambient",
+        "label": "KR 수면 / Healing Piano / Ambient",
+        "marketScore": 9.92,
+        "demand": 9.1,
+        "repeatability": 10.0,
+        "competitionIntensity": 8.2,
+        "aiFit": 9.8,
+        "monetizationProxy": 9.4,
+        "bpmRange": [
+          40,
+          76
+        ],
+        "vocalMode": "instrumental"
+      },
+      {
+        "id": "kr_cafe_jazz_bossa",
+        "label": "KR 카페 재즈 / Bossa / Cozy Instrumental",
+        "marketScore": 9.56,
+        "demand": 8.3,
+        "repeatability": 9.6,
+        "competitionIntensity": 7.8,
+        "aiFit": 9.5,
+        "monetizationProxy": 9.2,
+        "bpmRange": [
+          72,
+          118
+        ],
+        "vocalMode": "instrumental_or_light_vocal"
+      },
+      {
+        "id": "kr_focus_lofi_jazzhop",
+        "label": "Universal Focus Lo-fi Jazzhop / Study Beats",
+        "marketScore": 9.44,
+        "demand": 8.0,
+        "repeatability": 9.8,
+        "competitionIntensity": 8.5,
+        "aiFit": 9.6,
+        "monetizationProxy": 8.7,
+        "bpmRange": [
+          68,
+          92
+        ],
+        "vocalMode": "instrumental"
+      }
+    ],
+    "sleep": [
+      {
+        "id": "kr_sleep_healing_ambient",
+        "label": "KR 수면 / Healing Piano / Ambient",
+        "marketScore": 10.0,
+        "demand": 9.1,
+        "repeatability": 10.0,
+        "competitionIntensity": 8.2,
+        "aiFit": 9.8,
+        "monetizationProxy": 9.4,
+        "bpmRange": [
+          40,
+          76
+        ],
+        "vocalMode": "instrumental"
+      }
+    ],
+    "drive": [
+      {
+        "id": "kr_deephouse_lounge_drive",
+        "label": "KR Deep House / Lounge / Night Drive",
+        "marketScore": 8.73,
+        "demand": 7.8,
+        "repeatability": 9.0,
+        "competitionIntensity": 8.0,
+        "aiFit": 9.2,
+        "monetizationProxy": 8.6,
+        "bpmRange": [
+          112,
+          124
+        ],
+        "vocalMode": "instrumental_or_light_vocal"
+      },
+      {
+        "id": "kr_chill_rnb_neosoul",
+        "label": "KR Chill R&B / Neo-Soul / Mellow Hip-Hop",
+        "marketScore": 8.57,
+        "demand": 8.4,
+        "repeatability": 8.7,
+        "competitionIntensity": 8.1,
+        "aiFit": 8.4,
+        "monetizationProxy": 8.2,
+        "bpmRange": [
+          82,
+          108
+        ],
+        "vocalMode": "vocal"
+      }
+    ],
+    "vocal_story": [
+      {
+        "id": "kr_chill_rnb_neosoul",
+        "label": "KR Chill R&B / Neo-Soul / Mellow Hip-Hop",
+        "marketScore": 7.64,
+        "demand": 8.4,
+        "repeatability": 8.7,
+        "competitionIntensity": 8.1,
+        "aiFit": 8.4,
+        "monetizationProxy": 8.2,
+        "bpmRange": [
+          82,
+          108
+        ],
+        "vocalMode": "vocal"
+      },
+      {
+        "id": "kr_seasonal_ballad_softpop",
+        "label": "KR 계절 감성 발라드 / Soft Pop",
+        "marketScore": 7.51,
+        "demand": 9.2,
+        "repeatability": 8.2,
+        "competitionIntensity": 9.0,
+        "aiFit": 8.2,
+        "monetizationProxy": 8.5,
+        "bpmRange": [
+          68,
+          96
+        ],
+        "vocalMode": "vocal"
+      }
+    ],
+    "streaming_release": [
+      {
+        "id": "kr_7080_original_oldpop",
+        "label": "KR 7080 감성 Original Old Pop",
+        "marketScore": 8.54,
+        "demand": 8.2,
+        "repeatability": 9.3,
+        "competitionIntensity": 7.4,
+        "aiFit": 8.5,
+        "monetizationProxy": 9.0,
+        "bpmRange": [
+          70,
+          104
+        ],
+        "vocalMode": "vocal"
+      },
+      {
+        "id": "kr_deephouse_lounge_drive",
+        "label": "KR Deep House / Lounge / Night Drive",
+        "marketScore": 8.33,
+        "demand": 7.8,
+        "repeatability": 9.0,
+        "competitionIntensity": 8.0,
+        "aiFit": 9.2,
+        "monetizationProxy": 8.6,
+        "bpmRange": [
+          112,
+          124
+        ],
+        "vocalMode": "instrumental_or_light_vocal"
+      },
+      {
+        "id": "kr_seasonal_ballad_softpop",
+        "label": "KR 계절 감성 발라드 / Soft Pop",
+        "marketScore": 8.22,
+        "demand": 9.2,
+        "repeatability": 8.2,
+        "competitionIntensity": 9.0,
+        "aiFit": 8.2,
+        "monetizationProxy": 8.5,
+        "bpmRange": [
+          68,
+          96
+        ],
+        "vocalMode": "vocal"
+      },
+      {
+        "id": "kr_chill_rnb_neosoul",
+        "label": "KR Chill R&B / Neo-Soul / Mellow Hip-Hop",
+        "marketScore": 8.21,
+        "demand": 8.4,
+        "repeatability": 8.7,
+        "competitionIntensity": 8.1,
+        "aiFit": 8.4,
+        "monetizationProxy": 8.2,
+        "bpmRange": [
+          82,
+          108
+        ],
+        "vocalMode": "vocal"
+      },
+      {
+        "id": "global_chanson_cafe",
+        "label": "Global French Chanson / Paris Cafe",
+        "marketScore": 7.62,
+        "demand": 6.8,
+        "repeatability": 8.3,
+        "competitionIntensity": 5.8,
+        "aiFit": 7.8,
+        "monetizationProxy": 7.4,
+        "bpmRange": [
+          70,
+          112
+        ],
+        "vocalMode": "vocal"
+      }
+    ]
+  },
+  "JP": {
+    "revenue_balance": [
+      {
+        "id": "jp_sleep_healing_piano",
+        "label": "JP 睡眠用BGM / Healing Piano / Ambient",
+        "marketScore": 9.45,
+        "demand": 9.6,
+        "repeatability": 10.0,
+        "competitionIntensity": 8.2,
+        "aiFit": 9.9,
+        "monetizationProxy": 9.5,
+        "bpmRange": [
+          38,
+          72
+        ],
+        "vocalMode": "instrumental"
+      },
+      {
+        "id": "jp_cafe_jazz_bossa",
+        "label": "JP Cafe Jazz / Bossa / 作業用BGM",
+        "marketScore": 9.2,
+        "demand": 9.0,
+        "repeatability": 9.8,
+        "competitionIntensity": 7.8,
+        "aiFit": 9.5,
+        "monetizationProxy": 9.3,
+        "bpmRange": [
+          72,
+          118
+        ],
+        "vocalMode": "instrumental_or_light_vocal"
+      },
+      {
+        "id": "jp_chillpop_workbgm",
+        "label": "JP Japanese Chill Pop / R&B 作業用BGM",
+        "marketScore": 8.86,
+        "demand": 9.2,
+        "repeatability": 9.2,
+        "competitionIntensity": 8.4,
+        "aiFit": 8.8,
+        "monetizationProxy": 9.0,
+        "bpmRange": [
+          86,
+          108
+        ],
+        "vocalMode": "vocal"
+      },
+      {
+        "id": "jp_deephouse_lounge",
+        "label": "JP Deep House / Luxury Lounge / Night Drive",
+        "marketScore": 8.61,
+        "demand": 8.0,
+        "repeatability": 9.2,
+        "competitionIntensity": 8.0,
+        "aiFit": 9.3,
+        "monetizationProxy": 8.7,
+        "bpmRange": [
+          112,
+          124
+        ],
+        "vocalMode": "instrumental_or_light_vocal"
+      },
+      {
+        "id": "jp_chillrap_neosoul",
+        "label": "JP Chill Rap / Neo-Soul / Tokyo Night",
+        "marketScore": 8.57,
+        "demand": 8.6,
+        "repeatability": 8.7,
+        "competitionIntensity": 7.5,
+        "aiFit": 8.5,
+        "monetizationProxy": 8.5,
+        "bpmRange": [
+          90,
+          104
+        ],
+        "vocalMode": "vocal"
+      },
+      {
+        "id": "jp_citypop_retro_night",
+        "label": "JP City Pop / Retro Night Drive",
+        "marketScore": 8.33,
+        "demand": 8.1,
+        "repeatability": 8.8,
+        "competitionIntensity": 8.8,
+        "aiFit": 9.0,
+        "monetizationProxy": 8.4,
+        "bpmRange": [
+          90,
+          122
+        ],
+        "vocalMode": "vocal_or_instrumental"
+      },
+      {
+        "id": "jp_showa_inspired_original",
+        "label": "JP Showa-inspired Original Pop / Kayokyoku",
+        "marketScore": 8.14,
+        "demand": 7.6,
+        "repeatability": 8.4,
+        "competitionIntensity": 6.8,
+        "aiFit": 7.8,
+        "monetizationProxy": 8.1,
+        "bpmRange": [
+          68,
+          116
+        ],
+        "vocalMode": "vocal"
+      },
+      {
+        "id": "jp_acoustic_jpop_story",
+        "label": "JP Acoustic J-Pop / Singer-Songwriter Story",
+        "marketScore": 7.86,
+        "demand": 8.2,
+        "repeatability": 7.7,
+        "competitionIntensity": 9.0,
+        "aiFit": 8.3,
+        "monetizationProxy": 7.8,
+        "bpmRange": [
+          72,
+          112
+        ],
+        "vocalMode": "vocal"
+      }
+    ],
+    "long_watch": [
+      {
+        "id": "jp_sleep_healing_piano",
+        "label": "JP 睡眠用BGM / Healing Piano / Ambient",
+        "marketScore": 9.88,
+        "demand": 9.6,
+        "repeatability": 10.0,
+        "competitionIntensity": 8.2,
+        "aiFit": 9.9,
+        "monetizationProxy": 9.5,
+        "bpmRange": [
+          38,
+          72
+        ],
+        "vocalMode": "instrumental"
+      },
+      {
+        "id": "jp_cafe_jazz_bossa",
+        "label": "JP Cafe Jazz / Bossa / 作業用BGM",
+        "marketScore": 9.64,
+        "demand": 9.0,
+        "repeatability": 9.8,
+        "competitionIntensity": 7.8,
+        "aiFit": 9.5,
+        "monetizationProxy": 9.3,
+        "bpmRange": [
+          72,
+          118
+        ],
+        "vocalMode": "instrumental_or_light_vocal"
+      },
+      {
+        "id": "jp_chillpop_workbgm",
+        "label": "JP Japanese Chill Pop / R&B 作業用BGM",
+        "marketScore": 9.24,
+        "demand": 9.2,
+        "repeatability": 9.2,
+        "competitionIntensity": 8.4,
+        "aiFit": 8.8,
+        "monetizationProxy": 9.0,
+        "bpmRange": [
+          86,
+          108
+        ],
+        "vocalMode": "vocal"
+      },
+      {
+        "id": "kr_focus_lofi_jazzhop",
+        "label": "Universal Focus Lo-fi Jazzhop / Study Beats",
+        "marketScore": 9.06,
+        "demand": 8.0,
+        "repeatability": 9.8,
+        "competitionIntensity": 8.5,
+        "aiFit": 9.6,
+        "monetizationProxy": 8.7,
+        "bpmRange": [
+          68,
+          92
+        ],
+        "vocalMode": "instrumental"
+      },
+      {
+        "id": "jp_deephouse_lounge",
+        "label": "JP Deep House / Luxury Lounge / Night Drive",
+        "marketScore": 9.05,
+        "demand": 8.0,
+        "repeatability": 9.2,
+        "competitionIntensity": 8.0,
+        "aiFit": 9.3,
+        "monetizationProxy": 8.7,
+        "bpmRange": [
+          112,
+          124
+        ],
+        "vocalMode": "instrumental_or_light_vocal"
+      },
+      {
+        "id": "jp_chillrap_neosoul",
+        "label": "JP Chill Rap / Neo-Soul / Tokyo Night",
+        "marketScore": 8.19,
+        "demand": 8.6,
+        "repeatability": 8.7,
+        "competitionIntensity": 7.5,
+        "aiFit": 8.5,
+        "monetizationProxy": 8.5,
+        "bpmRange": [
+          90,
+          104
+        ],
+        "vocalMode": "vocal"
+      },
+      {
+        "id": "jp_citypop_retro_night",
+        "label": "JP City Pop / Retro Night Drive",
+        "marketScore": 8.05,
+        "demand": 8.1,
+        "repeatability": 8.8,
+        "competitionIntensity": 8.8,
+        "aiFit": 9.0,
+        "monetizationProxy": 8.4,
+        "bpmRange": [
+          90,
+          122
+        ],
+        "vocalMode": "vocal_or_instrumental"
+      },
+      {
+        "id": "jp_showa_inspired_original",
+        "label": "JP Showa-inspired Original Pop / Kayokyoku",
+        "marketScore": 7.77,
+        "demand": 7.6,
+        "repeatability": 8.4,
+        "competitionIntensity": 6.8,
+        "aiFit": 7.8,
+        "monetizationProxy": 8.1,
+        "bpmRange": [
+          68,
+          116
+        ],
+        "vocalMode": "vocal"
+      }
+    ],
+    "discovery": [
+      {
+        "id": "jp_chillpop_workbgm",
+        "label": "JP Japanese Chill Pop / R&B 作業用BGM",
+        "marketScore": 8.2,
+        "demand": 9.2,
+        "repeatability": 9.2,
+        "competitionIntensity": 8.4,
+        "aiFit": 8.8,
+        "monetizationProxy": 9.0,
+        "bpmRange": [
+          86,
+          108
+        ],
+        "vocalMode": "vocal"
+      },
+      {
+        "id": "jp_chillrap_neosoul",
+        "label": "JP Chill Rap / Neo-Soul / Tokyo Night",
+        "marketScore": 8.02,
+        "demand": 8.6,
+        "repeatability": 8.7,
+        "competitionIntensity": 7.5,
+        "aiFit": 8.5,
+        "monetizationProxy": 8.5,
+        "bpmRange": [
+          90,
+          104
+        ],
+        "vocalMode": "vocal"
+      },
+      {
+        "id": "jp_sleep_healing_piano",
+        "label": "JP 睡眠用BGM / Healing Piano / Ambient",
+        "marketScore": 8.01,
+        "demand": 9.6,
+        "repeatability": 10.0,
+        "competitionIntensity": 8.2,
+        "aiFit": 9.9,
+        "monetizationProxy": 9.5,
+        "bpmRange": [
+          38,
+          72
+        ],
+        "vocalMode": "instrumental"
+      },
+      {
+        "id": "jp_cafe_jazz_bossa",
+        "label": "JP Cafe Jazz / Bossa / 作業用BGM",
+        "marketScore": 7.77,
+        "demand": 9.0,
+        "repeatability": 9.8,
+        "competitionIntensity": 7.8,
+        "aiFit": 9.5,
+        "monetizationProxy": 9.3,
+        "bpmRange": [
+          72,
+          118
+        ],
+        "vocalMode": "instrumental_or_light_vocal"
+      },
+      {
+        "id": "jp_citypop_retro_night",
+        "label": "JP City Pop / Retro Night Drive",
+        "marketScore": 7.59,
+        "demand": 8.1,
+        "repeatability": 8.8,
+        "competitionIntensity": 8.8,
+        "aiFit": 9.0,
+        "monetizationProxy": 8.4,
+        "bpmRange": [
+          90,
+          122
+        ],
+        "vocalMode": "vocal_or_instrumental"
+      },
+      {
+        "id": "jp_acoustic_jpop_story",
+        "label": "JP Acoustic J-Pop / Singer-Songwriter Story",
+        "marketScore": 7.28,
+        "demand": 8.2,
+        "repeatability": 7.7,
+        "competitionIntensity": 9.0,
+        "aiFit": 8.3,
+        "monetizationProxy": 7.8,
+        "bpmRange": [
+          72,
+          112
+        ],
+        "vocalMode": "vocal"
+      },
+      {
+        "id": "jp_deephouse_lounge",
+        "label": "JP Deep House / Luxury Lounge / Night Drive",
+        "marketScore": 7.17,
+        "demand": 8.0,
+        "repeatability": 9.2,
+        "competitionIntensity": 8.0,
+        "aiFit": 9.3,
+        "monetizationProxy": 8.7,
+        "bpmRange": [
+          112,
+          124
+        ],
+        "vocalMode": "instrumental_or_light_vocal"
+      },
+      {
+        "id": "kr_focus_lofi_jazzhop",
+        "label": "Universal Focus Lo-fi Jazzhop / Study Beats",
+        "marketScore": 6.96,
+        "demand": 8.0,
+        "repeatability": 9.8,
+        "competitionIntensity": 8.5,
+        "aiFit": 9.6,
+        "monetizationProxy": 8.7,
+        "bpmRange": [
+          68,
+          92
+        ],
+        "vocalMode": "instrumental"
+      }
+    ],
+    "low_competition": [
+      {
+        "id": "jp_cafe_jazz_bossa",
+        "label": "JP Cafe Jazz / Bossa / 作業用BGM",
+        "marketScore": 7.78,
+        "demand": 9.0,
+        "repeatability": 9.8,
+        "competitionIntensity": 7.8,
+        "aiFit": 9.5,
+        "monetizationProxy": 9.3,
+        "bpmRange": [
+          72,
+          118
+        ],
+        "vocalMode": "instrumental_or_light_vocal"
+      },
+      {
+        "id": "jp_showa_inspired_original",
+        "label": "JP Showa-inspired Original Pop / Kayokyoku",
+        "marketScore": 7.2,
+        "demand": 7.6,
+        "repeatability": 8.4,
+        "competitionIntensity": 6.8,
+        "aiFit": 7.8,
+        "monetizationProxy": 8.1,
+        "bpmRange": [
+          68,
+          116
+        ],
+        "vocalMode": "vocal"
+      },
+      {
+        "id": "jp_sleep_healing_piano",
+        "label": "JP 睡眠用BGM / Healing Piano / Ambient",
+        "marketScore": 7.18,
+        "demand": 9.6,
+        "repeatability": 10.0,
+        "competitionIntensity": 8.2,
+        "aiFit": 9.9,
+        "monetizationProxy": 9.5,
+        "bpmRange": [
+          38,
+          72
+        ],
+        "vocalMode": "instrumental"
+      },
+      {
+        "id": "kr_focus_lofi_jazzhop",
+        "label": "Universal Focus Lo-fi Jazzhop / Study Beats",
+        "marketScore": 7.1,
+        "demand": 8.0,
+        "repeatability": 9.8,
+        "competitionIntensity": 8.5,
+        "aiFit": 9.6,
+        "monetizationProxy": 8.7,
+        "bpmRange": [
+          68,
+          92
+        ],
+        "vocalMode": "instrumental"
+      },
+      {
+        "id": "global_chanson_cafe",
+        "label": "Global French Chanson / Paris Cafe",
+        "marketScore": 7.1,
+        "demand": 6.8,
+        "repeatability": 8.3,
+        "competitionIntensity": 5.8,
+        "aiFit": 7.8,
+        "monetizationProxy": 7.4,
+        "bpmRange": [
+          70,
+          112
+        ],
+        "vocalMode": "vocal"
+      },
+      {
+        "id": "jp_chillpop_workbgm",
+        "label": "JP Japanese Chill Pop / R&B 作業用BGM",
+        "marketScore": 6.65,
+        "demand": 9.2,
+        "repeatability": 9.2,
+        "competitionIntensity": 8.4,
+        "aiFit": 8.8,
+        "monetizationProxy": 9.0,
+        "bpmRange": [
+          86,
+          108
+        ],
+        "vocalMode": "vocal"
+      },
+      {
+        "id": "jp_chillrap_neosoul",
+        "label": "JP Chill Rap / Neo-Soul / Tokyo Night",
+        "marketScore": 6.65,
+        "demand": 8.6,
+        "repeatability": 8.7,
+        "competitionIntensity": 7.5,
+        "aiFit": 8.5,
+        "monetizationProxy": 8.5,
+        "bpmRange": [
+          90,
+          104
+        ],
+        "vocalMode": "vocal"
+      },
+      {
+        "id": "jp_deephouse_lounge",
+        "label": "JP Deep House / Luxury Lounge / Night Drive",
+        "marketScore": 6.62,
+        "demand": 8.0,
+        "repeatability": 9.2,
+        "competitionIntensity": 8.0,
+        "aiFit": 9.3,
+        "monetizationProxy": 8.7,
+        "bpmRange": [
+          112,
+          124
+        ],
+        "vocalMode": "instrumental_or_light_vocal"
+      }
+    ],
+    "senior": [
+      {
+        "id": "jp_showa_inspired_original",
+        "label": "JP Showa-inspired Original Pop / Kayokyoku",
+        "marketScore": 8.23,
+        "demand": 7.6,
+        "repeatability": 8.4,
+        "competitionIntensity": 6.8,
+        "aiFit": 7.8,
+        "monetizationProxy": 8.1,
+        "bpmRange": [
+          68,
+          116
+        ],
+        "vocalMode": "vocal"
+      }
+    ],
+    "cafe_store": [
+      {
+        "id": "jp_cafe_jazz_bossa",
+        "label": "JP Cafe Jazz / Bossa / 作業用BGM",
+        "marketScore": 9.69,
+        "demand": 9.0,
+        "repeatability": 9.8,
+        "competitionIntensity": 7.8,
+        "aiFit": 9.5,
+        "monetizationProxy": 9.3,
+        "bpmRange": [
+          72,
+          118
+        ],
+        "vocalMode": "instrumental_or_light_vocal"
+      },
+      {
+        "id": "kr_focus_lofi_jazzhop",
+        "label": "Universal Focus Lo-fi Jazzhop / Study Beats",
+        "marketScore": 9.12,
+        "demand": 8.0,
+        "repeatability": 9.8,
+        "competitionIntensity": 8.5,
+        "aiFit": 9.6,
+        "monetizationProxy": 8.7,
+        "bpmRange": [
+          68,
+          92
+        ],
+        "vocalMode": "instrumental"
+      },
+      {
+        "id": "jp_deephouse_lounge",
+        "label": "JP Deep House / Luxury Lounge / Night Drive",
+        "marketScore": 9.12,
+        "demand": 8.0,
+        "repeatability": 9.2,
+        "competitionIntensity": 8.0,
+        "aiFit": 9.3,
+        "monetizationProxy": 8.7,
+        "bpmRange": [
+          112,
+          124
+        ],
+        "vocalMode": "instrumental_or_light_vocal"
+      },
+      {
+        "id": "jp_citypop_retro_night",
+        "label": "JP City Pop / Retro Night Drive",
+        "marketScore": 8.82,
+        "demand": 8.1,
+        "repeatability": 8.8,
+        "competitionIntensity": 8.8,
+        "aiFit": 9.0,
+        "monetizationProxy": 8.4,
+        "bpmRange": [
+          90,
+          122
+        ],
+        "vocalMode": "vocal_or_instrumental"
+      },
+      {
+        "id": "global_chanson_cafe",
+        "label": "Global French Chanson / Paris Cafe",
+        "marketScore": 8.05,
+        "demand": 6.8,
+        "repeatability": 8.3,
+        "competitionIntensity": 5.8,
+        "aiFit": 7.8,
+        "monetizationProxy": 7.4,
+        "bpmRange": [
+          70,
+          112
+        ],
+        "vocalMode": "vocal"
+      }
+    ],
+    "focus_work": [
+      {
+        "id": "jp_sleep_healing_piano",
+        "label": "JP 睡眠用BGM / Healing Piano / Ambient",
+        "marketScore": 10.0,
+        "demand": 9.6,
+        "repeatability": 10.0,
+        "competitionIntensity": 8.2,
+        "aiFit": 9.9,
+        "monetizationProxy": 9.5,
+        "bpmRange": [
+          38,
+          72
+        ],
+        "vocalMode": "instrumental"
+      },
+      {
+        "id": "jp_cafe_jazz_bossa",
+        "label": "JP Cafe Jazz / Bossa / 作業用BGM",
+        "marketScore": 9.79,
+        "demand": 9.0,
+        "repeatability": 9.8,
+        "competitionIntensity": 7.8,
+        "aiFit": 9.5,
+        "monetizationProxy": 9.3,
+        "bpmRange": [
+          72,
+          118
+        ],
+        "vocalMode": "instrumental_or_light_vocal"
+      },
+      {
+        "id": "jp_chillpop_workbgm",
+        "label": "JP Japanese Chill Pop / R&B 作業用BGM",
+        "marketScore": 9.38,
+        "demand": 9.2,
+        "repeatability": 9.2,
+        "competitionIntensity": 8.4,
+        "aiFit": 8.8,
+        "monetizationProxy": 9.0,
+        "bpmRange": [
+          86,
+          108
+        ],
+        "vocalMode": "vocal"
+      },
+      {
+        "id": "kr_focus_lofi_jazzhop",
+        "label": "Universal Focus Lo-fi Jazzhop / Study Beats",
+        "marketScore": 9.24,
+        "demand": 8.0,
+        "repeatability": 9.8,
+        "competitionIntensity": 8.5,
+        "aiFit": 9.6,
+        "monetizationProxy": 8.7,
+        "bpmRange": [
+          68,
+          92
+        ],
+        "vocalMode": "instrumental"
+      },
+      {
+        "id": "jp_deephouse_lounge",
+        "label": "JP Deep House / Luxury Lounge / Night Drive",
+        "marketScore": 9.21,
+        "demand": 8.0,
+        "repeatability": 9.2,
+        "competitionIntensity": 8.0,
+        "aiFit": 9.3,
+        "monetizationProxy": 8.7,
+        "bpmRange": [
+          112,
+          124
+        ],
+        "vocalMode": "instrumental_or_light_vocal"
+      }
+    ],
+    "sleep": [
+      {
+        "id": "jp_sleep_healing_piano",
+        "label": "JP 睡眠用BGM / Healing Piano / Ambient",
+        "marketScore": 10.0,
+        "demand": 9.6,
+        "repeatability": 10.0,
+        "competitionIntensity": 8.2,
+        "aiFit": 9.9,
+        "monetizationProxy": 9.5,
+        "bpmRange": [
+          38,
+          72
+        ],
+        "vocalMode": "instrumental"
+      }
+    ],
+    "drive": [
+      {
+        "id": "jp_deephouse_lounge",
+        "label": "JP Deep House / Luxury Lounge / Night Drive",
+        "marketScore": 8.87,
+        "demand": 8.0,
+        "repeatability": 9.2,
+        "competitionIntensity": 8.0,
+        "aiFit": 9.3,
+        "monetizationProxy": 8.7,
+        "bpmRange": [
+          112,
+          124
+        ],
+        "vocalMode": "instrumental_or_light_vocal"
+      },
+      {
+        "id": "jp_chillrap_neosoul",
+        "label": "JP Chill Rap / Neo-Soul / Tokyo Night",
+        "marketScore": 8.76,
+        "demand": 8.6,
+        "repeatability": 8.7,
+        "competitionIntensity": 7.5,
+        "aiFit": 8.5,
+        "monetizationProxy": 8.5,
+        "bpmRange": [
+          90,
+          104
+        ],
+        "vocalMode": "vocal"
+      },
+      {
+        "id": "jp_citypop_retro_night",
+        "label": "JP City Pop / Retro Night Drive",
+        "marketScore": 8.58,
+        "demand": 8.1,
+        "repeatability": 8.8,
+        "competitionIntensity": 8.8,
+        "aiFit": 9.0,
+        "monetizationProxy": 8.4,
+        "bpmRange": [
+          90,
+          122
+        ],
+        "vocalMode": "vocal_or_instrumental"
+      }
+    ],
+    "vocal_story": [
+      {
+        "id": "jp_chillpop_workbgm",
+        "label": "JP Japanese Chill Pop / R&B 作業用BGM",
+        "marketScore": 8.02,
+        "demand": 9.2,
+        "repeatability": 9.2,
+        "competitionIntensity": 8.4,
+        "aiFit": 8.8,
+        "monetizationProxy": 9.0,
+        "bpmRange": [
+          86,
+          108
+        ],
+        "vocalMode": "vocal"
+      },
+      {
+        "id": "jp_chillrap_neosoul",
+        "label": "JP Chill Rap / Neo-Soul / Tokyo Night",
+        "marketScore": 7.9,
+        "demand": 8.6,
+        "repeatability": 8.7,
+        "competitionIntensity": 7.5,
+        "aiFit": 8.5,
+        "monetizationProxy": 8.5,
+        "bpmRange": [
+          90,
+          104
+        ],
+        "vocalMode": "vocal"
+      },
+      {
+        "id": "jp_acoustic_jpop_story",
+        "label": "JP Acoustic J-Pop / Singer-Songwriter Story",
+        "marketScore": 7.1,
+        "demand": 8.2,
+        "repeatability": 7.7,
+        "competitionIntensity": 9.0,
+        "aiFit": 8.3,
+        "monetizationProxy": 7.8,
+        "bpmRange": [
+          72,
+          112
+        ],
+        "vocalMode": "vocal"
+      }
+    ],
+    "streaming_release": [
+      {
+        "id": "jp_chillpop_workbgm",
+        "label": "JP Japanese Chill Pop / R&B 作業用BGM",
+        "marketScore": 8.7,
+        "demand": 9.2,
+        "repeatability": 9.2,
+        "competitionIntensity": 8.4,
+        "aiFit": 8.8,
+        "monetizationProxy": 9.0,
+        "bpmRange": [
+          86,
+          108
+        ],
+        "vocalMode": "vocal"
+      },
+      {
+        "id": "jp_chillrap_neosoul",
+        "label": "JP Chill Rap / Neo-Soul / Tokyo Night",
+        "marketScore": 8.44,
+        "demand": 8.6,
+        "repeatability": 8.7,
+        "competitionIntensity": 7.5,
+        "aiFit": 8.5,
+        "monetizationProxy": 8.5,
+        "bpmRange": [
+          90,
+          104
+        ],
+        "vocalMode": "vocal"
+      },
+      {
+        "id": "jp_citypop_retro_night",
+        "label": "JP City Pop / Retro Night Drive",
+        "marketScore": 8.17,
+        "demand": 8.1,
+        "repeatability": 8.8,
+        "competitionIntensity": 8.8,
+        "aiFit": 9.0,
+        "monetizationProxy": 8.4,
+        "bpmRange": [
+          90,
+          122
+        ],
+        "vocalMode": "vocal_or_instrumental"
+      },
+      {
+        "id": "jp_showa_inspired_original",
+        "label": "JP Showa-inspired Original Pop / Kayokyoku",
+        "marketScore": 8.02,
+        "demand": 7.6,
+        "repeatability": 8.4,
+        "competitionIntensity": 6.8,
+        "aiFit": 7.8,
+        "monetizationProxy": 8.1,
+        "bpmRange": [
+          68,
+          116
+        ],
+        "vocalMode": "vocal"
+      },
+      {
+        "id": "jp_acoustic_jpop_story",
+        "label": "JP Acoustic J-Pop / Singer-Songwriter Story",
+        "marketScore": 7.73,
+        "demand": 8.2,
+        "repeatability": 7.7,
+        "competitionIntensity": 9.0,
+        "aiFit": 8.3,
+        "monetizationProxy": 7.8,
+        "bpmRange": [
+          72,
+          112
+        ],
+        "vocalMode": "vocal"
+      },
+      {
+        "id": "global_chanson_cafe",
+        "label": "Global French Chanson / Paris Cafe",
+        "marketScore": 7.62,
+        "demand": 6.8,
+        "repeatability": 8.3,
+        "competitionIntensity": 5.8,
+        "aiFit": 7.8,
+        "monetizationProxy": 7.4,
+        "bpmRange": [
+          70,
+          112
+        ],
+        "vocalMode": "vocal"
+      }
+    ]
+  }
+}

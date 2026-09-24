@@ -1,0 +1,187 @@
+{
+  "market_auto": {
+    "label": "시장 자동 / 범용",
+    "audience": "selected market + selected use-case",
+    "language": "selected by user / market recipe",
+    "mainGenrePolicy": "Use the selected market recipe as the dominant genre family. Keep one or at most two secondary colors and avoid genre soup.",
+    "bpmPolicy": "Use the selected market recipe range and create intentional set-level contrast; do not smooth every track into the same BPM.",
+    "vocalPolicy": "Use selected vocal mode. If vocal, define one coherent phonation family and vary performance behavior rather than randomly swapping singer age/weight. If instrumental, remove vocal-positive wording.",
+    "mixPolicy": "Prioritize long-listening clarity, a stable groove appropriate to the use-case, and low listener fatigue. Scene/mood changes must not break the main utility of the playlist.",
+    "structurePolicy": "Use hook/bridge/final appropriate to the selected recipe. For long-use instrumental content, prioritize gradual development and loop compatibility instead of pop-song section forcing.",
+    "hardExcludes": [
+      "real-artist soundalike",
+      "copied melody",
+      "copied lyrics",
+      "contradictory genre stack",
+      "unrequested singer swap"
+    ]
+  },
+  "senior": {
+    "label": "시니어 채널",
+    "audience": "40+ / senior-friendly playlist listeners",
+    "language": "project-defined",
+    "mainGenrePolicy": "Soft old-pop / soul / ballad family; selected recipe supplies the exact main genre.",
+    "bpmPolicy": "Usually 72-96 BPM; keep pulse clear and avoid dragging. Raise tempo rather than stretching vowels when a render feels sleepy.",
+    "vocalPolicy": "Natural mature-but-not-aged lead, clear diction, low listening fatigue, restrained vibrato, no power-belt dependence, no exaggerated rasp.",
+    "mixPolicy": "Warm midrange, controlled highs and sub-bass, clear vocal, gentle dynamics; avoid harsh transient density.",
+    "structurePolicy": "Memorable chorus, meaningful bridge contrast, sustained final payoff; no abrupt early ending.",
+    "hardExcludes": [
+      "shouty hook",
+      "festival EDM",
+      "aggressive trap",
+      "harsh high-end",
+      "excessive melisma",
+      "power-belt climax"
+    ]
+  },
+  "chili_male": {
+    "label": "CHILI LAB 彼のSTORY",
+    "audience": "Japan 20s-30s",
+    "language": "Japanese-dominant with sparse English code-switch",
+    "mainGenrePolicy": "Chill Rap is always the main genre; one secondary tint only.",
+    "bpmPolicy": "Core 92-100 BPM; flagship 96-104; only 1-2 memory tracks may fall near 88-92. Low energy comes from dynamics, not dragged diction.",
+    "vocalPolicy": "HARD LOCK one young-adult Japanese male lead. Channel signature: close-mic speech-forward tenor/light tenor-baritone; warm-light chest core; forward oral resonance; controlled breath 10-20%; subtle dry grain 5-12%; clipped endings; narrow spoken-sung Verse; 45-55% rap-forward; occasional behind-the-beat release.",
+    "mixPolicy": "Soft punchy kick, dry rim/snare, light hats, warm moving bass, intimate vocal distance.",
+    "structurePolicy": "Verse rhythm-first; Chorus more melodic without singer change; Bridge >=2 contrast axes; Anchor Final A+B+C; 8-bar turnaround preferred.",
+    "hardExcludes": [
+      "female lead",
+      "duet",
+      "mixed vocal group",
+      "mature crooner",
+      "deep gravel baritone",
+      "generic polished idol tenor",
+      "repeated R&B scoop",
+      "soul melisma",
+      "long portamento",
+      "falsetto climax",
+      "power belt",
+      "full R&B ballad",
+      "smooth jazz lounge"
+    ]
+  },
+  "chili_female": {
+    "label": "CHILI LAB 彼女のSTORY",
+    "audience": "Japan 20s-30s",
+    "language": "Japanese-dominant with sparse English code-switch",
+    "mainGenrePolicy": "Chill Rap is always the main genre; one secondary tint only.",
+    "bpmPolicy": "Core 94-102 BPM; flagship 100-108; only 1-2 memory tracks may fall near 88-92. Low energy must retain an audible rap pocket.",
+    "vocalPolicy": "HARD LOCK one young-adult Japanese female light mezzo/light mezzo-soprano. Channel signature: close-mic speech-forward supported core; controlled breath 15-30%; subtle dry husky grain 5-15%; bright-forward resonance; thin-to-medium weight; crisp light consonants; clipped endings; Verse 45-60% rap-forward; occasional behind-the-beat release.",
+    "mixPolicy": "Soft punchy kick, dry rim/snare, lightly swung hats, warm syncopated moving bass; intimate but not whispery.",
+    "structurePolicy": "Verse rhythm-first; Chorus brighter and more melodic with same identity; Bridge >=2 contrast axes; Anchor Final A+B+C; same-female restrained self-response only.",
+    "hardExcludes": [
+      "male lead",
+      "male backing vocal",
+      "duet",
+      "mixed vocal group",
+      "mature contralto",
+      "heavy low alto",
+      "breathy pop diva",
+      "whisper-only lead",
+      "R&B scoop",
+      "soul melisma",
+      "long portamento",
+      "anime voice",
+      "idol squeak",
+      "falsetto climax",
+      "power belt",
+      "full R&B ballad",
+      "smooth jazz lounge"
+    ]
+  },
+  "chili_dual": {
+    "label": "CHILI LAB ふたりのSTORY",
+    "audience": "Japan 20s-30s",
+    "language": "English or Japanese according to project brief",
+    "mainGenrePolicy": "Chill Rap first; one secondary tint only.",
+    "bpmPolicy": "Core 92-100 BPM; flagship 96-104; only 1-2 memory tracks near 88-92.",
+    "vocalPolicy": "Exactly two recurring young-adult identities: fixed male speech-forward warm-light chest signature + fixed female supported light-mezzo bright-forward signature. Solos reuse the same identities. Duets alternate 1-2 bar phrases and join only for short title hooks.",
+    "mixPolicy": "Dry backbeat, moving warm bass, compact speech-rhythmic verses; preserve separate vocal spaces.",
+    "structurePolicy": "Male Verse 45-55% rap-forward; Female 48-60%; Chorus 60-75% melodic; duet wall prohibited; Bridge separates voices; Final alternates responses then one short joined line.",
+    "hardExcludes": [
+      "third voice",
+      "mixed choir",
+      "giant duet wall",
+      "long unison singing",
+      "singer identity swap",
+      "mature crooner",
+      "airy whisper female",
+      "power belt",
+      "falsetto climax"
+    ]
+  },
+  "cafe": {
+    "label": "카페 채널",
+    "audience": "playlist / cafe listening",
+    "language": "project-defined",
+    "mainGenrePolicy": "Recipe-selected mellow genre must stay dominant; avoid over-stacking genre tags.",
+    "bpmPolicy": "Usually 78-104 BPM depending on recipe; relaxed but awake.",
+    "vocalPolicy": "Close, natural, low-fatigue vocal; speech clarity over melisma; use an approved recurring voice preset when available.",
+    "mixPolicy": "Warm, uncluttered, long-listening balance; moving bass and clear pocket even when soft.",
+    "structurePolicy": "Hook should be memorable but not shouty; Bridge changes texture/density; Final should sustain rather than spike then end.",
+    "hardExcludes": [
+      "festival EDM",
+      "shouty hook",
+      "dense 808 dominance",
+      "giant vocal stack",
+      "harsh top end"
+    ]
+  },
+  "chanson": {
+    "label": "샹송 채널",
+    "audience": "French/chanson playlist listeners",
+    "language": "French-dominant",
+    "mainGenrePolicy": "French chanson first; secondary color may be acoustic jazz, musette, cafe pop, or restrained cinematic texture.",
+    "bpmPolicy": "Usually 72-98 BPM; maintain forward phrase motion and avoid overly slow crooning across the whole set.",
+    "vocalPolicy": "Natural French diction, intimate narrative delivery, restrained vibrato, clear consonants, no faux-French accent caricature, no constant smoky rasp.",
+    "mixPolicy": "Acoustic-forward: guitar/piano/accordion/strings chosen sparingly; bass movement and natural room prioritized over lush pad walls.",
+    "structurePolicy": "Narrative Verse, singable French hook, bridge perspective shift, warm sustained final resolution.",
+    "hardExcludes": [
+      "English-shaped French stress",
+      "constant smoky rasp",
+      "power-belt climax",
+      "festival EDM",
+      "hard trap",
+      "giant vocal wall"
+    ]
+  },
+  "deep_house": {
+    "label": "딥하우스 채널",
+    "audience": "electronic playlist listeners",
+    "language": "project-defined / instrumental allowed",
+    "mainGenrePolicy": "Deep House first. Secondary tint may be melodic house, organic house, soulful house, or restrained vocal house.",
+    "bpmPolicy": "Usually 116-124 BPM; stable dance pulse. Do not fake energy by excessive loudness.",
+    "vocalPolicy": "If vocal: concise hook-focused lead, controlled range, minimal melisma, production-integrated phrasing. Instrumental mode removes vocal-positive terms.",
+    "mixPolicy": "Four-on-the-floor kick, syncopated bass, restrained percussion, evolving texture, clean breakdown/re-entry, controlled sidechain.",
+    "structurePolicy": "Intro groove -> development -> breakdown/bridge -> clear re-entry -> extended payoff/outro; avoid pop-ballad structure drift.",
+    "hardExcludes": [
+      "festival big-room EDM",
+      "hardstyle",
+      "aggressive dubstep",
+      "shouty pop belt",
+      "static bass",
+      "muddy sub-bass"
+    ]
+  },
+  "lory_custom": {
+    "label": "로리 채널 (사용자 커스텀)",
+    "audience": "defined by imported user directive",
+    "language": "defined by imported user directive",
+    "mainGenrePolicy": "Do not infer a genre from the channel name. Imported user directive and custom master define the music identity.",
+    "bpmPolicy": "Use imported plan unless it conflicts with explicit current master constraints.",
+    "vocalPolicy": "Use imported plan and current custom master. Preserve recurring voice identity when the series requires it.",
+    "mixPolicy": "Use selected genre recipe and user directive.",
+    "structurePolicy": "Use imported story/track plan; apply common Suno QA for hook, bridge, final, runtime and conflicts.",
+    "hardExcludes": []
+  },
+  "custom": {
+    "label": "Custom",
+    "audience": "defined by user directive",
+    "language": "defined by user directive",
+    "mainGenrePolicy": "defined by user directive/master",
+    "bpmPolicy": "defined by user directive/master",
+    "vocalPolicy": "defined by user directive/master",
+    "mixPolicy": "defined by user directive/master",
+    "structurePolicy": "defined by user directive/master",
+    "hardExcludes": []
+  }
+}

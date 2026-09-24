@@ -1,0 +1,31 @@
+{
+  "meta": {
+    "compilerVersion": "string",
+    "channelPreset": "string",
+    "model": "string",
+    "songCount": 15,
+    "sourceDirectiveFingerprint": "string"
+  },
+  "songs": [
+    {
+      "trackNo": 1,
+      "title": "string",
+      "hookPhrase": "string",
+      "BPM": 98,
+      "trackRole": "general|memory|anchor|flagship|custom",
+      "vocalType": "string",
+      "storyPov": "string",
+      "storyAct": 1,
+      "storyActLabel": "string",
+      "listenerSituation": "string",
+      "emotionArc": "string",
+      "distinctChoice": "string",
+      "performanceSignature": "string",
+      "lyrics": "string with \\n line breaks",
+      "stylePrompt": "paste-ready Suno Style field text",
+      "negativeStyleText": "paste-ready Suno Exclude styles text",
+      "moneyChordDesign": "string",
+      "generationRunHint": "string"
+    }
+  ]
+}

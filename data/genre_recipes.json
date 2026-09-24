@@ -1,0 +1,9 @@
+{
+  "auto": {"label":"자동 / 지시문 우선","mainGenre":"AUTO","secondary":"one compatible tint only","tempo":"preset/default","notes":"Compiler does not force a recipe genre."},
+  "chill_rap": {"label":"Chill Rap","mainGenre":"Chill Rap","secondary":"light jazz-hop / lo-fi soul / acoustic soul-hop / soft broken beat / airy 2-step / restrained city-pop","tempo":"88-108","notes":"Speech-rhythmic Verse, dry backbeat, moving bass, melodic hook."},
+  "old_pop_ballad": {"label":"Soft Old Pop Ballad","mainGenre":"Soft Old Pop Ballad","secondary":"soft soul / adult pop / acoustic pop","tempo":"72-92","notes":"Clear melody, low fatigue, warm natural instruments, no dragging."},
+  "soul": {"label":"Soft Soul","mainGenre":"Soft Soul","secondary":"old-pop / acoustic soul / gentle R&B tint","tempo":"74-96","notes":"Warm groove and clear hook; keep melisma restrained."},
+  "cafe_pop": {"label":"Cafe Pop","mainGenre":"Cafe Pop","secondary":"acoustic soul / light jazz-pop / lo-fi pop","tempo":"80-104","notes":"Uncluttered long-listening mix and natural vocals."},
+  "chanson": {"label":"French Chanson","mainGenre":"French Chanson","secondary":"acoustic jazz / musette / cafe pop","tempo":"72-98","notes":"French diction first, narrative phrasing, sparse acoustic arrangement."},
+  "deep_house": {"label":"Deep House","mainGenre":"Deep House","secondary":"melodic house / organic house / soulful house","tempo":"116-124","notes":"Four-on-the-floor, syncopated bass, breakdown and clean re-entry."}
+}

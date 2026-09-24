@@ -1,0 +1,16 @@
+{
+  "updated": "2026-09-23",
+  "sources": [
+    {"name":"YouTube Blog — Ambient channels that help you sleep, relax, and concentrate","date":"2025-12-05","use":"ambient/sleep/focus long-session demand; Soothing Relaxation >4.8B channel views"},
+    {"name":"YouTube Blog — Year on YouTube 2025 Korea","date":"2025","use":"Korean YouTube music/culture context"},
+    {"name":"Melon Magazine — 2025 DJ Playlist data","date":"2026","use":"seasonal Korean ballad playlist preference"},
+    {"name":"KOCCA / 2025 Music Industry White Paper coverage","date":"2026","use":"Korean music platform landscape and YouTube Music growth"},
+    {"name":"PlaylistBoard Japan / Cafe / House rankings","date":"2026-09","use":"recent long-form playlist categories in Japan and cafe/house contexts"},
+    {"name":"Current Japanese YouTube chill/lofi/作業用BGM playlist examples","date":"2026","use":"Japanese chill-pop, R&B, lofi, chill-rap work-BGM positioning"},
+    {"name":"Spotify public playlists — Japan Cafe BGM / Japanese City Pop / K-R&B / Lo-fi","date":"2026 snapshots","use":"persistent category evidence"},
+    {"name":"GitHub mttkllr/suno-field-guide","date":"2026","use":"prompt structure, genre cloud, front-loading, style/lyrics discipline"},
+    {"name":"GitHub junhao-ye/suno-lyrics-skill","date":"2026","use":"separate Lyrics / Style / Exclude / Title fields and quality gate"},
+    {"name":"GitHub Nihondo/suno_create_assistant","date":"2026","use":"saved style/preset, 1000-char guard, key/tempo and take-history UX ideas"},
+    {"name":"GitHub ddv1982/suno-prompting","date":"2026","use":"structured prompt-app architecture and reusable prompt recipes"}
+  ]
+}

@@ -1,0 +1,685 @@
+{
+  "methodology": {
+    "version": "2026-09-23",
+    "note": "Scores are heuristic market-opportunity proxies, not revenue guarantees. They combine current playlist/use-case evidence, long-session suitability, repeatability, AI-generation fit, and competition intensity.",
+    "scoreScale": "1-10",
+    "weightsDefault": {
+      "demand": 0.28,
+      "repeatability": 0.22,
+      "monetizationProxy": 0.18,
+      "aiFit": 0.17,
+      "opportunity": 0.15
+    }
+  },
+  "markets": {
+    "KR": {
+      "label": "한국",
+      "defaultLanguage": "Korean",
+      "platformNote": "YouTube/YouTube Music + Melon/Genie/FLO ecosystem"
+    },
+    "JP": {
+      "label": "일본",
+      "defaultLanguage": "Japanese",
+      "platformNote": "YouTube/YouTube Music + Spotify/Apple Music/LINE MUSIC/Amazon ecosystem"
+    },
+    "GLOBAL": {
+      "label": "글로벌",
+      "defaultLanguage": "English",
+      "platformNote": "YouTube + Spotify/Apple Music oriented"
+    }
+  },
+  "useCases": {
+    "revenue_balance": "수익/성장 균형",
+    "long_watch": "긴 시청시간/플레이리스트",
+    "discovery": "신규 유입/클릭",
+    "low_competition": "상대적 틈새",
+    "senior": "중장년/시니어",
+    "cafe_store": "카페/매장",
+    "focus_work": "공부/작업",
+    "sleep": "수면/힐링",
+    "drive": "드라이브/야간",
+    "vocal_story": "보컬 스토리형",
+    "streaming_release": "음원 발매/스트리밍"
+  },
+  "recipes": [
+    {
+      "id": "kr_seasonal_ballad_softpop",
+      "label": "KR 계절 감성 발라드 / Soft Pop",
+      "markets": [
+        "KR"
+      ],
+      "useCases": [
+        "revenue_balance",
+        "discovery",
+        "vocal_story",
+        "streaming_release",
+        "senior"
+      ],
+      "vocalMode": "vocal",
+      "languages": [
+        "Korean",
+        "English"
+      ],
+      "demand": 9.2,
+      "repeatability": 8.2,
+      "competitionIntensity": 9.0,
+      "aiFit": 8.2,
+      "monetizationProxy": 8.5,
+      "bpmRange": [
+        68,
+        96
+      ],
+      "genreFamily": "Ballad / Soft Pop / Acoustic Soul",
+      "styleBlueprint": "seasonal emotional soft-pop or ballad; warm piano/acoustic guitar; restrained drums; clear memorable hook; mature natural vocal; bridge contrast; fuller final without power-belt excess",
+      "lyricBlueprint": "concrete seasonal memory, everyday scene, restrained emotion, simple singable Korean, one strong callback hook",
+      "excludeCore": [
+        "over-singing",
+        "idol squeak",
+        "festival EDM",
+        "hard trap",
+        "excessive melisma"
+      ],
+      "marketRationale": "Korean playlist/editorial behavior repeatedly favors seasonal emotional ballad themes; broad age reach but high competition.",
+      "risk": "Very competitive. Thumbnail/title/theme differentiation matters as much as music quality."
+    },
+    {
+      "id": "kr_7080_original_oldpop",
+      "label": "KR 7080 감성 Original Old Pop",
+      "markets": [
+        "KR"
+      ],
+      "useCases": [
+        "revenue_balance",
+        "long_watch",
+        "senior",
+        "cafe_store",
+        "streaming_release"
+      ],
+      "vocalMode": "vocal",
+      "languages": [
+        "English",
+        "Korean"
+      ],
+      "demand": 8.2,
+      "repeatability": 9.3,
+      "competitionIntensity": 7.4,
+      "aiFit": 8.5,
+      "monetizationProxy": 9.0,
+      "bpmRange": [
+        70,
+        104
+      ],
+      "genreFamily": "70s/80s-inspired Soft Pop / Soft Rock / Soul Pop",
+      "styleBlueprint": "original nostalgic soft pop with warm electric piano, clean guitar, gentle bass, restrained analog-era drum character, easy chorus, comfortable mid-register vocal",
+      "lyricBlueprint": "memory, old radio, family, hometown, autumn, first snow, letters, coffee, train, ordinary love; avoid copying known oldies lyrics or melodies",
+      "excludeCore": [
+        "famous-song imitation",
+        "arena rock belt",
+        "modern hyperpop",
+        "hard EDM",
+        "over-bright mastering"
+      ],
+      "marketRationale": "Active Korean YouTube channels and recent uploads continue targeting 7080 nostalgia, cafe listening, rest and long-session playback.",
+      "risk": "Must remain original; nostalgia is a mood/era trait, not imitation of specific legacy songs."
+    },
+    {
+      "id": "kr_cafe_jazz_bossa",
+      "label": "KR 카페 재즈 / Bossa / Cozy Instrumental",
+      "markets": [
+        "KR",
+        "GLOBAL"
+      ],
+      "useCases": [
+        "revenue_balance",
+        "long_watch",
+        "cafe_store",
+        "focus_work",
+        "low_competition"
+      ],
+      "vocalMode": "instrumental_or_light_vocal",
+      "languages": [
+        "Instrumental",
+        "English",
+        "Korean"
+      ],
+      "demand": 8.3,
+      "repeatability": 9.6,
+      "competitionIntensity": 7.8,
+      "aiFit": 9.5,
+      "monetizationProxy": 9.2,
+      "bpmRange": [
+        72,
+        118
+      ],
+      "genreFamily": "Cafe Jazz / Bossa Nova / Soft Swing / Lounge",
+      "styleBlueprint": "warm piano, brushed drums, upright or rounded electric bass, clean jazz guitar, light bossa pulse, consistent low-fatigue dynamics",
+      "lyricBlueprint": "instrumental preferred; if vocal, sparse non-distracting lines and short hooks",
+      "excludeCore": [
+        "virtuoso soloing",
+        "harsh brass",
+        "big-band wall",
+        "aggressive swing",
+        "vocal belting"
+      ],
+      "marketRationale": "Cafe/restaurant/work BGM is an evergreen long-session use case and playlist boards continue to feature multi-hour jazz/cafe mixes.",
+      "risk": "High supply; visual brand, seasonality and consistent audio quality are key."
+    },
+    {
+      "id": "kr_chill_rnb_neosoul",
+      "label": "KR Chill R&B / Neo-Soul / Mellow Hip-Hop",
+      "markets": [
+        "KR",
+        "GLOBAL"
+      ],
+      "useCases": [
+        "revenue_balance",
+        "discovery",
+        "drive",
+        "vocal_story",
+        "streaming_release"
+      ],
+      "vocalMode": "vocal",
+      "languages": [
+        "Korean",
+        "English"
+      ],
+      "demand": 8.4,
+      "repeatability": 8.7,
+      "competitionIntensity": 8.1,
+      "aiFit": 8.4,
+      "monetizationProxy": 8.2,
+      "bpmRange": [
+        82,
+        108
+      ],
+      "genreFamily": "Chill R&B / Neo-Soul / Mellow Hip-Hop",
+      "styleBlueprint": "dry modern pocket, warm moving bass, Rhodes, restrained guitar, speech-rhythmic verse, melodic compact hook, intimate supported vocal",
+      "lyricBlueprint": "urban everyday scenes, conversational intimacy, compact verse phrases, emotionally specific hooks",
+      "excludeCore": [
+        "full R&B ballad",
+        "diva melisma",
+        "hard trap",
+        "drill",
+        "generic idol chorus"
+      ],
+      "marketRationale": "Current Korean R&B/Soul charts and chill-R&B playlist ecosystems show durable demand.",
+      "risk": "Generic AI R&B is common; vocal phrasing identity is essential."
+    },
+    {
+      "id": "kr_focus_lofi_jazzhop",
+      "label": "Universal Focus Lo-fi Jazzhop / Study Beats",
+      "markets": [
+        "KR",
+        "JP",
+        "GLOBAL"
+      ],
+      "useCases": [
+        "long_watch",
+        "focus_work",
+        "cafe_store",
+        "low_competition"
+      ],
+      "vocalMode": "instrumental",
+      "languages": [
+        "Instrumental"
+      ],
+      "demand": 8.0,
+      "repeatability": 9.8,
+      "competitionIntensity": 8.5,
+      "aiFit": 9.6,
+      "monetizationProxy": 8.7,
+      "bpmRange": [
+        68,
+        92
+      ],
+      "genreFamily": "Lo-fi Hip-Hop / Jazzhop / Study Beats",
+      "styleBlueprint": "steady low-distraction beat, soft jazz chords, muted drums, warm bass, minimal melodic motifs, no sudden transitions, long-loop compatibility",
+      "lyricBlueprint": "instrumental only",
+      "excludeCore": [
+        "lead vocal",
+        "big drops",
+        "bright EDM risers",
+        "busy solos",
+        "dramatic modulation"
+      ],
+      "marketRationale": "Study/focus lo-fi remains an established cross-market use case with strong repeat-session behavior.",
+      "risk": "Very competitive globally; localization and visual identity help."
+    },
+    {
+      "id": "kr_sleep_healing_ambient",
+      "label": "KR 수면 / Healing Piano / Ambient",
+      "markets": [
+        "KR",
+        "GLOBAL"
+      ],
+      "useCases": [
+        "revenue_balance",
+        "long_watch",
+        "sleep",
+        "focus_work"
+      ],
+      "vocalMode": "instrumental",
+      "languages": [
+        "Instrumental"
+      ],
+      "demand": 9.1,
+      "repeatability": 10.0,
+      "competitionIntensity": 8.2,
+      "aiFit": 9.8,
+      "monetizationProxy": 9.4,
+      "bpmRange": [
+        40,
+        76
+      ],
+      "genreFamily": "Ambient / Healing Piano / Sleep Music",
+      "styleBlueprint": "very soft piano or pads, slow harmonic rhythm, low transient density, stable dynamics, natural ambience or water/rain texture, no startling peaks",
+      "lyricBlueprint": "instrumental only",
+      "excludeCore": [
+        "lead vocal",
+        "strong kick",
+        "sharp transient",
+        "dramatic climax",
+        "sudden silence"
+      ],
+      "marketRationale": "YouTube explicitly identifies ambient channels for sleep, relaxation and concentration as massive long-session content; leading channels have billions of views.",
+      "risk": "Medical/health claims should be avoided; market is large but crowded."
+    },
+    {
+      "id": "kr_deephouse_lounge_drive",
+      "label": "KR Deep House / Lounge / Night Drive",
+      "markets": [
+        "KR",
+        "GLOBAL"
+      ],
+      "useCases": [
+        "revenue_balance",
+        "long_watch",
+        "drive",
+        "cafe_store",
+        "streaming_release"
+      ],
+      "vocalMode": "instrumental_or_light_vocal",
+      "languages": [
+        "English",
+        "Instrumental"
+      ],
+      "demand": 7.8,
+      "repeatability": 9.0,
+      "competitionIntensity": 8.0,
+      "aiFit": 9.2,
+      "monetizationProxy": 8.6,
+      "bpmRange": [
+        112,
+        124
+      ],
+      "genreFamily": "Deep House / Melodic House / Lounge",
+      "styleBlueprint": "four-on-the-floor, warm sidechained bass, restrained synth plucks, airy pads, polished lounge groove, no festival drop, smooth breakdown/re-entry",
+      "lyricBlueprint": "if vocal, sparse English hook lines with large instrumental space",
+      "excludeCore": [
+        "festival EDM",
+        "big-room drop",
+        "hard techno",
+        "screamed vocal",
+        "over-compressed master"
+      ],
+      "marketRationale": "Current playlist boards and long mixes continue to show deep-house/luxury/night-drive demand across cafe, drive and background contexts.",
+      "risk": "Global competition is strong; mood packaging and visual branding are crucial."
+    },
+    {
+      "id": "jp_chillpop_workbgm",
+      "label": "JP Japanese Chill Pop / R&B 作業用BGM",
+      "markets": [
+        "JP"
+      ],
+      "useCases": [
+        "revenue_balance",
+        "long_watch",
+        "focus_work",
+        "discovery",
+        "vocal_story",
+        "streaming_release"
+      ],
+      "vocalMode": "vocal",
+      "languages": [
+        "Japanese"
+      ],
+      "demand": 9.2,
+      "repeatability": 9.2,
+      "competitionIntensity": 8.4,
+      "aiFit": 8.8,
+      "monetizationProxy": 9.0,
+      "bpmRange": [
+        86,
+        108
+      ],
+      "genreFamily": "Japanese Chill Pop / Mellow R&B / Lo-fi Pop",
+      "styleBlueprint": "Japanese chill-pop first, mellow R&B tint, conversational native phrasing, compact verse, clean modern rhythm section, melodic but restrained chorus",
+      "lyricBlueprint": "native contemporary Japanese, concrete room/train/night/cafe/work scenes, restrained emotional language, searchable short hook",
+      "excludeCore": [
+        "English-shaped Japanese stress",
+        "anime squeak",
+        "diva melisma",
+        "full R&B ballad",
+        "K-pop power chorus"
+      ],
+      "marketRationale": "Recent Japanese YouTube playlist examples explicitly package chill pop/R&B/lofi as 作業用BGM, sleep and night listening, including videos with substantial view counts.",
+      "risk": "Japanese naturalness and title packaging matter; generic translated lyrics underperform."
+    },
+    {
+      "id": "jp_chillrap_neosoul",
+      "label": "JP Chill Rap / Neo-Soul / Tokyo Night",
+      "markets": [
+        "JP"
+      ],
+      "useCases": [
+        "revenue_balance",
+        "discovery",
+        "drive",
+        "vocal_story",
+        "streaming_release"
+      ],
+      "vocalMode": "vocal",
+      "languages": [
+        "Japanese",
+        "English"
+      ],
+      "demand": 8.6,
+      "repeatability": 8.7,
+      "competitionIntensity": 7.5,
+      "aiFit": 8.5,
+      "monetizationProxy": 8.5,
+      "bpmRange": [
+        90,
+        104
+      ],
+      "genreFamily": "Chill Rap / Neo-Soul / Jazz Rap",
+      "styleBlueprint": "speech-forward Japanese chill rap, dry rim, moving bass, Rhodes or clean guitar, rhythmic verse, compact melodic hook, close supported vocal",
+      "lyricBlueprint": "short mora phrases, urban relationship micro-scenes, conversational first-person, active rap pocket, controlled code-switch",
+      "excludeCore": [
+        "generic idol tenor",
+        "airy pop diva",
+        "full R&B ballad",
+        "hard trap",
+        "drill",
+        "long melisma"
+      ],
+      "marketRationale": "Current Japanese playlist uploads use 日本語ラップ/チルラップ/作業用BGM/lofi/neosoul positioning, indicating a real but more focused audience than broad chill-pop.",
+      "risk": "Requires strong vocal phrasing identity to avoid generic AI rap-pop."
+    },
+    {
+      "id": "jp_cafe_jazz_bossa",
+      "label": "JP Cafe Jazz / Bossa / 作業用BGM",
+      "markets": [
+        "JP",
+        "GLOBAL"
+      ],
+      "useCases": [
+        "revenue_balance",
+        "long_watch",
+        "cafe_store",
+        "focus_work",
+        "low_competition"
+      ],
+      "vocalMode": "instrumental_or_light_vocal",
+      "languages": [
+        "Instrumental",
+        "Japanese",
+        "English"
+      ],
+      "demand": 9.0,
+      "repeatability": 9.8,
+      "competitionIntensity": 7.8,
+      "aiFit": 9.5,
+      "monetizationProxy": 9.3,
+      "bpmRange": [
+        72,
+        118
+      ],
+      "genreFamily": "Cafe Jazz / Bossa Nova / Lounge",
+      "styleBlueprint": "warm piano, brushed kit, upright bass, soft jazz guitar, bossa pulse, smooth room tone, low-fatigue long-play arrangement",
+      "lyricBlueprint": "instrumental preferred; if vocal, sparse and unobtrusive",
+      "excludeCore": [
+        "big-band wall",
+        "busy solo",
+        "harsh brass",
+        "power vocal",
+        "festival dynamics"
+      ],
+      "marketRationale": "作業用・勉強用 jazz BGM remains a recurring Japanese playlist category and Spotify carries Japan Cafe BGM style playlists.",
+      "risk": "Competition is high but long-session utility is excellent."
+    },
+    {
+      "id": "jp_sleep_healing_piano",
+      "label": "JP 睡眠用BGM / Healing Piano / Ambient",
+      "markets": [
+        "JP"
+      ],
+      "useCases": [
+        "revenue_balance",
+        "long_watch",
+        "sleep",
+        "focus_work"
+      ],
+      "vocalMode": "instrumental",
+      "languages": [
+        "Instrumental"
+      ],
+      "demand": 9.6,
+      "repeatability": 10.0,
+      "competitionIntensity": 8.2,
+      "aiFit": 9.9,
+      "monetizationProxy": 9.5,
+      "bpmRange": [
+        38,
+        72
+      ],
+      "genreFamily": "Sleep BGM / Healing Piano / Ambient",
+      "styleBlueprint": "gentle piano, soft pads, low-frequency warmth, optional rain/water/forest ambience, extremely stable dynamics, no abrupt changes",
+      "lyricBlueprint": "instrumental only",
+      "excludeCore": [
+        "lead vocal",
+        "strong percussion",
+        "sudden peak",
+        "bright transient",
+        "dramatic cadence"
+      ],
+      "marketRationale": "Japanese playlist rankings feature multi-hour 睡眠用BGM, while dedicated sleep channels show large cumulative view counts.",
+      "risk": "Avoid unsubstantiated health/medical claims in titles and descriptions."
+    },
+    {
+      "id": "jp_citypop_retro_night",
+      "label": "JP City Pop / Retro Night Drive",
+      "markets": [
+        "JP",
+        "GLOBAL"
+      ],
+      "useCases": [
+        "revenue_balance",
+        "drive",
+        "cafe_store",
+        "streaming_release",
+        "discovery"
+      ],
+      "vocalMode": "vocal_or_instrumental",
+      "languages": [
+        "Japanese",
+        "English",
+        "Instrumental"
+      ],
+      "demand": 8.1,
+      "repeatability": 8.8,
+      "competitionIntensity": 8.8,
+      "aiFit": 9.0,
+      "monetizationProxy": 8.4,
+      "bpmRange": [
+        90,
+        122
+      ],
+      "genreFamily": "City Pop / Retro Pop / Funk-Pop",
+      "styleBlueprint": "original city-pop-inspired groove, clean guitar, electric piano, rounded bass, restrained brass/synth accents, night-drive polish, modern clean master",
+      "lyricBlueprint": "urban night, train, bay road, convenience store, summer rain, late call; original hooks only",
+      "excludeCore": [
+        "specific 80s song imitation",
+        "copying melody",
+        "overdone cassette degradation",
+        "idol squeak",
+        "EDM drop"
+      ],
+      "marketRationale": "City-pop remains an evergreen Japanese/overseas nostalgia category used for drive, cafe and work playlists, though current competition is substantial.",
+      "risk": "Avoid famous-artist soundalikes and direct retro-song mimicry."
+    },
+    {
+      "id": "jp_deephouse_lounge",
+      "label": "JP Deep House / Luxury Lounge / Night Drive",
+      "markets": [
+        "JP",
+        "GLOBAL"
+      ],
+      "useCases": [
+        "revenue_balance",
+        "long_watch",
+        "drive",
+        "cafe_store",
+        "focus_work"
+      ],
+      "vocalMode": "instrumental_or_light_vocal",
+      "languages": [
+        "English",
+        "Instrumental"
+      ],
+      "demand": 8.0,
+      "repeatability": 9.2,
+      "competitionIntensity": 8.0,
+      "aiFit": 9.3,
+      "monetizationProxy": 8.7,
+      "bpmRange": [
+        112,
+        124
+      ],
+      "genreFamily": "Deep House / Lounge / Melodic House",
+      "styleBlueprint": "clean deep-house groove, soft sidechain, warm sub-bass, minimal pluck, airy pads, elegant breakdown, smooth re-entry, long-mix continuity",
+      "lyricBlueprint": "instrumental or sparse English hook only",
+      "excludeCore": [
+        "big room",
+        "hard techno",
+        "festival drop",
+        "busy vocal",
+        "harsh limiter"
+      ],
+      "marketRationale": "Japanese playlist/ranking pages currently include deep-house and night-drive mixes as long background listening.",
+      "risk": "Needs strong visual/mood positioning to stand out."
+    },
+    {
+      "id": "jp_showa_inspired_original",
+      "label": "JP Showa-inspired Original Pop / Kayokyoku",
+      "markets": [
+        "JP"
+      ],
+      "useCases": [
+        "senior",
+        "revenue_balance",
+        "streaming_release",
+        "low_competition"
+      ],
+      "vocalMode": "vocal",
+      "languages": [
+        "Japanese"
+      ],
+      "demand": 7.6,
+      "repeatability": 8.4,
+      "competitionIntensity": 6.8,
+      "aiFit": 7.8,
+      "monetizationProxy": 8.1,
+      "bpmRange": [
+        68,
+        116
+      ],
+      "genreFamily": "Showa-inspired Pop / Kayokyoku / Soft Folk-Pop",
+      "styleBlueprint": "original retro Japanese pop with clear melody, acoustic/electric guitar, piano, modest strings or brass, comfortable vocal register, modern-clean rather than copied vintage recording",
+      "lyricBlueprint": "station, harbor, letter, season, hometown, ordinary adult love; concise natural Japanese",
+      "excludeCore": [
+        "famous Showa artist imitation",
+        "copied melody",
+        "extreme vibrato caricature",
+        "idol anime tone"
+      ],
+      "marketRationale": "昭和歌謡 continues to have cross-generational nostalgia interest, including younger-listener curation and live event activity.",
+      "risk": "Niche and nostalgia-driven; originality is mandatory."
+    },
+    {
+      "id": "jp_acoustic_jpop_story",
+      "label": "JP Acoustic J-Pop / Singer-Songwriter Story",
+      "markets": [
+        "JP"
+      ],
+      "useCases": [
+        "vocal_story",
+        "streaming_release",
+        "discovery",
+        "revenue_balance"
+      ],
+      "vocalMode": "vocal",
+      "languages": [
+        "Japanese"
+      ],
+      "demand": 8.2,
+      "repeatability": 7.7,
+      "competitionIntensity": 9.0,
+      "aiFit": 8.3,
+      "monetizationProxy": 7.8,
+      "bpmRange": [
+        72,
+        112
+      ],
+      "genreFamily": "Acoustic J-Pop / Singer-Songwriter / Indie Pop",
+      "styleBlueprint": "acoustic or clean-electric core, modest drums, intimate native vocal, strong verse-to-chorus lyric payoff, memorable title hook",
+      "lyricBlueprint": "specific contemporary Japanese scenes, restrained first-person storytelling, simple chorus phrase, no translationese",
+      "excludeCore": [
+        "generic anime opening",
+        "idol squeak",
+        "power-belt chorus",
+        "over-orchestration"
+      ],
+      "marketRationale": "Broad Japanese listening demand but high competition; strongest when narrative and vocal identity are distinctive.",
+      "risk": "High competition and higher dependence on lyric quality."
+    },
+    {
+      "id": "global_chanson_cafe",
+      "label": "Global French Chanson / Paris Cafe",
+      "markets": [
+        "GLOBAL",
+        "KR",
+        "JP"
+      ],
+      "useCases": [
+        "cafe_store",
+        "low_competition",
+        "streaming_release"
+      ],
+      "vocalMode": "vocal",
+      "languages": [
+        "French"
+      ],
+      "demand": 6.8,
+      "repeatability": 8.3,
+      "competitionIntensity": 5.8,
+      "aiFit": 7.8,
+      "monetizationProxy": 7.4,
+      "bpmRange": [
+        70,
+        112
+      ],
+      "genreFamily": "French Chanson / Cafe Pop / Musette-tinted Pop",
+      "styleBlueprint": "French chanson first, warm piano/acoustic guitar, optional accordion used sparingly, conversational French vocal, elegant restrained rhythm section",
+      "lyricBlueprint": "Parisian everyday detail, autumn cafe, station, river, letter, understated romance; native French phrasing",
+      "excludeCore": [
+        "cabaret caricature",
+        "over-accordion",
+        "operatic belt",
+        "famous chanson imitation"
+      ],
+      "marketRationale": "Smaller but differentiated cafe/European-aesthetic niche with lower competition than generic lo-fi or ballad.",
+      "risk": "Smaller addressable audience; language quality matters."
+    }
+  ]
+}

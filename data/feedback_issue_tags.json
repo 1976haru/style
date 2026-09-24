@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "tags": [
+    {"id":"generic_vocal","label":"기본 Suno 보컬"},
+    {"id":"vocal_identity_shift","label":"곡/섹션 중 보컬 정체성 변함"},
+    {"id":"too_airy","label":"너무 airy/whisper"},
+    {"id":"too_rnb","label":"R&B/발라드 쪽으로 쏠림"},
+    {"id":"rap_weak","label":"랩/말붙임 부족"},
+    {"id":"rap_too_hard","label":"랩이 너무 강함"},
+    {"id":"too_slow","label":"너무 느림"},
+    {"id":"too_fast","label":"너무 빠름"},
+    {"id":"hook_weak","label":"훅 약함"},
+    {"id":"bridge_weak","label":"브릿지 약함"},
+    {"id":"final_weak","label":"파이널 약함"},
+    {"id":"early_ending","label":"조기 종료"},
+    {"id":"wrong_gender","label":"성별 오류"},
+    {"id":"wrong_language","label":"언어/발음 오류"},
+    {"id":"prompt_ignored","label":"프롬프트 준수 부족"},
+    {"id":"structure_drift","label":"구조 이탈"},
+    {"id":"lyrics_awkward","label":"가사 어색함"},
+    {"id":"other","label":"기타"}
+  ]
+}

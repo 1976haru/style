@@ -1,0 +1,538 @@
+{
+  "compilerVersion": "0.4.0",
+  "mode": "HYBRID",
+  "model": "v6",
+  "market": "JP",
+  "goal": "vocal_story",
+  "songCount": 15,
+  "outputMode": "full_pack",
+  "presetId": "chili_male",
+  "presetLabel": "CHILI LAB 彼のSTORY",
+  "legacyRecipe": "자동 / 지시문 우선",
+  "marketRecipeId": "jp_chillpop_workbgm",
+  "marketRecipeLabel": "JP Japanese Chill Pop / R&B 作業用BGM",
+  "marketScore": 8.02,
+  "parsedDirective": {
+    "fingerprint": "113d71ae33676f3b",
+    "raw_length": 16630,
+    "episode_id": "001",
+    "concept": "窓ぎわの君が気になった",
+    "story_pov": "male",
+    "language": "Japanese",
+    "song_count": 15,
+    "detected_bpms": [
+      64,
+      74,
+      76,
+      77,
+      78,
+      82,
+      84,
+      87,
+      89,
+      97
+    ],
+    "detected_vocal_terms": [
+      "baritone",
+      "tenor",
+      "whisper"
+    ],
+    "detected_model_versions": [],
+    "has_already_used_lists": false,
+    "has_track_plan": true,
+    "likely_json": false,
+    "raw_json": null
+  },
+  "referenceDNA": {},
+  "referenceOwnership": "external",
+  "structuredTrackPlan": [
+    {
+      "trackNo": 1,
+      "locks": {
+        "story": true,
+        "scene": true,
+        "title": true,
+        "hook": true
+      },
+      "title": "Title 1",
+      "hookPhrase": "Hook 1",
+      "storyAct": "",
+      "storyActLabel": "Act 1 / story beat 1",
+      "storyArcRole": "Act 1 / story beat 1 - his first-person interpretation - vocal=male - title=\"Title 1\" - hook=\"Hook 1\"",
+      "listenerSituation": "같은 기차 안에서 장면 1를 떠올린다.",
+      "emotionArc": "감정 전환 1",
+      "BPM": 96,
+      "genre": "Chill Rap / Mellow Boom-Bap tint",
+      "vocal": "one recurring young-adult Japanese male; speech-forward tenor/light tenor-baritone; warm-light chest; forward oral resonance; breath 10-20%; dry grain 5-12%; clipped endings; Verse 45-55% rap-forward",
+      "musicRole": "Core",
+      "structure": "Verse rhythm-first → Pre/Turn → melodic Chorus → 8-bar turnaround → Bridge >=2 axes → Pre-Final → Final A+B",
+      "performanceSignature": "dry immediate pickup; one delayed keyword landing; compact clipped endings"
+    },
+    {
+      "trackNo": 2,
+      "locks": {
+        "story": true,
+        "scene": true,
+        "title": true,
+        "hook": true
+      },
+      "title": "Title 2",
+      "hookPhrase": "Hook 2",
+      "storyAct": "",
+      "storyActLabel": "Act 1 / story beat 2",
+      "storyArcRole": "Act 1 / story beat 2 - his first-person interpretation - vocal=male - title=\"Title 2\" - hook=\"Hook 2\"",
+      "listenerSituation": "같은 기차 안에서 장면 2를 떠올린다.",
+      "emotionArc": "감정 전환 2",
+      "BPM": 104,
+      "genre": "Chill Rap / Lo-fi Hip-Hop Study tint",
+      "vocal": "one recurring young-adult Japanese male; speech-forward tenor/light tenor-baritone; warm-light chest; forward oral resonance; breath 10-20%; dry grain 5-12%; clipped endings; Verse 45-55% rap-forward",
+      "musicRole": "Anchor",
+      "structure": "Verse rhythm-first → Pre/Turn → Chorus → 8-bar turnaround → Bridge >=3 audible contrast axes → Pre-Final → Final A + Final B + Post C; no early end",
+      "performanceSignature": "quick off-beat pickup; one-beat micro-rest before hook; same-voice melodic opening only in Chorus"
+    },
+    {
+      "trackNo": 3,
+      "locks": {
+        "story": true,
+        "scene": true,
+        "title": true,
+        "hook": true
+      },
+      "title": "Title 3",
+      "hookPhrase": "Hook 3",
+      "storyAct": "",
+      "storyActLabel": "Act 1 / story beat 3",
+      "storyArcRole": "Act 1 / story beat 3 - his first-person interpretation - vocal=male - title=\"Title 3\" - hook=\"Hook 3\"",
+      "listenerSituation": "같은 기차 안에서 장면 3를 떠올린다.",
+      "emotionArc": "감정 전환 3",
+      "BPM": 98,
+      "genre": "Chill Rap / Japanese Chill Pop tint",
+      "vocal": "one recurring young-adult Japanese male; speech-forward tenor/light tenor-baritone; warm-light chest; forward oral resonance; breath 10-20%; dry grain 5-12%; clipped endings; Verse 45-55% rap-forward",
+      "musicRole": "Core",
+      "structure": "Verse rhythm-first → Pre/Turn → melodic Chorus → 8-bar turnaround → Bridge >=2 axes → Pre-Final → Final A+B",
+      "performanceSignature": "2-bar speech-rhythmic burst; slight behind-the-beat release; narrow Verse pitch"
+    },
+    {
+      "trackNo": 4,
+      "locks": {
+        "story": true,
+        "scene": true,
+        "title": true,
+        "hook": true
+      },
+      "title": "Title 4",
+      "hookPhrase": "Hook 4",
+      "storyAct": "",
+      "storyActLabel": "Act 2 / story beat 4",
+      "storyArcRole": "Act 2 / story beat 4 - his first-person interpretation - vocal=male - title=\"Title 4\" - hook=\"Hook 4\"",
+      "listenerSituation": "같은 기차 안에서 장면 4를 떠올린다.",
+      "emotionArc": "감정 전환 4",
+      "BPM": 96,
+      "genre": "Chill Rap / Jazz Rap tint",
+      "vocal": "one recurring young-adult Japanese male; speech-forward tenor/light tenor-baritone; warm-light chest; forward oral resonance; breath 10-20%; dry grain 5-12%; clipped endings; Verse 45-55% rap-forward",
+      "musicRole": "Core",
+      "structure": "Verse rhythm-first → Pre/Turn → melodic Chorus → 8-bar turnaround → Bridge >=2 axes → Pre-Final → Final A+B",
+      "performanceSignature": "stop-start cadence with two deliberate micro-rests; clean supported hook entry"
+    },
+    {
+      "trackNo": 5,
+      "locks": {
+        "story": true,
+        "scene": true,
+        "title": true,
+        "hook": true
+      },
+      "title": "Title 5",
+      "hookPhrase": "Hook 5",
+      "storyAct": "",
+      "storyActLabel": "Act 2 / story beat 5",
+      "storyArcRole": "Act 2 / story beat 5 - his first-person interpretation - vocal=male - title=\"Title 5\" - hook=\"Hook 5\"",
+      "listenerSituation": "같은 기차 안에서 장면 5를 떠올린다.",
+      "emotionArc": "감정 전환 5",
+      "BPM": 98,
+      "genre": "Chill Rap / Trap-Soul tint",
+      "vocal": "one recurring young-adult Japanese male; speech-forward tenor/light tenor-baritone; warm-light chest; forward oral resonance; breath 10-20%; dry grain 5-12%; clipped endings; Verse 45-55% rap-forward",
+      "musicRole": "Core",
+      "structure": "Verse rhythm-first → Pre/Turn → melodic Chorus → 8-bar turnaround → Bridge >=2 axes → Pre-Final → Final A+B",
+      "performanceSignature": "late phrase endings; low Verse intensity; Chorus widens one step without singer change"
+    },
+    {
+      "trackNo": 6,
+      "locks": {
+        "story": true,
+        "scene": true,
+        "title": true,
+        "hook": true
+      },
+      "title": "Title 6",
+      "hookPhrase": "Hook 6",
+      "storyAct": "",
+      "storyActLabel": "Act 2 / story beat 6",
+      "storyArcRole": "Act 2 / story beat 6 - his first-person interpretation - vocal=male - title=\"Title 6\" - hook=\"Hook 6\"",
+      "listenerSituation": "같은 기차 안에서 장면 6를 떠올린다.",
+      "emotionArc": "감정 전환 6",
+      "BPM": 98,
+      "genre": "Chill Rap / Mellow Boom-Bap tint",
+      "vocal": "one recurring young-adult Japanese male; speech-forward tenor/light tenor-baritone; warm-light chest; forward oral resonance; breath 10-20%; dry grain 5-12%; clipped endings; Verse 45-55% rap-forward",
+      "musicRole": "Core",
+      "structure": "Verse rhythm-first → Pre/Turn → melodic Chorus → 8-bar turnaround → Bridge >=2 axes → Pre-Final → Final A+B",
+      "performanceSignature": "brisk syncopated chain; short answer phrases; dry consonant release"
+    },
+    {
+      "trackNo": 7,
+      "locks": {
+        "story": true,
+        "scene": true,
+        "title": true,
+        "hook": true
+      },
+      "title": "Title 7",
+      "hookPhrase": "Hook 7",
+      "storyAct": "",
+      "storyActLabel": "Act 3 / story beat 7",
+      "storyArcRole": "Act 3 / story beat 7 - his first-person interpretation - vocal=male - title=\"Title 7\" - hook=\"Hook 7\"",
+      "listenerSituation": "같은 기차 안에서 장면 7를 떠올린다.",
+      "emotionArc": "감정 전환 7",
+      "BPM": 96,
+      "genre": "Chill Rap / Lo-fi Hip-Hop Study tint",
+      "vocal": "one recurring young-adult Japanese male; speech-forward tenor/light tenor-baritone; warm-light chest; forward oral resonance; breath 10-20%; dry grain 5-12%; clipped endings; Verse 45-55% rap-forward",
+      "musicRole": "Core",
+      "structure": "Verse rhythm-first → Pre/Turn → melodic Chorus → 8-bar turnaround → Bridge >=2 axes → Pre-Final → Final A+B",
+      "performanceSignature": "playful off-beat attack; clipped refrain endings; no scoop-in"
+    },
+    {
+      "trackNo": 8,
+      "locks": {
+        "story": true,
+        "scene": true,
+        "title": true,
+        "hook": true
+      },
+      "title": "Title 8",
+      "hookPhrase": "Hook 8",
+      "storyAct": "",
+      "storyActLabel": "Act 3 / story beat 8",
+      "storyArcRole": "Act 3 / story beat 8 - his first-person interpretation - vocal=male - title=\"Title 8\" - hook=\"Hook 8\"",
+      "listenerSituation": "같은 기차 안에서 장면 8를 떠올린다.",
+      "emotionArc": "감정 전환 8",
+      "BPM": 96,
+      "genre": "Chill Rap / Japanese Chill Pop tint",
+      "vocal": "one recurring young-adult Japanese male; speech-forward tenor/light tenor-baritone; warm-light chest; forward oral resonance; breath 10-20%; dry grain 5-12%; clipped endings; Verse 45-55% rap-forward",
+      "musicRole": "Core",
+      "structure": "Verse rhythm-first → Pre/Turn → melodic Chorus → 8-bar turnaround → Bridge >=2 axes → Pre-Final → Final A+B",
+      "performanceSignature": "smooth pocket with sparse pauses; delayed final word; restrained upper-mid hook"
+    },
+    {
+      "trackNo": 9,
+      "locks": {
+        "story": true,
+        "scene": true,
+        "title": true,
+        "hook": true
+      },
+      "title": "Title 9",
+      "hookPhrase": "Hook 9",
+      "storyAct": "",
+      "storyActLabel": "Act 3 / story beat 9",
+      "storyArcRole": "Act 3 / story beat 9 - his first-person interpretation - vocal=male - title=\"Title 9\" - hook=\"Hook 9\"",
+      "listenerSituation": "같은 기차 안에서 장면 9를 떠올린다.",
+      "emotionArc": "감정 전환 9",
+      "BPM": 102,
+      "genre": "Chill Rap / Jazz Rap tint",
+      "vocal": "one recurring young-adult Japanese male; speech-forward tenor/light tenor-baritone; warm-light chest; forward oral resonance; breath 10-20%; dry grain 5-12%; clipped endings; Verse 45-55% rap-forward",
+      "musicRole": "Anchor",
+      "structure": "Verse rhythm-first → Pre/Turn → Chorus → 8-bar turnaround → Bridge >=3 audible contrast axes → Pre-Final → Final A + Final B + Post C; no early end",
+      "performanceSignature": "closest dry delivery; tension pause before title hook; Final restores full groove"
+    },
+    {
+      "trackNo": 10,
+      "locks": {
+        "story": true,
+        "scene": true,
+        "title": true,
+        "hook": true
+      },
+      "title": "Title 10",
+      "hookPhrase": "Hook 10",
+      "storyAct": "",
+      "storyActLabel": "Act 4 / story beat 10",
+      "storyArcRole": "Act 4 / story beat 10 - his first-person interpretation - vocal=male - title=\"Title 10\" - hook=\"Hook 10\"",
+      "listenerSituation": "같은 기차 안에서 장면 10를 떠올린다.",
+      "emotionArc": "감정 전환 10",
+      "BPM": 96,
+      "genre": "Chill Rap / Trap-Soul tint",
+      "vocal": "one recurring young-adult Japanese male; speech-forward tenor/light tenor-baritone; warm-light chest; forward oral resonance; breath 10-20%; dry grain 5-12%; clipped endings; Verse 45-55% rap-forward",
+      "musicRole": "Core",
+      "structure": "Verse rhythm-first → Pre/Turn → melodic Chorus → 8-bar turnaround → Bridge >=2 axes → Pre-Final → Final A+B",
+      "performanceSignature": "low-dynamic supported talk-rap; no whisper/croon; lazy behind-beat landing"
+    },
+    {
+      "trackNo": 11,
+      "locks": {
+        "story": true,
+        "scene": true,
+        "title": true,
+        "hook": true
+      },
+      "title": "Title 11",
+      "hookPhrase": "Hook 11",
+      "storyAct": "",
+      "storyActLabel": "Act 4 / story beat 11",
+      "storyArcRole": "Act 4 / story beat 11 - his first-person interpretation - vocal=male - title=\"Title 11\" - hook=\"Hook 11\"",
+      "listenerSituation": "같은 기차 안에서 장면 11를 떠올린다.",
+      "emotionArc": "감정 전환 11",
+      "BPM": 90,
+      "genre": "Chill Rap / Mellow Boom-Bap tint",
+      "vocal": "one recurring young-adult Japanese male; speech-forward tenor/light tenor-baritone; warm-light chest; forward oral resonance; breath 10-20%; dry grain 5-12%; clipped endings; Verse 45-55% rap-forward",
+      "musicRole": "Memory",
+      "structure": "compact Verse → restrained Chorus → 8-bar turnaround → Bridge >=2 axes, lower density but not ballad collapse → Final A+B",
+      "performanceSignature": "one-beat pause before hook; warm supported center; compact self-response"
+    },
+    {
+      "trackNo": 12,
+      "locks": {
+        "story": true,
+        "scene": true,
+        "title": true,
+        "hook": true
+      },
+      "title": "Title 12",
+      "hookPhrase": "Hook 12",
+      "storyAct": "",
+      "storyActLabel": "Act 4 / story beat 12",
+      "storyArcRole": "Act 4 / story beat 12 - his first-person interpretation - vocal=male - title=\"Title 12\" - hook=\"Hook 12\"",
+      "listenerSituation": "같은 기차 안에서 장면 12를 떠올린다.",
+      "emotionArc": "감정 전환 12",
+      "BPM": 98,
+      "genre": "Chill Rap / Lo-fi Hip-Hop Study tint",
+      "vocal": "one recurring young-adult Japanese male; speech-forward tenor/light tenor-baritone; warm-light chest; forward oral resonance; breath 10-20%; dry grain 5-12%; clipped endings; Verse 45-55% rap-forward",
+      "musicRole": "Core",
+      "structure": "Verse rhythm-first → Pre/Turn → melodic Chorus → 8-bar turnaround → Bridge >=2 axes → Pre-Final → Final A+B",
+      "performanceSignature": "message-like short phrases; swallowed start then crisp ending; no airy fade"
+    },
+    {
+      "trackNo": 13,
+      "locks": {
+        "story": true,
+        "scene": true,
+        "title": true,
+        "hook": true
+      },
+      "title": "Title 13",
+      "hookPhrase": "Hook 13",
+      "storyAct": "",
+      "storyActLabel": "Act 5 / story beat 13",
+      "storyArcRole": "Act 5 / story beat 13 - his first-person interpretation - vocal=male - title=\"Title 13\" - hook=\"Hook 13\"",
+      "listenerSituation": "같은 기차 안에서 장면 13를 떠올린다.",
+      "emotionArc": "감정 전환 13",
+      "BPM": 90,
+      "genre": "Chill Rap / Japanese Chill Pop tint",
+      "vocal": "one recurring young-adult Japanese male; speech-forward tenor/light tenor-baritone; warm-light chest; forward oral resonance; breath 10-20%; dry grain 5-12%; clipped endings; Verse 45-55% rap-forward",
+      "musicRole": "Memory",
+      "structure": "compact Verse → restrained Chorus → 8-bar turnaround → Bridge >=2 axes, lower density but not ballad collapse → Final A+B",
+      "performanceSignature": "intimate narrow-pitch talk-rap; sparse micro-rests; steady chest/support core"
+    },
+    {
+      "trackNo": 14,
+      "locks": {
+        "story": true,
+        "scene": true,
+        "title": true,
+        "hook": true
+      },
+      "title": "Title 14",
+      "hookPhrase": "Hook 14",
+      "storyAct": "",
+      "storyActLabel": "Act 5 / story beat 14",
+      "storyArcRole": "Act 5 / story beat 14 - his first-person interpretation - vocal=male - title=\"Title 14\" - hook=\"Hook 14\"",
+      "listenerSituation": "같은 기차 안에서 장면 14를 떠올린다.",
+      "emotionArc": "감정 전환 14",
+      "BPM": 96,
+      "genre": "Chill Rap / Jazz Rap tint",
+      "vocal": "one recurring young-adult Japanese male; speech-forward tenor/light tenor-baritone; warm-light chest; forward oral resonance; breath 10-20%; dry grain 5-12%; clipped endings; Verse 45-55% rap-forward",
+      "musicRole": "Core",
+      "structure": "Verse rhythm-first → Pre/Turn → melodic Chorus → 8-bar turnaround → Bridge >=2 axes → Pre-Final → Final A+B",
+      "performanceSignature": "confident conversational pocket; short pickups; wider hook only"
+    },
+    {
+      "trackNo": 15,
+      "locks": {
+        "story": true,
+        "scene": true,
+        "title": true,
+        "hook": true
+      },
+      "title": "Title 15",
+      "hookPhrase": "Hook 15",
+      "storyAct": "",
+      "storyActLabel": "Act 5 / story beat 15",
+      "storyArcRole": "Act 5 / story beat 15 - his first-person interpretation - vocal=male - title=\"Title 15\" - hook=\"Hook 15\"",
+      "listenerSituation": "같은 기차 안에서 장면 15를 떠올린다.",
+      "emotionArc": "감정 전환 15",
+      "BPM": 100,
+      "genre": "Chill Rap / Trap-Soul tint",
+      "vocal": "one recurring young-adult Japanese male; speech-forward tenor/light tenor-baritone; warm-light chest; forward oral resonance; breath 10-20%; dry grain 5-12%; clipped endings; Verse 45-55% rap-forward",
+      "musicRole": "Anchor",
+      "structure": "Verse rhythm-first → Pre/Turn → Chorus → 8-bar turnaround → Bridge >=3 audible contrast axes → Pre-Final → Final A + Final B + Post C; no early end",
+      "performanceSignature": "reflective opener; repeated hook with changed pickup timing; fuller Final with same timbre"
+    }
+  ],
+  "trackPlanMeta": {
+    "parseMode": "markdown-table",
+    "trackCount": 15,
+    "storyMapHits": 15,
+    "sceneHits": 15,
+    "lockedByDefault": [
+      "story",
+      "scene",
+      "title",
+      "hook"
+    ],
+    "recomputableByDefault": [
+      "BPM",
+      "genre",
+      "vocal",
+      "musicRole",
+      "structure",
+      "performanceSignature"
+    ],
+    "rangesUsed": {
+      "core": [
+        92,
+        100
+      ],
+      "anchor": [
+        96,
+        104
+      ],
+      "memory": [
+        88,
+        92
+      ]
+    },
+    "masterRangeOverrides": {},
+    "masterProfile": {
+      "genre": "",
+      "vocalFingerprint": "",
+      "structureCue": ""
+    },
+    "vocalMode": "vocal",
+    "recomputedFields": [
+      "BPM",
+      "genre",
+      "vocal",
+      "musicRole",
+      "structure",
+      "performanceSignature"
+    ],
+    "preservedLockedFields": [
+      "story",
+      "scene",
+      "title",
+      "hook"
+    ]
+  },
+  "performanceInsights": {
+    "active": false,
+    "n": 0,
+    "scope": "preset",
+    "minSamples": 3,
+    "guidance": []
+  },
+  "directiveEmbeddingMode": "STRUCTURED_DIGEST_ONLY",
+  "directiveDigest": {
+    "episodeId": "001",
+    "concept": "窓ぎわの君が気になった",
+    "storyPov": "male",
+    "language": "Japanese",
+    "songCount": 15,
+    "alreadyUsed": {},
+    "storyBoundaryNotes": [],
+    "note": "Music/BPM/vocal/structure rules from the legacy directive are intentionally omitted here because the structured current track plan supersedes them."
+  },
+  "priorityStack": [
+    "latest user brief",
+    "structured locked track plan",
+    "trusted imported planning data",
+    "custom master",
+    "market recipe/channel preset",
+    "local generation feedback",
+    "reference DNA",
+    "public rules",
+    "legacy music rules"
+  ],
+  "trustedImportedFields": [
+    "story/episode source",
+    "POV",
+    "trackNo/order",
+    "story acts",
+    "track-specific scenes",
+    "listenerSituation",
+    "fixed titles/hooks",
+    "alreadyUsed histories",
+    "explicit locks"
+  ],
+  "replaceableLegacyFields": [
+    "old model version",
+    "obsolete BPM policy",
+    "old singer age/weight",
+    "track-by-track singer swapping",
+    "legacy breath-mix ratios",
+    "outdated prompt syntax",
+    "stale genre hierarchy"
+  ],
+  "sources": [
+    {
+      "name": "Suno Field Guide",
+      "url": "https://github.com/mttkllr/suno-field-guide",
+      "license": "repository license not relied on for copied text; rules summarized"
+    },
+    {
+      "name": "Suno Lyrics Skill",
+      "url": "https://github.com/junhao-ye/suno-lyrics-skill",
+      "license": "repository guidance summarized"
+    },
+    {
+      "name": "Suno Create Assistant",
+      "url": "https://github.com/Nihondo/suno_create_assistant",
+      "license": "MIT"
+    },
+    {
+      "name": "Suno Prompting",
+      "url": "https://github.com/ddv1982/suno-prompting",
+      "license": "MIT"
+    },
+    {
+      "name": "Awesome Suno Prompts",
+      "url": "https://github.com/naqashmunir21/awesome-suno-prompts",
+      "license": "CC0-1.0"
+    },
+    {
+      "name": "Suno v6 release notes",
+      "url": "https://about.suno.com/release-notes/introducing-v6",
+      "license": "reference only"
+    },
+    {
+      "name": "Suno Personas help",
+      "url": "https://help.suno.com/en/articles/3484161",
+      "license": "reference only"
+    }
+  ],
+  "qa": [
+    {
+      "level": "WARN",
+      "code": "LEGACY_LOW_BPM",
+      "message": "Imported directive contains low BPM values [64, 74, 76, 77, 78, 82, 84]; Hybrid mode should treat them as replaceable unless explicitly marked as current user override."
+    },
+    {
+      "level": "INFO",
+      "code": "LEGACY_VOCAL_RULES",
+      "message": "Legacy vocal/prompt directives detected: lowered larynx, soft male voice just above a whisper. Hybrid mode will keep story data but supersede outdated music/vocal instructions."
+    },
+    {
+      "level": "PASS",
+      "code": "TRACK_PLAN_OK",
+      "message": "Structured track plan locks and recomputed music fields passed."
+    }
+  ]
+}

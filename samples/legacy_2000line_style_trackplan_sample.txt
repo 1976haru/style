@@ -1,0 +1,381 @@
+001. 窓ぎわの君が気になった
+彼のSTORY / male POV / Japanese / 15 tracks
+- T1: Act 1 / story beat 1 - his first-person interpretation - vocal=male - title="Title 1" - hook="Hook 1"
+- T2: Act 1 / story beat 2 - his first-person interpretation - vocal=male - title="Title 2" - hook="Hook 2"
+- T3: Act 1 / story beat 3 - his first-person interpretation - vocal=male - title="Title 3" - hook="Hook 3"
+- T4: Act 2 / story beat 4 - his first-person interpretation - vocal=male - title="Title 4" - hook="Hook 4"
+- T5: Act 2 / story beat 5 - his first-person interpretation - vocal=male - title="Title 5" - hook="Hook 5"
+- T6: Act 2 / story beat 6 - his first-person interpretation - vocal=male - title="Title 6" - hook="Hook 6"
+- T7: Act 3 / story beat 7 - his first-person interpretation - vocal=male - title="Title 7" - hook="Hook 7"
+- T8: Act 3 / story beat 8 - his first-person interpretation - vocal=male - title="Title 8" - hook="Hook 8"
+- T9: Act 3 / story beat 9 - his first-person interpretation - vocal=male - title="Title 9" - hook="Hook 9"
+- T10: Act 4 / story beat 10 - his first-person interpretation - vocal=male - title="Title 10" - hook="Hook 10"
+- T11: Act 4 / story beat 11 - his first-person interpretation - vocal=male - title="Title 11" - hook="Hook 11"
+- T12: Act 4 / story beat 12 - his first-person interpretation - vocal=male - title="Title 12" - hook="Hook 12"
+- T13: Act 5 / story beat 13 - his first-person interpretation - vocal=male - title="Title 13" - hook="Hook 13"
+- T14: Act 5 / story beat 14 - his first-person interpretation - vocal=male - title="Title 14" - hook="Hook 14"
+- T15: Act 5 / story beat 15 - his first-person interpretation - vocal=male - title="Title 15" - hook="Hook 15"
+[This pack's 15-track plan]
+| Track | Genre | BPM | Vocal | Structure | Intro | Scene frame | Role |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | Mellow Boom-Bap | 78 BPM | male | T2 | instrumental | jpstory-train-1 | steady |
+| 2 | Lo-fi Hip-Hop Study | 74 BPM | male | T3 | instrumental | jpstory-train-2 | flagship |
+| 3 | Chill Rap | 77 BPM | male | T4 | instrumental | jpstory-train-3 | steady |
+| 4 | Jazz Rap | 87 BPM | male | T5 | instrumental | jpstory-train-4 | steady |
+| 5 | Trap-Soul | 74 BPM | male | T1 | instrumental | jpstory-train-5 | steady |
+| 6 | Mellow Boom-Bap | 84 BPM | male | T2 | instrumental | jpstory-train-6 | steady |
+| 7 | Lo-fi Hip-Hop Study | 76 BPM | male | T3 | instrumental | jpstory-train-7 | steady |
+| 8 | Chill Rap | 82 BPM | male | T4 | instrumental | jpstory-train-8 | steady |
+| 9 | Jazz Rap | 97 BPM | male | T5 | instrumental | jpstory-train-9 | flagship |
+| 10 | Trap-Soul | 74 BPM | male | T1 | instrumental | jpstory-train-10 | steady |
+| 11 | Mellow Boom-Bap | 89 BPM | male | T2 | instrumental | jpstory-train-11 | memory-focused late track |
+| 12 | Lo-fi Hip-Hop Study | 82 BPM | male | T3 | instrumental | jpstory-train-12 | steady |
+| 13 | Chill Rap | 78 BPM | male | T4 | instrumental | jpstory-train-13 | memory-focused late track |
+| 14 | Jazz Rap | 84 BPM | male | T5 | instrumental | jpstory-train-14 | steady |
+| 15 | Trap-Soul | 64 BPM | male | T1 | instrumental | jpstory-train-15 | steady |
+[Lyric scenes]
+  Track 1: 같은 기차 안에서 장면 1를 떠올린다.
+    emotional turn: 감정 전환 1
+    time: the present day / cast: two people / motion: train
+  Track 2: 같은 기차 안에서 장면 2를 떠올린다.
+    emotional turn: 감정 전환 2
+    time: the present day / cast: two people / motion: train
+  Track 3: 같은 기차 안에서 장면 3를 떠올린다.
+    emotional turn: 감정 전환 3
+    time: the present day / cast: two people / motion: train
+  Track 4: 같은 기차 안에서 장면 4를 떠올린다.
+    emotional turn: 감정 전환 4
+    time: the present day / cast: two people / motion: train
+  Track 5: 같은 기차 안에서 장면 5를 떠올린다.
+    emotional turn: 감정 전환 5
+    time: the present day / cast: two people / motion: train
+  Track 6: 같은 기차 안에서 장면 6를 떠올린다.
+    emotional turn: 감정 전환 6
+    time: the present day / cast: two people / motion: train
+  Track 7: 같은 기차 안에서 장면 7를 떠올린다.
+    emotional turn: 감정 전환 7
+    time: the present day / cast: two people / motion: train
+  Track 8: 같은 기차 안에서 장면 8를 떠올린다.
+    emotional turn: 감정 전환 8
+    time: the present day / cast: two people / motion: train
+  Track 9: 같은 기차 안에서 장면 9를 떠올린다.
+    emotional turn: 감정 전환 9
+    time: the present day / cast: two people / motion: train
+  Track 10: 같은 기차 안에서 장면 10를 떠올린다.
+    emotional turn: 감정 전환 10
+    time: the present day / cast: two people / motion: train
+  Track 11: 같은 기차 안에서 장면 11를 떠올린다.
+    emotional turn: 감정 전환 11
+    time: the present day / cast: two people / motion: train
+  Track 12: 같은 기차 안에서 장면 12를 떠올린다.
+    emotional turn: 감정 전환 12
+    time: the present day / cast: two people / motion: train
+  Track 13: 같은 기차 안에서 장면 13를 떠올린다.
+    emotional turn: 감정 전환 13
+    time: the present day / cast: two people / motion: train
+  Track 14: 같은 기차 안에서 장면 14를 떠올린다.
+    emotional turn: 감정 전환 14
+    time: the present day / cast: two people / motion: train
+  Track 15: 같은 기차 안에서 장면 15를 떠올린다.
+    emotional turn: 감정 전환 15
+    time: the present day / cast: two people / motion: train
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx
+full-voiced male tenor, firm glottal closure
+soft male voice just above a whisper
+male baritone with lowered larynx

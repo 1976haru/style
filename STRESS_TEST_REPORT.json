@@ -1,0 +1,219 @@
+[
+  {
+    "case": "male003",
+    "tracks": 15,
+    "bpmMin": 86,
+    "bpmMax": 104,
+    "bpmAvg": 96,
+    "rangesUsed": {
+      "core": [
+        92,
+        100
+      ],
+      "anchor": [
+        96,
+        104
+      ],
+      "memory": [
+        84,
+        92
+      ]
+    },
+    "roles": {
+      "Core": 8,
+      "Anchor": 4,
+      "Memory": 3
+    },
+    "vocals": {
+      "male": 15
+    },
+    "locksAllTrue": true,
+    "titleExact": 15,
+    "hookExact": 15,
+    "listenerExact": 15,
+    "tintTintCount": 0,
+    "badBpmCount": 0,
+    "qaFailCount": 0,
+    "qa": [
+      {
+        "level": "INFO",
+        "code": "LEGACY_VOCAL_RULES",
+        "message": "Legacy vocal/prompt directives detected: mature crooner, v14.4. Hybrid mode will keep story data but supersede outdated music/vocal instructions."
+      },
+      {
+        "level": "PASS",
+        "code": "TRACK_PLAN_OK",
+        "message": "Structured track plan locks and recomputed music fields passed."
+      }
+    ],
+    "compiledChars": 55035,
+    "rawLegacyReinserted": false
+  },
+  {
+    "case": "female004",
+    "tracks": 15,
+    "bpmMin": 84,
+    "bpmMax": 104,
+    "bpmAvg": 95.6,
+    "rangesUsed": {
+      "core": [
+        94,
+        102
+      ],
+      "anchor": [
+        96,
+        104
+      ],
+      "memory": [
+        82,
+        88
+      ]
+    },
+    "roles": {
+      "Core": 7,
+      "Anchor": 4,
+      "Memory": 4
+    },
+    "vocals": {
+      "female": 15
+    },
+    "locksAllTrue": true,
+    "titleExact": 15,
+    "hookExact": 15,
+    "listenerExact": 15,
+    "tintTintCount": 0,
+    "badBpmCount": 0,
+    "qaFailCount": 0,
+    "qa": [
+      {
+        "level": "WARN",
+        "code": "LEGACY_LOW_BPM",
+        "message": "Imported directive contains low BPM values [76]; Hybrid mode should treat them as replaceable unless explicitly marked as current user override."
+      },
+      {
+        "level": "INFO",
+        "code": "LEGACY_VOCAL_RULES",
+        "message": "Legacy vocal/prompt directives detected: breath-mix: verse 35-45, v14.4. Hybrid mode will keep story data but supersede outdated music/vocal instructions."
+      },
+      {
+        "level": "PASS",
+        "code": "TRACK_PLAN_OK",
+        "message": "Structured track plan locks and recomputed music fields passed."
+      }
+    ],
+    "compiledChars": 60419,
+    "rawLegacyReinserted": false
+  },
+  {
+    "case": "story004",
+    "tracks": 15,
+    "bpmMin": 90,
+    "bpmMax": 104,
+    "bpmAvg": 96.5,
+    "rangesUsed": {
+      "core": [
+        92,
+        100
+      ],
+      "anchor": [
+        96,
+        104
+      ],
+      "memory": [
+        88,
+        92
+      ]
+    },
+    "roles": {
+      "Core": 9,
+      "Memory": 3,
+      "Anchor": 3
+    },
+    "vocals": {
+      "duet": 3,
+      "female": 6,
+      "male": 6
+    },
+    "locksAllTrue": true,
+    "titleExact": 15,
+    "hookExact": 15,
+    "listenerExact": 15,
+    "tintTintCount": 0,
+    "badBpmCount": 0,
+    "qaFailCount": 0,
+    "qa": [
+      {
+        "level": "WARN",
+        "code": "LEGACY_LOW_BPM",
+        "message": "Imported directive contains low BPM values [80, 82, 83]; Hybrid mode should treat them as replaceable unless explicitly marked as current user override."
+      },
+      {
+        "level": "INFO",
+        "code": "LEGACY_VOCAL_RULES",
+        "message": "Legacy vocal/prompt directives detected: v13. Hybrid mode will keep story data but supersede outdated music/vocal instructions."
+      },
+      {
+        "level": "PASS",
+        "code": "TRACK_PLAN_OK",
+        "message": "Structured track plan locks and recomputed music fields passed."
+      }
+    ],
+    "compiledChars": 45093,
+    "rawLegacyReinserted": false
+  },
+  {
+    "case": "legacy",
+    "tracks": 15,
+    "bpmMin": 86,
+    "bpmMax": 104,
+    "bpmAvg": 96.5,
+    "rangesUsed": {
+      "core": [
+        92,
+        100
+      ],
+      "anchor": [
+        96,
+        104
+      ],
+      "memory": [
+        84,
+        92
+      ]
+    },
+    "roles": {
+      "Core": 10,
+      "Anchor": 3,
+      "Memory": 2
+    },
+    "vocals": {
+      "male": 15
+    },
+    "locksAllTrue": true,
+    "titleExact": null,
+    "hookExact": null,
+    "listenerExact": null,
+    "tintTintCount": 0,
+    "badBpmCount": 0,
+    "qaFailCount": 0,
+    "qa": [
+      {
+        "level": "WARN",
+        "code": "LEGACY_LOW_BPM",
+        "message": "Imported directive contains low BPM values [64, 74, 76, 77, 78, 82, 84]; Hybrid mode should treat them as replaceable unless explicitly marked as current user override."
+      },
+      {
+        "level": "INFO",
+        "code": "LEGACY_VOCAL_RULES",
+        "message": "Legacy vocal/prompt directives detected: lowered larynx, soft male voice just above a whisper. Hybrid mode will keep story data but supersede outdated music/vocal instructions."
+      },
+      {
+        "level": "PASS",
+        "code": "TRACK_PLAN_OK",
+        "message": "Structured track plan locks and recomputed music fields passed."
+      }
+    ],
+    "compiledChars": 54917,
+    "rawLegacyReinserted": false
+  }
+]
