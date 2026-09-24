@@ -39,7 +39,25 @@ class App(tk.Tk):
         self.feedback_db=ROOT/'user_data'/'feedback.sqlite3'; init_feedback_db(self.feedback_db)
         self.feedback_tracks=[]; self.feedback_track_map={}; self.feedback_selected_id=None
         self.learning_analysis={}; self.learning_scope={}; self.experiment_plan=[]; self.experiment_manifest={}; self.ab_results={}
-        self._build(); self.run_recommendations(); self.refresh_feedback_view(); self.refresh_learning_analysis()
+        self._build()
+        self.update_idletasks()
+        self.after(50, self._startup_initialize)
+
+    def _startup_initialize(self):
+        """Paint the Tk window first, then run data-heavy startup work."""
+        try:
+            print('[STARTUP] UI ready', flush=True)
+            self.run_recommendations()
+            print('[STARTUP] market recommendations ready', flush=True)
+            self.refresh_feedback_view()
+            print('[STARTUP] feedback + learning analysis ready', flush=True)
+        except Exception as exc:
+            import traceback
+            traceback.print_exc()
+            try:
+                messagebox.showerror('시작 오류', f'초기화 중 오류가 발생했습니다.\n\n{exc}\n\nPowerShell 로그를 확인하세요.')
+            except Exception:
+                pass
 
     def _build(self):
         hdr=ttk.Frame(self,padding=(10,8)); hdr.pack(fill='x')
@@ -481,7 +499,15 @@ def cli(args):
     return 0
 
 if __name__=='__main__':
-    ap=argparse.ArgumentParser(); ap.add_argument('--directive'); ap.add_argument('--master'); ap.add_argument('--reference'); ap.add_argument('--preset',default='market_auto',choices=PRESETS.keys()); ap.add_argument('--recipe',default='auto',choices=RECIPES.keys()); ap.add_argument('--market',default='JP',choices=['KR','JP','GLOBAL','ANY']); ap.add_argument('--goal',default='revenue_balance',choices=MARKET['useCases'].keys()); ap.add_argument('--vocal',default='any',choices=['any','vocal','instrumental']); ap.add_argument('--language',default='any'); ap.add_argument('--market-recipe',default=''); ap.add_argument('--ownership',default='external',choices=['external','user_owned']); ap.add_argument('--song-count',type=int,default=15); ap.add_argument('--output-mode',default='full_pack',choices=['full_pack','lyrics_plus_prompt','prompt_only']); ap.add_argument('--model',default='v6',choices=['v6','v6-wild','v6-mini']); ap.add_argument('--mode',default='HYBRID',choices=['HYBRID','MASTER_FIRST','PRESERVE']); ap.add_argument('--episode',default=''); ap.add_argument('--out'); ap.add_argument('--track-plan-out'); ap.add_argument('--no-track-plan',action='store_true'); ap.add_argument('--feedback-db'); ap.add_argument('--no-feedback-learning',action='store_true'); ap.add_argument('--cli',action='store_true')
+    ap=argparse.ArgumentParser(); ap.add_argument('--directive'); ap.add_argument('--master'); ap.add_argument('--reference'); ap.add_argument('--preset',default='market_auto',choices=PRESETS.keys()); ap.add_argument('--recipe',default='auto',choices=RECIPES.keys()); ap.add_argument('--market',default='JP',choices=['KR','JP','GLOBAL','ANY']); ap.add_argument('--goal',default='revenue_balance',choices=MARKET['useCases'].keys()); ap.add_argument('--vocal',default='any',choices=['any','vocal','instrumental']); ap.add_argument('--language',default='any'); ap.add_argument('--market-recipe',default=''); ap.add_argument('--ownership',default='external',choices=['external','user_owned']); ap.add_argument('--song-count',type=int,default=15); ap.add_argument('--output-mode',default='full_pack',choices=['full_pack','lyrics_plus_prompt','prompt_only']); ap.add_argument('--model',default='v6',choices=['v6','v6-wild','v6-mini']); ap.add_argument('--mode',default='HYBRID',choices=['HYBRID','MASTER_FIRST','PRESERVE']); ap.add_argument('--episode',default=''); ap.add_argument('--out'); ap.add_argument('--track-plan-out'); ap.add_argument('--no-track-plan',action='store_true'); ap.add_argument('--feedback-db'); ap.add_argument('--no-feedback-learning',action='store_true'); ap.add_argument('--cli',action='store_true'); ap.add_argument('--startup-check',action='store_true')
     args=ap.parse_args()
     if args.cli or args.directive or args.out or args.reference: raise SystemExit(cli(args))
+    if args.startup_check:
+        print('[STARTUP-CHECK] imports/data OK')
+        app=App()
+        app.update_idletasks()
+        print('[STARTUP-CHECK] Tk App constructed OK')
+        app.destroy()
+        raise SystemExit(0)
+    print('[STARTUP] launching GUI...', flush=True)
     App().mainloop()
