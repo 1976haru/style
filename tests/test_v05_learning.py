@@ -4,7 +4,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from core.learning import (\n    analyze_feedback_patterns, build_ab_experiment_plan, validate_lock_preservation,\n    select_feedback_scope, build_experiment_manifest,\n)
+from core.learning import (
+    analyze_feedback_patterns, build_ab_experiment_plan, validate_lock_preservation,
+    select_feedback_scope, build_experiment_manifest,
+)
 
 
 def _record(i, *, keep=True, bpm=98, genre="Chill Rap", signature="dry pickup; micro-rest", issue=None):
