@@ -150,6 +150,36 @@ def test_e2e_validator_reports_required_regressions():
     } <= codes
 
 
+def test_e2e_accepts_preserved_basic_vocal_role_labels():
+    directive = json.loads(_directive("male"))
+    for song in directive["songs"]:
+        song["vocalType"] = "Male Solo"
+    raw = json.dumps(directive, ensure_ascii=False)
+    original, _ = extract_track_plan(raw, 15)
+    recomputed, meta = recompute_track_plan(
+        original, "chili_male", PRESETS["chili_male"], MARKET_RECIPE, MASTER
+    )
+    issues = validate_e2e_output(
+        _generated(recomputed), original, recomputed, meta, PRESETS["chili_male"]
+    )
+    assert "LEGACY_VOCAL_LEAK" not in {x["code"] for x in issues}
+
+
+def test_dual_flexible_language_policy_accepts_english_project():
+    directive = _directive("dual")
+    original, _ = extract_track_plan(directive, 15)
+    recomputed, meta = recompute_track_plan(
+        original, "chili_dual", PRESETS["chili_dual"], MARKET_RECIPE, MASTER
+    )
+    generated = json.loads(_generated(recomputed))
+    for song in generated["songs"]:
+        song["lyrics"] = "[Verse]\nThis English project follows the brief with natural conversational lines."
+    issues = validate_e2e_output(
+        json.dumps(generated), original, recomputed, meta, PRESETS["chili_dual"]
+    )
+    assert "WRONG_LANGUAGE" not in {x["code"] for x in issues}
+
+
 def test_windows_sqlite_connections_release_file_handles():
     # Keep the database on the project volume. Besides sandbox compatibility,
     # this exercises the same Windows filesystem semantics as user_data/.

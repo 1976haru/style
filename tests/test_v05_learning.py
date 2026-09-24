@@ -162,11 +162,25 @@ def test_feedback_schema_migrates_experiment_columns_and_roundtrips():
                 )
                 """
             )
+            con.execute(
+                """INSERT INTO feedback(
+                    created_at,session_id,track_no,title,decision,overall,
+                    vocal_identity,hook,groove,prompt_adherence,issue_tags
+                ) VALUES (?,?,?,?,?,?,?,?,?,?,?)""",
+                (
+                    "2026-09-25T00:00:00+00:00", "legacy-v04", 7,
+                    "Preserved legacy evaluation", "KEEP", 5, 5, 4, 5, 5, "[]",
+                ),
+            )
             con.commit()
         init_feedback_db(db)
         with closing(sqlite3.connect(db)) as con:
             cols = {row[1] for row in con.execute("PRAGMA table_info(feedback)").fetchall()}
         assert {"experiment_arm", "experiment_axis", "experiment_context"} <= cols
+        legacy_rows = list_feedback(db, 100)
+        assert len(legacy_rows) == 1
+        assert legacy_rows[0]["session_id"] == "legacy-v04"
+        assert legacy_rows[0]["title"] == "Preserved legacy evaluation"
 
         record = {
             **_record(999),
@@ -184,6 +198,9 @@ def test_feedback_schema_migrates_experiment_columns_and_roundtrips():
         assert row["experiment_arm"] == "B"
         assert row["experiment_axis"] == "bpm"
         assert row["experiment_context"]["manifest"] == "v05"
+        moved = db.with_name(db.stem + "_moved.sqlite3")
+        db.replace(moved)
+        moved.replace(db)
     finally:
         if db.exists():
             db.unlink()
@@ -205,3 +222,38 @@ def test_ab_results_are_descriptive_signals_not_winners():
     assert result["policy"]["declareWinner"] is False
     assert result["byAxis"][0]["axis"] == "bpm"
     assert result["byAxis"][0]["signal"] == "positive_early"
+
+
+def test_feedback_closed_loop_persists_experiment_context_and_analyzes():
+    db = ROOT / ".test_v05_closed_loop.sqlite3"
+    try:
+        if db.exists():
+            db.unlink()
+        init_feedback_db(db)
+        for i in range(10):
+            arm = "A" if i < 5 else "B"
+            axis = "baseline" if arm == "A" else "bpm"
+            record = {
+                **_record(i, keep=arm == "B", bpm=96 if arm == "A" else 100),
+                "session_id": "closed-loop",
+                "preset_id": "chili_male",
+                "market_recipe_id": "jp_chill",
+                "track_no": i % 15 + 1,
+                "title": f"T{i + 1}",
+                "experiment_arm": arm,
+                "experiment_axis": axis,
+                "experiment_context": {"proposalOnly": True, "axis": axis},
+            }
+            add_feedback(db, record)
+
+        stored = list_feedback(db, 100)
+        assert len(stored) == 10
+        assert {row["experiment_arm"] for row in stored} == {"A", "B"}
+        assert all(row["experiment_context"]["proposalOnly"] is True for row in stored)
+        result = analyze_ab_results(stored, min_per_arm=5, min_per_axis=3)
+        assert result["active"] is True
+        assert result["byAxis"][0]["axis"] == "bpm"
+        assert result["policy"]["autoApply"] is False
+    finally:
+        if db.exists():
+            db.unlink()
