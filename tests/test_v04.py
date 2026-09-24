@@ -1,4 +1,5 @@
-import sys, tempfile
+import sys, uuid
+from contextlib import contextmanager
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
@@ -10,6 +11,17 @@ from core.io_utils import load_json
 PRESETS=load_json(ROOT/'data'/'channel_presets.json')
 RECIPES=load_json(ROOT/'data'/'genre_recipes.json')
 PUBLIC=load_json(ROOT/'data'/'public_rules.json')
+
+
+@contextmanager
+def _project_db():
+    """Use the project volume so Windows SQLite locking is exercised reliably."""
+    db = ROOT / f'.test_feedback_{uuid.uuid4().hex}.sqlite3'
+    try:
+        yield db
+    finally:
+        if db.exists():
+            db.unlink()
 
 
 def _rec(recipe='jp_chill_test', decision='KEEP', score=5, issue=None):
@@ -24,8 +36,8 @@ def _rec(recipe='jp_chill_test', decision='KEEP', score=5, issue=None):
 
 
 def test_feedback_threshold_and_ranking():
-    with tempfile.TemporaryDirectory() as td:
-        db=Path(td)/'fb.sqlite3'; init_feedback_db(db)
+    with _project_db() as db:
+        init_feedback_db(db)
         rows=[{'id':'jp_chill_test','label':'JP Chill Test','marketScore':7.0,'demand':7,'repeatability':8,'competitionIntensity':6,'aiFit':9,'monetizationProxy':7,'bpmRange':[92,102],'vocalMode':'vocal'}]
         ranked=apply_feedback_ranking(rows,db,min_samples=3)
         assert ranked[0]['feedbackN']==0 and ranked[0]['adjustedScore10']==7.0
@@ -39,8 +51,8 @@ def test_feedback_threshold_and_ranking():
 
 
 def test_feedback_insights_activate_after_three_and_capture_failures():
-    with tempfile.TemporaryDirectory() as td:
-        db=Path(td)/'fb.sqlite3'; init_feedback_db(db)
+    with _project_db() as db:
+        init_feedback_db(db)
         add_feedback(db,_rec(decision='KEEP',score=5))
         add_feedback(db,_rec(decision='KEEP',score=4))
         x=build_feedback_insights(db,'chili_male','jp_chill_test',3)
@@ -67,8 +79,7 @@ def test_compiler_embeds_feedback_only_as_soft_prior():
 
 
 def test_feedback_db_aggregate():
-    with tempfile.TemporaryDirectory() as td:
-        db=Path(td)/'fb.sqlite3'
+    with _project_db() as db:
         add_feedback(db,_rec(decision='KEEP',score=5))
         add_feedback(db,_rec(decision='REGEN',score=2,issue='rap_weak'))
         agg=aggregate_feedback(db)
