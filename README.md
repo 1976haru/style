@@ -1,7 +1,18 @@
-> Current verified build: **v0.4.1** — real-input stress-test hotfix. See `STRESS_TEST_REPORT.md`.
+> Current verified build: **v0.4.2 Stable** — full E2E validation + Windows/Linux CI verified. See `STRESS_TEST_REPORT.md` and `core/e2e.py`.
 
-# Suno Master Prompt Studio v0.4 — Feedback Learning Edition
+# Suno Master Prompt Studio v0.4.2 Stable — Feedback Learning + E2E Validation
 
+## v0.4.2 Stable 검증 상태
+
+- Full E2E harness: 기존 directive/JSON → Track Plan → LOCK → 음악 재계산 → 최종 생성 JSON 검증
+- 남성 / 여성 / 두사람 STORY fixture 회귀 테스트
+- 2,100줄 상당 legacy appendix HYBRID 비재삽입 테스트
+- Story / Scene / Title / Hook LOCK 검증
+- BPM / vocal / genre / role / structure / Bridge / Final / Anchor Final 검증
+- duplicate title/hook, wrong language/gender, generic vocal, legacy leakage 탐지
+- Windows SQLite file-handle 회귀 검증
+- Local: **23 tests PASS**, `compileall` PASS, `git diff --check` PASS
+- GitHub Actions: **Windows 3.11 / 3.12 + Ubuntu 3.11 / 3.12 모두 PASS**
 ## v0.4 핵심
 
 기존 v0.3의 **2,000줄 지시문 → 15곡 Track Plan 구조화 → Story/Scene LOCK → 최신 마스터 기반 음악 재계산** 흐름에, 실제 Suno 생성 결과를 다시 학습하는 **Feedback DB**를 추가했습니다.

@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.4.2 — Stable E2E validation
+- Added full E2E validation harness in `core/e2e.py`.
+- Added male / female / dual-story end-to-end fixtures.
+- Added 2,100-line-equivalent legacy directive regression coverage for HYBRID non-reinjection.
+- Added final-output checks for 15-track count, Story/Scene/Title/Hook locks, vocal gender/role, role BPM ranges, legacy BPM/vocal leakage, genre policy, stylePrompt length, Bridge/Final, Anchor Final, duplicate titles/hooks, language and generic vocal signatures.
+- Added negative tests proving required QA failures are actually detected.
+- Hardened Windows SQLite handle cleanup and regression tests.
+- Verification baseline: 23 tests PASS locally; compileall PASS; git diff --check PASS.
+- GitHub Actions verified on Windows 3.11/3.12 and Ubuntu 3.11/3.12.
 ## 0.4.0
 - Added local SQLite Feedback DB.
 - Added KEEP/MAYBE/REGEN and 1-5 ratings for overall, vocal identity, hook, groove and prompt adherence.
