@@ -6,6 +6,12 @@ import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 
 from core.io_utils import read_text, write_text, write_json
+from core.master_registry import (
+    CHANNEL_LABELS,
+    DEFAULT_REGISTRY_PATH,
+    read_registered_master,
+    register_master,
+)
 from core.workflows import (
     GENRE_CHOICES,
     load_json_text,
@@ -16,6 +22,8 @@ from core.workflows import (
     finalize_existing_upgrade,
     finalize_haru_result,
 )
+
+CHANNEL_OPTIONS = {label: channel_id for channel_id, label in CHANNEL_LABELS.items()}
 
 
 class SimpleApp(tk.Tk):
@@ -31,11 +39,13 @@ class SimpleApp(tk.Tk):
         self.existing_master_text = ""
         self.existing_instruction = ""
         self.existing_final = None
+        self.existing_channel_id = "custom"
 
         self.haru_text = ""
         self.haru_master_text = ""
         self.haru_instruction = ""
         self.haru_final = None
+        self.registry_path = DEFAULT_REGISTRY_PATH
 
         self._build()
 
@@ -92,7 +102,7 @@ class SimpleApp(tk.Tk):
         ttk.Button(row, text="원본 JSON 불러오기", command=self.load_existing_json).pack(side="left")
         self.existing_source_var = tk.StringVar(value="선택 안 됨")
         ttk.Label(row, textvariable=self.existing_source_var).pack(side="left", padx=10)
-        ttk.Button(row, text="최신 마스터 TXT 불러오기", command=self.load_existing_master).pack(side="left", padx=(20, 0))
+        ttk.Button(row, text="마스터 변경/관리", command=self.manage_existing_master).pack(side="left", padx=(20, 0))
         self.existing_master_var = tk.StringVar(value="선택 안 됨")
         ttk.Label(row, textvariable=self.existing_master_var).pack(side="left", padx=10)
 
@@ -103,13 +113,17 @@ class SimpleApp(tk.Tk):
         genre_row.pack(fill="x", pady=(8, 0))
         ttk.Label(genre_row, text="장르 선택").pack(side="left")
         self.existing_genre_var = tk.StringVar(value="자동(원본 유지)")
-        ttk.Combobox(
+        self.existing_genre_cb = ttk.Combobox(
             genre_row,
             textvariable=self.existing_genre_var,
             state="readonly",
             width=25,
             values=list(GENRE_CHOICES),
-        ).pack(side="left", padx=8)
+        )
+        self.existing_genre_cb.pack(side="left", padx=8)
+        self.existing_genre_cb.bind("<<ComboboxSelected>>", lambda _e: self._refresh_existing_master_label())
+        self.existing_active_master_var = tk.StringVar(value="사용 마스터: 미등록")
+        ttk.Label(genre_row, textvariable=self.existing_active_master_var, foreground="#333").pack(side="left", padx=16)
 
         step2 = ttk.Labelframe(self.existing_tab, text="STEP 2  ChatGPT 업그레이드 지시문", padding=10)
         step2.pack(fill="both", expand=True, pady=(10, 0))
@@ -150,9 +164,27 @@ class SimpleApp(tk.Tk):
         ttk.Button(row, text="Haru Studio TXT 불러오기", command=self.load_haru_txt).pack(side="left")
         self.haru_source_var = tk.StringVar(value="선택 안 됨")
         ttk.Label(row, textvariable=self.haru_source_var).pack(side="left", padx=10)
-        ttk.Button(row, text="최신 마스터 TXT 불러오기", command=self.load_haru_master).pack(side="left", padx=(20, 0))
-        self.haru_master_var = tk.StringVar(value="선택 안 됨")
-        ttk.Label(row, textvariable=self.haru_master_var).pack(side="left", padx=10)
+        options = ttk.Frame(step1)
+        options.pack(fill="x", pady=(8, 0))
+        ttk.Label(options, text="채널/보컬 타입").pack(side="left")
+        self.haru_channel_var = tk.StringVar(value="시니어")
+        self.haru_channel_cb = ttk.Combobox(
+            options, textvariable=self.haru_channel_var, state="readonly", width=18,
+            values=list(CHANNEL_OPTIONS),
+        )
+        self.haru_channel_cb.pack(side="left", padx=8)
+        self.haru_channel_cb.bind("<<ComboboxSelected>>", lambda _e: self._refresh_haru_master())
+        ttk.Label(options, text="장르").pack(side="left", padx=(16, 0))
+        self.haru_genre_var = tk.StringVar(value="Soft Old Pop Ballad")
+        self.haru_genre_cb = ttk.Combobox(
+            options, textvariable=self.haru_genre_var, state="readonly", width=25,
+            values=[x for x in GENRE_CHOICES if not x.startswith("자동")],
+        )
+        self.haru_genre_cb.pack(side="left", padx=8)
+        self.haru_genre_cb.bind("<<ComboboxSelected>>", lambda _e: self._refresh_haru_master())
+        ttk.Button(options, text="마스터 변경/관리", command=self.manage_haru_master).pack(side="left", padx=(16, 0))
+        self.haru_master_var = tk.StringVar(value="사용 마스터: 미등록")
+        ttk.Label(options, textvariable=self.haru_master_var).pack(side="left", padx=10)
 
         step2 = ttk.Labelframe(self.haru_tab, text="STEP 2  신규 15곡 제작 지시문", padding=10)
         step2.pack(fill="both", expand=True, pady=(10, 0))
@@ -174,6 +206,48 @@ class SimpleApp(tk.Tk):
         ttk.Button(row3, text="최종 JSON 저장", command=self.save_haru_final).pack(side="left", padx=5)
         self.haru_result_var = tk.StringVar(value="아직 결과 JSON을 검증하지 않았습니다.")
         ttk.Label(row3, textvariable=self.haru_result_var).pack(side="left", padx=12)
+        self._refresh_haru_master()
+
+    def _registered_master(self, channel_id):
+        text, path = read_registered_master(channel_id, self.registry_path)
+        return text, path
+
+    def _refresh_existing_master_label(self):
+        label = CHANNEL_LABELS[self.existing_channel_id]
+        registered = bool(self.existing_master_text)
+        self.existing_active_master_var.set(
+            f"사용 마스터: {label} 최신 마스터 + {self.existing_genre_var.get()} Genre Master"
+            if registered else f"사용 마스터: {label} 미등록 + {self.existing_genre_var.get()} Genre Master"
+        )
+
+    def _choose_and_register_master(self, channel_id, source_text=""):
+        label = CHANNEL_LABELS[channel_id]
+        p = filedialog.askopenfilename(
+            title=f"{label} 최신 마스터 TXT 선택",
+            filetypes=[("Text", "*.txt"), ("Markdown", "*.md"), ("All", "*.*")],
+        )
+        if not p:
+            return "", None
+        text = read_text(p)
+        if source_text:
+            compat = validate_master_compatibility(load_json_text(source_text), text)
+            if not compat["ok"]:
+                messagebox.showerror("마스터 불일치", "\n".join(compat["errors"]))
+                return "", None
+        register_master(channel_id, p, self.registry_path)
+        return text, Path(p)
+
+    def _ensure_master(self, channel_id, source_text=""):
+        text, path = self._registered_master(channel_id)
+        if text:
+            return text, path
+        label = CHANNEL_LABELS[channel_id]
+        messagebox.showinfo(
+            "최신 마스터 등록 필요",
+            f"{label} 최신 마스터가 아직 등록되지 않았습니다.\n\n"
+            "최신 마스터 TXT를 한 번 선택해주세요.\n다음부터 자동으로 사용합니다.",
+        )
+        return self._choose_and_register_master(channel_id, source_text)
 
     def load_existing_json(self):
         p = filedialog.askopenfilename(title="기존 15곡 JSON 선택", filetypes=[("JSON", "*.json"), ("All", "*.*")])
@@ -189,19 +263,31 @@ class SimpleApp(tk.Tk):
         self.existing_source_text = text
         self.existing_final = None
         self.existing_source_var.set(Path(p).name)
+        self.existing_channel_id = profile["channelId"]
+        if profile["genreHint"] in GENRE_CHOICES:
+            self.existing_genre_var.set(profile["genreHint"])
+        self.existing_master_text, master_path = self._registered_master(self.existing_channel_id)
+        label = CHANNEL_LABELS[self.existing_channel_id]
+        self.existing_master_var.set(master_path.name if master_path else "미등록")
+        self.existing_active_master_var.set(
+            f"사용 마스터: {label} 최신 마스터 + {self.existing_genre_var.get()} Genre Master"
+        )
         self.existing_detect_var.set(
             f"감지: {profile['sourceType']} / {profile['trackCount']}곡 / vocal={profile['vocalMode']} / genre={profile['genreHint'] or '미확인'} / episode={profile['episodeTitle'] or '-'}"
         )
 
-    def load_existing_master(self):
-        p = filedialog.askopenfilename(title="최신 마스터 TXT 선택", filetypes=[("Text", "*.txt"), ("Markdown", "*.md"), ("All", "*.*")])
-        if not p:
+    def manage_existing_master(self):
+        text, path = self._choose_and_register_master(self.existing_channel_id, self.existing_source_text)
+        if not text:
             return
-        self.existing_master_text = read_text(p)
-        self.existing_master_var.set(Path(p).name)
+        self.existing_master_text = text
+        self.existing_master_var.set(path.name)
+        self.existing_active_master_var.set(
+            f"사용 마스터: {CHANNEL_LABELS[self.existing_channel_id]} 최신 마스터 + {self.existing_genre_var.get()} Genre Master"
+        )
         if self.existing_source_text:
             try:
-                result = validate_master_compatibility(load_json_text(self.existing_source_text), self.existing_master_text)
+                result = validate_master_compatibility(load_json_text(self.existing_source_text), text)
                 if result["ok"]:
                     msg = f"마스터 호환 확인: source={result['source']['vocalMode']} / master={result['master']['vocalMode']}"
                     if result["warnings"]:
@@ -213,6 +299,14 @@ class SimpleApp(tk.Tk):
                 self.existing_detect_var.set(f"마스터 확인 오류: {exc}")
 
     def make_existing_instruction(self):
+        if not self.existing_source_text:
+            messagebox.showwarning("순서 확인", "원본 JSON을 먼저 불러오세요.")
+            return
+        if not self.existing_master_text:
+            self.existing_master_text, path = self._ensure_master(self.existing_channel_id, self.existing_source_text)
+            if not self.existing_master_text:
+                return
+            self.existing_master_var.set(path.name)
         try:
             inst, compat = build_existing_json_upgrade_instruction(
                 self.existing_source_text,
@@ -228,6 +322,13 @@ class SimpleApp(tk.Tk):
         self.existing_detect_var.set(
             f"READY: {compat['source']['sourceType']} / {compat['source']['trackCount']}곡 / genre={self.existing_genre_var.get()} / master={compat['master']['vocalMode']}" +
             (f" / {warn}" if warn else "")
+        )
+        self.existing_active_master_var.set(
+            f"사용 마스터: {CHANNEL_LABELS[self.existing_channel_id]} 최신 마스터 + {self.existing_genre_var.get()} Genre Master"
+        )
+        messagebox.showinfo(
+            "생성 완료",
+            f"업그레이드 지시문 생성 완료\n{CHANNEL_LABELS[self.existing_channel_id]} + {self.existing_genre_var.get()}",
         )
 
     def save_existing_instruction(self):
@@ -278,21 +379,47 @@ class SimpleApp(tk.Tk):
         self.haru_final = None
         self.haru_source_var.set(Path(p).name)
 
-    def load_haru_master(self):
-        p = filedialog.askopenfilename(title="최신 마스터 TXT 선택", filetypes=[("Text", "*.txt"), ("Markdown", "*.md"), ("All", "*.*")])
-        if not p:
-            return
-        self.haru_master_text = read_text(p)
-        self.haru_master_var.set(Path(p).name)
+    def _refresh_haru_master(self):
+        channel_id = CHANNEL_OPTIONS[self.haru_channel_var.get()]
+        self.haru_master_text, path = self._registered_master(channel_id)
+        self.haru_master_var.set(
+            f"사용 마스터: {CHANNEL_LABELS[channel_id]} 최신 마스터 + {self.haru_genre_var.get()} Genre Master"
+            if path else f"사용 마스터: {CHANNEL_LABELS[channel_id]} 미등록"
+        )
+
+    def manage_haru_master(self):
+        channel_id = CHANNEL_OPTIONS[self.haru_channel_var.get()]
+        text, path = self._choose_and_register_master(channel_id)
+        if text:
+            self.haru_master_text = text
+            self.haru_master_var.set(
+                f"사용 마스터: {CHANNEL_LABELS[channel_id]} 최신 마스터 + {self.haru_genre_var.get()} Genre Master"
+            )
 
     def make_haru_instruction(self):
+        if not self.haru_text:
+            messagebox.showwarning("순서 확인", "Haru Studio TXT를 먼저 불러오세요.")
+            return
+        channel_id = CHANNEL_OPTIONS[self.haru_channel_var.get()]
+        if not self.haru_master_text:
+            self.haru_master_text, _path = self._ensure_master(channel_id)
+            if not self.haru_master_text:
+                return
+            self._refresh_haru_master()
         try:
-            inst = build_haru_txt_instruction(self.haru_text, self.haru_master_text, 15)
+            inst = build_haru_txt_instruction(
+                self.haru_text, self.haru_master_text, 15,
+                channel_id, self.haru_genre_var.get(),
+            )
         except Exception as exc:
             messagebox.showerror("지시문 생성 실패", str(exc))
             return
         self.haru_instruction = inst
         self._put_text(self.haru_output, inst)
+        messagebox.showinfo(
+            "생성 완료",
+            f"신규 15곡 제작 지시문 생성 완료\n{CHANNEL_LABELS[channel_id]} + {self.haru_genre_var.get()}",
+        )
 
     def save_haru_instruction(self):
         if not self.haru_instruction:

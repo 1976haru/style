@@ -1,4 +1,5 @@
 import json
+from pathlib import Path
 
 from core.workflows import (
     build_existing_json_upgrade_instruction,
@@ -7,6 +8,15 @@ from core.workflows import (
     finalize_haru_result,
     validate_master_compatibility,
     detect_source_profile,
+)
+from core.master_registry import (
+    build_active_master,
+    default_registry,
+    load_genre_profiles,
+    load_master_registry,
+    read_registered_master,
+    register_master,
+    save_master_registry,
 )
 
 
@@ -24,7 +34,14 @@ def _source():
                 "title": f"TITLE-{i}",
                 "titleLocalized": f"TITLE-{i}",
                 "hookPhrase": f"HOOK-{i}",
+                "story": f"STORY-{i}",
+                "storyAct": f"ACT-{i}",
+                "scene": f"SCENE-RAW-{i}",
                 "listenerSituation": f"SCENE-{i}",
+                "emotionArc": f"EMOTION-{i}",
+                "centralImage": f"IMAGE-{i}",
+                "seasonMoment": f"SEASON-{i}",
+                "distinctChoice": f"CHOICE-{i}",
                 "lyrics": f"[Verse]\\nLYRICS-{i}",
                 "BPM": 96,
                 "trackRole": "general",
@@ -57,16 +74,19 @@ def test_existing_upgrade_instruction_contains_full_source_and_master():
     assert "LYRICS-15" in inst
     assert "Male Solo ONLY" in inst
     assert "structured_track_plan" in inst
-    assert 'UI 선택: 자동(원본 유지)' in inst
-    assert "다른 장르로 바꾸지 마라" in inst
+    assert "[CHANNEL / VOCAL MASTER]" in inst
+    assert "[SELECTED GENRE MASTER]" in inst
+    assert '"id": "chill_rap"' in inst
+    assert "[PRECEDENCE]" in inst
 
 
 def test_existing_upgrade_selected_genre_is_explicit():
     inst, _ = build_existing_json_upgrade_instruction(
         json.dumps(_source(), ensure_ascii=False), MALE_MASTER, "Deep House"
     )
-    assert 'UI 선택: Deep House' in inst
-    assert "선택 장르 'Deep House'를 모든 곡의 주 장르로 적용" in inst
+    assert '"id": "deep_house"' in inst
+    assert "four-on-the-floor" in inst
+    assert "extended payoff/outro" in inst
 
 
 def test_source_profile_detects_male_female_dual_and_senior():
@@ -85,6 +105,50 @@ def test_source_profile_detects_male_female_dual_and_senior():
     senior["meta"]["channelLabel"] = "시니어 채널"
     senior["meta"]["genrePolicy"] = "Soft Old Pop Ballad"
     assert detect_source_profile(senior)["sourceType"] == "시니어"
+    assert detect_source_profile(male)["channelId"] == "chili_male"
+    assert detect_source_profile(male)["genreHint"] == "Chill Rap"
+
+
+def test_registry_save_load_register_and_automatic_reuse():
+    registry_path = Path(__file__).resolve().parents[1] / ".test_master_registry.json"
+    master_path = Path(__file__).resolve().parents[1] / ".test_male_master.txt"
+    try:
+        master_path.write_text(MALE_MASTER, encoding="utf-8")
+        save_master_registry(default_registry(), registry_path)
+        assert load_master_registry(registry_path)["channelMasters"]["chili_male"]["path"] == ""
+        register_master("chili_male", master_path, registry_path)
+        first_text, first_path = read_registered_master("chili_male", registry_path)
+        second_text, second_path = read_registered_master("chili_male", registry_path)
+        assert first_text == second_text == MALE_MASTER
+        assert first_path == second_path == master_path.resolve()
+    finally:
+        for path in (registry_path, master_path):
+            if path.exists():
+                path.unlink()
+
+
+def test_genre_master_profiles_are_materially_distinct():
+    profiles = load_genre_profiles()
+    chill = profiles["chill_rap"]
+    old = profiles["old_pop_ballad"]
+    deep = profiles["deep_house"]
+    assert set(("chill_rap", "old_pop_ballad", "soul", "cafe_pop", "chanson", "deep_house")) <= set(profiles)
+    assert chill["bpm"] == {"min": 88, "max": 108}
+    assert old["bpm"] == {"min": 72, "max": 92}
+    assert deep["bpm"] == {"min": 116, "max": 124}
+    assert chill["bridge"] != old["bridge"] != deep["bridge"]
+    assert chill["final"] != old["final"] != deep["final"]
+    assert chill["stylePromptRules"] != old["stylePromptRules"] != deep["stylePromptRules"]
+    assert chill["excludeRules"] != old["excludeRules"] != deep["excludeRules"]
+
+
+def test_active_master_contains_full_blocks_and_precedence():
+    profile = load_genre_profiles()["deep_house"]
+    active = build_active_master(MALE_MASTER, profile, detect_source_profile(_source()))
+    assert "[CHANNEL / VOCAL MASTER]" in active
+    assert "[SELECTED GENRE MASTER]" in active
+    assert "Channel vocal identity and hard locks override genre defaults." in active
+    assert "116" in active and "124" in active
 
 
 def test_wrong_instrumental_master_is_blocked_for_male_source():
@@ -93,6 +157,21 @@ def test_wrong_instrumental_master_is_blocked_for_male_source():
     result = validate_master_compatibility(source, bad)
     assert result["ok"] is False
     assert any("Instrumental" in x for x in result["errors"])
+
+
+def test_wrong_male_female_dual_masters_are_blocked():
+    male = _source()
+    female_master = "CHILI female-only / Female Solo / 彼女 / Chill Rap"
+    assert validate_master_compatibility(male, female_master)["ok"] is False
+    female = json.loads(json.dumps(male))
+    female["meta"]["storyPov"] = "female"
+    for row in female["songs"]:
+        row["vocalType"] = "Female Solo"
+    assert validate_master_compatibility(female, MALE_MASTER)["ok"] is False
+    dual = json.loads(json.dumps(male))
+    dual["meta"]["storyPov"] = "dual"
+    dual["songs"][0]["vocalType"] = "Male-Female Duet"
+    assert validate_master_compatibility(dual, MALE_MASTER)["ok"] is False
 
 
 def test_finalize_existing_preserves_content_and_full_schema_but_updates_music():
@@ -120,6 +199,13 @@ def test_finalize_existing_preserves_content_and_full_schema_but_updates_music()
         assert row["hookPhrase"] == f"HOOK-{i}"
         assert row["lyrics"] == f"[Verse]\\nLYRICS-{i}"
         assert row["listenerSituation"] == f"SCENE-{i}"
+        assert row["story"] == f"STORY-{i}"
+        assert row["storyAct"] == f"ACT-{i}"
+        assert row["scene"] == f"SCENE-RAW-{i}"
+        assert row["emotionArc"] == f"EMOTION-{i}"
+        assert row["centralImage"] == f"IMAGE-{i}"
+        assert row["seasonMoment"] == f"SEASON-{i}"
+        assert row["distinctChoice"] == f"CHOICE-{i}"
         assert row["youtube"] == {"title": f"YT-{i}"}
         assert row["customField"] == {"keep": i}
         assert row["BPM"] == 100
@@ -133,6 +219,16 @@ def test_haru_instruction_requires_complete_suno_json():
     assert "lyrics" in inst
     assert "stylePrompt" in inst
     assert txt in inst
+    assert '"id": "chill_rap"' in inst
+
+
+def test_haru_instruction_uses_selected_channel_and_genre():
+    inst = build_haru_txt_instruction(
+        "senior episode brief", MALE_MASTER, 15, "senior", "Soft Old Pop Ballad"
+    )
+    assert '"channelId": "senior"' in inst
+    assert '"id": "old_pop_ballad"' in inst
+    assert "warm natural instruments" in inst
 
 
 def test_finalize_haru_requires_title_lyrics_prompt():

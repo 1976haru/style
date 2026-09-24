@@ -5,6 +5,8 @@ import re
 from copy import deepcopy
 from typing import Any, Dict, List, Tuple
 
+from .master_registry import build_active_master, load_genre_profiles
+
 
 TRACK_MUTABLE_FIELDS = {
     "BPM", "bpm", "trackRole", "musicRole", "rapRatio", "rapForwardRatio",
@@ -24,13 +26,13 @@ META_MUTABLE_FIELDS = {
 }
 
 GENRE_CHOICES = {
-    "자동(원본 유지)": "AUTO_PRESERVE",
-    "Chill Rap": "Chill Rap",
-    "Soft Old Pop Ballad": "Soft Old Pop Ballad",
-    "Soft Soul": "Soft Soul",
-    "Cafe Pop": "Cafe Pop",
-    "French Chanson": "French Chanson",
-    "Deep House": "Deep House",
+    "자동(원본 유지)": "auto",
+    "Chill Rap": "chill_rap",
+    "Soft Old Pop Ballad": "old_pop_ballad",
+    "Soft Soul": "soul",
+    "Cafe Pop": "cafe_pop",
+    "French Chanson": "chanson",
+    "Deep House": "deep_house",
 }
 
 
@@ -81,9 +83,21 @@ def detect_source_profile(source: Dict[str, Any]) -> Dict[str, Any]:
         ),
     ]).casefold()
 
-    if any(x in hay for x in ("instrumental", "no lead vocal", "no vocal")):
+    story_pov = str(meta.get("storyPov", "")).strip().casefold()
+    vocal_types = " ".join(str(r.get("vocalType", "")) for r in rows).casefold()
+    if story_pov in {"dual", "duet", "two", "couple", "두사람"} or re.search(r"\bduet\b|male-female|male/female", vocal_types):
+        vocal_mode = "dual"
+    elif story_pov in {"female", "woman", "여성", "彼女"}:
+        vocal_mode = "female"
+    elif story_pov in {"male", "man", "남성", "彼"}:
+        vocal_mode = "male"
+    elif vocal_types and re.search(r"\bfemale\b", vocal_types) and not re.search(r"\bmale\b", vocal_types):
+        vocal_mode = "female"
+    elif vocal_types and re.search(r"\bmale\b", vocal_types) and not re.search(r"\bfemale\b", vocal_types):
+        vocal_mode = "male"
+    elif any(x in hay for x in ("instrumental only", "no lead vocal", "no vocal")):
         vocal_mode = "instrumental"
-    elif any(x in hay for x in ("duet", "male/female", "male-female", "두사람", "彼と彼女", "dual")):
+    elif any(x in hay for x in ("duet", "male/female", "male-female", "두사람", "彼と彼女")):
         vocal_mode = "dual"
     elif any(x in hay for x in ("female", "여성", "彼女")):
         vocal_mode = "female"
@@ -107,11 +121,32 @@ def detect_source_profile(source: Dict[str, Any]) -> Dict[str, Any]:
 
     genre_policy = str(meta.get("genrePolicy", ""))
     genre_text = " ".join(str(r.get("genreText", "")) + " " + str(r.get("stylePrompt", "")) for r in rows[:3])
-    genre_hint = "Chill Rap" if "chill rap" in (genre_policy + " " + genre_text).casefold() else ""
+    genre_blob = (genre_policy + " " + genre_text).casefold()
+    genre_candidates = (
+        ("Deep House", ("deep house",)),
+        ("French Chanson", ("french chanson", "chanson")),
+        ("Soft Old Pop Ballad", ("soft old pop", "old-pop ballad", "old pop ballad")),
+        ("Soft Soul", ("soft soul",)),
+        ("Cafe Pop", ("cafe pop", "café pop")),
+        ("Chill Rap", ("chill rap",)),
+    )
+    genre_hint = next((label for label, tokens in genre_candidates if any(x in genre_blob for x in tokens)), "")
+
+    if source_type == "시니어":
+        channel_id = "senior"
+    elif source_type == "남성":
+        channel_id = "chili_male"
+    elif source_type == "여성":
+        channel_id = "chili_female"
+    elif source_type == "두사람":
+        channel_id = "chili_dual"
+    else:
+        channel_id = "custom"
 
     return {
         "trackCount": len(rows),
         "sourceType": source_type,
+        "channelId": channel_id,
         "vocalMode": vocal_mode,
         "genreHint": genre_hint,
         "episodeTitle": str(meta.get("episodeTitle", "")),
@@ -123,8 +158,8 @@ def detect_master_profile(master_text: str) -> Dict[str, Any]:
     low = (master_text or "").casefold()
     instrumental = any(x in low for x in ("instrumental only", "no lead vocal", "sleep bgm", "healing piano"))
     dual = any(x in low for x in ("male signature", "female signature", "male/female", "male-female", "duet", "두사람"))
-    female = any(x in low for x in ("female solo", "female-only", "여성", "彼女"))
-    male = any(x in low for x in ("male solo", "male-only", "남성", "彼のstory"))
+    female = bool(re.search(r"(?:^|[^a-z])female(?:\s+solo|-only)(?:[^a-z]|$)", low)) or any(x in low for x in ("여성", "彼女"))
+    male = bool(re.search(r"(?:^|[^a-z])male(?:\s+solo|-only)(?:[^a-z]|$)", low)) or any(x in low for x in ("남성", "彼のstory"))
     if instrumental:
         vocal_mode = "instrumental"
     elif dual:
@@ -180,17 +215,17 @@ def build_existing_json_upgrade_instruction(
         raise ValueError(f"기존 JSON은 15곡이어야 합니다. 현재 {len(rows)}곡입니다.")
     if genre_choice not in GENRE_CHOICES:
         raise ValueError(f"지원하지 않는 장르 선택입니다: {genre_choice}")
-    genre_value = GENRE_CHOICES[genre_choice]
-    if genre_value == "AUTO_PRESERVE":
-        genre_rule = (
-            "원본 각 곡의 genreId/genreText/genre/stylePrompt 장르 정체성을 유지한다. "
-            "최신 MASTER가 명시적으로 요구하는 기술적 품질만 반영하고 다른 장르로 바꾸지 마라."
-        )
-    else:
-        genre_rule = (
-            f"선택 장르 '{genre_value}'를 모든 곡의 주 장르로 적용한다. "
-            "원본의 스토리·제목·훅·가사는 유지하고, 보조 색채는 곡별로 하나만 허용한다."
-        )
+    genre_id = GENRE_CHOICES[genre_choice]
+    if genre_id == "auto":
+        detected_label = compat["source"].get("genreHint")
+        genre_id = GENRE_CHOICES.get(detected_label or "", "")
+        if not genre_id or genre_id == "auto":
+            raise ValueError("원본 장르를 자동 감지하지 못했습니다. 장르를 직접 선택하세요.")
+    profiles = load_genre_profiles()
+    genre_profile = profiles.get(genre_id)
+    if not genre_profile:
+        raise ValueError(f"Genre Master Profile을 찾을 수 없습니다: {genre_id}")
+    active_master = build_active_master(master_text, genre_profile, compat["source"])
 
     instruction = """# EXISTING JSON -> LATEST MASTER UPGRADE
 
@@ -210,26 +245,36 @@ def build_existing_json_upgrade_instruction(
 9. 최종 응답은 설명 없이 JSON object 하나만 출력한다.
 10. songs 15곡을 모두 출력한다.
 
-[SELECTED GENRE POLICY]
-- UI 선택: """ + genre_choice + """
-- 적용 규칙: """ + genre_rule + """
-
 [DETECTED SOURCE]
 """ + json.dumps(compat["source"], ensure_ascii=False, indent=2) + """
 
-[LATEST MASTER - ACTIVE AUTHORITY FOR MUSIC FIELDS ONLY]
-""" + master_text.strip() + """
+[ACTIVE MASTER - CHANNEL + GENRE]
+""" + active_master + """
 
 [ORIGINAL JSON - IMMUTABLE CONTENT + FULL SCHEMA]
 """ + json.dumps(source, ensure_ascii=False, indent=2)
     return instruction, compat
 
 
-def build_haru_txt_instruction(haru_text: str, master_text: str, expected_count: int = 15) -> str:
+def build_haru_txt_instruction(
+    haru_text: str,
+    master_text: str,
+    expected_count: int = 15,
+    channel_id: str = "custom",
+    genre_choice: str = "Chill Rap",
+) -> str:
     if not (haru_text or "").strip():
         raise ValueError("Haru Studio TXT가 비어 있습니다.")
     if not (master_text or "").strip():
         raise ValueError("최신 마스터 TXT가 비어 있습니다.")
+    genre_id = GENRE_CHOICES.get(genre_choice)
+    if not genre_id or genre_id == "auto":
+        raise ValueError("Haru Studio workflow에서는 장르를 직접 선택하세요.")
+    genre_profile = load_genre_profiles().get(genre_id)
+    if not genre_profile:
+        raise ValueError(f"Genre Master Profile을 찾을 수 없습니다: {genre_id}")
+    source_profile = {"sourceType": channel_id, "channelId": channel_id, "trackCount": expected_count}
+    active_master = build_active_master(master_text, genre_profile, source_profile)
     return """# HARU STUDIO TXT -> COMPLETE SUNO JSON
 
 목표:
@@ -247,8 +292,8 @@ def build_haru_txt_instruction(haru_text: str, master_text: str, expected_count:
 8. 최종 응답은 설명 없이 JSON object 하나만 출력한다.
 9. 정확히 """ + str(expected_count) + """곡을 출력한다.
 
-[LATEST MASTER - ACTIVE MUSIC AUTHORITY]
-""" + master_text.strip() + """
+[ACTIVE MASTER - CHANNEL + GENRE]
+""" + active_master + """
 
 [HARU STUDIO TXT - STORY / EPISODE AUTHORITY]
 """ + haru_text.strip()
