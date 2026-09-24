@@ -20,6 +20,7 @@ from core.learning import (
     analyze_feedback_patterns, build_ab_experiment_plan, validate_lock_preservation,
     select_feedback_scope, build_experiment_manifest, analyze_ab_results,
 )
+from simple_app import SimpleApp
 
 PRESETS = load_json(ROOT/'data'/'channel_presets.json')
 RECIPES = load_json(ROOT/'data'/'genre_recipes.json')
@@ -532,16 +533,20 @@ def cli(args):
     return 0
 
 if __name__=='__main__':
-    ap=argparse.ArgumentParser(); ap.add_argument('--directive'); ap.add_argument('--master'); ap.add_argument('--reference'); ap.add_argument('--preset',default='market_auto',choices=PRESETS.keys()); ap.add_argument('--recipe',default='auto',choices=RECIPES.keys()); ap.add_argument('--market',default='JP',choices=['KR','JP','GLOBAL','ANY']); ap.add_argument('--goal',default='revenue_balance',choices=MARKET['useCases'].keys()); ap.add_argument('--vocal',default='any',choices=['any','vocal','instrumental']); ap.add_argument('--language',default='any'); ap.add_argument('--market-recipe',default=''); ap.add_argument('--ownership',default='external',choices=['external','user_owned']); ap.add_argument('--song-count',type=int,default=15); ap.add_argument('--output-mode',default='full_pack',choices=['full_pack','lyrics_plus_prompt','prompt_only']); ap.add_argument('--model',default='v6',choices=['v6','v6-wild','v6-mini']); ap.add_argument('--mode',default='HYBRID',choices=['HYBRID','MASTER_FIRST','PRESERVE']); ap.add_argument('--episode',default=''); ap.add_argument('--out'); ap.add_argument('--track-plan-out'); ap.add_argument('--no-track-plan',action='store_true'); ap.add_argument('--feedback-db'); ap.add_argument('--no-feedback-learning',action='store_true'); ap.add_argument('--cli',action='store_true'); ap.add_argument('--startup-check',action='store_true')
+    ap=argparse.ArgumentParser(); ap.add_argument('--directive'); ap.add_argument('--master'); ap.add_argument('--reference'); ap.add_argument('--preset',default='market_auto',choices=PRESETS.keys()); ap.add_argument('--recipe',default='auto',choices=RECIPES.keys()); ap.add_argument('--market',default='JP',choices=['KR','JP','GLOBAL','ANY']); ap.add_argument('--goal',default='revenue_balance',choices=MARKET['useCases'].keys()); ap.add_argument('--vocal',default='any',choices=['any','vocal','instrumental']); ap.add_argument('--language',default='any'); ap.add_argument('--market-recipe',default=''); ap.add_argument('--ownership',default='external',choices=['external','user_owned']); ap.add_argument('--song-count',type=int,default=15); ap.add_argument('--output-mode',default='full_pack',choices=['full_pack','lyrics_plus_prompt','prompt_only']); ap.add_argument('--model',default='v6',choices=['v6','v6-wild','v6-mini']); ap.add_argument('--mode',default='HYBRID',choices=['HYBRID','MASTER_FIRST','PRESERVE']); ap.add_argument('--episode',default=''); ap.add_argument('--out'); ap.add_argument('--track-plan-out'); ap.add_argument('--no-track-plan',action='store_true'); ap.add_argument('--feedback-db'); ap.add_argument('--no-feedback-learning',action='store_true'); ap.add_argument('--cli',action='store_true'); ap.add_argument('--startup-check',action='store_true'); ap.add_argument('--advanced-ui',action='store_true')
     args=ap.parse_args()
     if args.cli or args.directive or args.out or args.reference: raise SystemExit(cli(args))
     if args.startup_check:
         print('[STARTUP-CHECK] imports/data OK', flush=True)
-        app=App()
-        print('[STARTUP-CHECK] App() returned', flush=True)
+        app=SimpleApp()
+        print('[STARTUP-CHECK] SimpleApp() returned', flush=True)
         app.update_idletasks()
-        print('[STARTUP-CHECK] Tk App constructed OK', flush=True)
+        print('[STARTUP-CHECK] Two-workflow UI constructed OK', flush=True)
         app.destroy()
         raise SystemExit(0)
-    print('[STARTUP] launching GUI...', flush=True)
-    App().mainloop()
+    if args.advanced_ui:
+        print('[STARTUP] launching advanced legacy UI...', flush=True)
+        App().mainloop()
+    else:
+        print('[STARTUP] launching simple two-workflow UI...', flush=True)
+        SimpleApp().mainloop()
