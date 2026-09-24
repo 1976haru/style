@@ -4,7 +4,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from core.learning import analyze_feedback_patterns, build_ab_experiment_plan, validate_lock_preservation
+from core.learning import (\n    analyze_feedback_patterns, build_ab_experiment_plan, validate_lock_preservation,\n    select_feedback_scope, build_experiment_manifest,\n)
 
 
 def _record(i, *, keep=True, bpm=98, genre="Chill Rap", signature="dry pickup; micro-rest", issue=None):
@@ -85,3 +85,33 @@ def test_inactive_analysis_keeps_all_tracks_baseline():
     planned = build_ab_experiment_plan(original, analysis, exploration_count=5)
     assert validate_lock_preservation(original, planned) == []
     assert all(x["experiment"]["arm"] == "A" for x in planned)
+
+
+def test_scope_does_not_pool_unrelated_recipes():
+    rows = [
+        {**_record(i), "preset_id": "chili_male", "market_recipe_id": "jp_chill"}
+        for i in range(20)
+    ] + [
+        {**_record(100 + i), "preset_id": "senior_kr", "market_recipe_id": "kr_oldpop"}
+        for i in range(20)
+    ]
+    scope = select_feedback_scope(rows, "chili_male", "jp_chill")
+    assert scope["n"] == 20
+    analysis = analyze_feedback_patterns(scope["records"])
+    assert analysis["active"] is False
+
+
+def test_experiment_manifest_is_proposal_only_and_lock_safe():
+    original = _plan()
+    analysis = analyze_feedback_patterns([_record(i) for i in range(30)])
+    manifest = build_experiment_manifest(
+        original,
+        analysis,
+        {"presetId": "chili_male", "marketRecipeId": "jp_chill"},
+        exploration_count=4,
+    )
+    assert manifest["mode"] == "PROPOSAL_ONLY"
+    assert manifest["summary"]["armB"] == 4
+    assert manifest["summary"]["lockViolations"] == 0
+    assert manifest["context"]["presetId"] == "chili_male"
+    assert all("proposedChanges" in row for row in manifest["tracks"])

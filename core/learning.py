@@ -245,3 +245,83 @@ def validate_lock_preservation(
         if before.get("trusted") != after.get("trusted"):
             issues.append(f"track {i}: trusted Story/Scene/Title/Hook block changed")
     return issues
+
+
+def select_feedback_scope(
+    records: Iterable[Dict[str, Any]],
+    preset_id: str = "",
+    market_recipe_id: str = "",
+) -> Dict[str, Any]:
+    """Return only records belonging to the active production context.
+
+    v0.5 deliberately does not pool unrelated channel/recipe feedback to reach
+    the activation threshold. This prevents cross-channel contamination.
+    """
+    rows = [dict(r) for r in records if isinstance(r, dict)]
+    selected = rows
+    labels: List[str] = []
+    if preset_id:
+        selected = [r for r in selected if str(r.get("preset_id") or "") == preset_id]
+        labels.append(f"preset={preset_id}")
+    if market_recipe_id:
+        selected = [r for r in selected if str(r.get("market_recipe_id") or "") == market_recipe_id]
+        labels.append(f"recipe={market_recipe_id}")
+    return {
+        "scope": " + ".join(labels) if labels else "all-feedback",
+        "presetId": preset_id,
+        "marketRecipeId": market_recipe_id,
+        "records": selected,
+        "n": len(selected),
+        "totalAvailable": len(rows),
+    }
+
+
+def build_experiment_manifest(
+    track_plan: List[Dict[str, Any]],
+    analysis: Dict[str, Any],
+    context: Dict[str, Any] | None = None,
+    exploration_count: int = 4,
+) -> Dict[str, Any]:
+    """Build a portable, proposal-only A/B manifest.
+
+    The manifest never mutates or replaces recomputed music values. It records
+    suggested experiment axes separately so generation can remain baseline
+    until an explicit apply workflow is introduced and reviewed.
+    """
+    planned = build_ab_experiment_plan(track_plan, analysis, exploration_count)
+    lock_issues = validate_lock_preservation(track_plan, planned)
+    rows = []
+    for row in planned:
+        exp = row.get("experiment") or {}
+        trusted = row.get("trusted") or {}
+        rows.append({
+            "trackNo": row.get("trackNo"),
+            "title": trusted.get("title", ""),
+            "arm": exp.get("arm", "A"),
+            "axis": exp.get("axis", "baseline"),
+            "proposedChanges": exp.get("proposedChanges") or {},
+            "reason": exp.get("reason", ""),
+        })
+    return {
+        "schemaVersion": 1,
+        "mode": "PROPOSAL_ONLY",
+        "context": dict(context or {}),
+        "learning": {
+            "active": bool(analysis.get("active")),
+            "n": int(analysis.get("n", 0) or 0),
+            "minSamples": int(analysis.get("minSamples", DEFAULT_MIN_SAMPLES) or DEFAULT_MIN_SAMPLES),
+            "confidence": analysis.get("confidence", "insufficient"),
+            "topBpmWindows": analysis.get("topBpmWindows", []),
+            "topGenres": analysis.get("topGenres", []),
+            "topPerformanceAtoms": analysis.get("topPerformanceAtoms", []),
+            "topIssues": analysis.get("topIssues", {}),
+        },
+        "summary": {
+            "tracks": len(rows),
+            "armA": sum(1 for r in rows if r["arm"] == "A"),
+            "armB": sum(1 for r in rows if r["arm"] == "B"),
+            "lockViolations": len(lock_issues),
+        },
+        "lockViolations": lock_issues,
+        "tracks": rows,
+    }

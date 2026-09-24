@@ -16,6 +16,10 @@ from core.feedback import (
     init_feedback_db, add_feedback, list_feedback, delete_feedback, aggregate_feedback,
     apply_feedback_ranking, build_feedback_insights, export_feedback_json, export_feedback_csv, ISSUE_TAGS
 )
+from core.learning import (
+    analyze_feedback_patterns, build_ab_experiment_plan, validate_lock_preservation,
+    select_feedback_scope, build_experiment_manifest,
+)
 
 PRESETS = load_json(ROOT/'data'/'channel_presets.json')
 RECIPES = load_json(ROOT/'data'/'genre_recipes.json')
@@ -27,25 +31,26 @@ FEEDBACK_TAG_DATA = load_json(ROOT/'data'/'feedback_issue_tags.json')
 class App(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.title('Suno Master Prompt Studio v0.4 — Feedback Learning Edition')
+        self.title('Suno Master Prompt Studio v0.5-dev — Evidence-guided A/B Learning')
         self.geometry('1540x960')
         self.minsize(1220,780)
         self.compiled=''; self.manifest={}; self.qa=[]; self.market_rows=[]; self.selected_market_recipe={}
         self.track_plan=[]; self.track_plan_meta={}; self.selected_track_no=None
         self.feedback_db=ROOT/'user_data'/'feedback.sqlite3'; init_feedback_db(self.feedback_db)
         self.feedback_tracks=[]; self.feedback_track_map={}; self.feedback_selected_id=None
-        self._build(); self.run_recommendations(); self.refresh_feedback_view()
+        self.learning_analysis={}; self.learning_scope={}; self.experiment_plan=[]; self.experiment_manifest={}
+        self._build(); self.run_recommendations(); self.refresh_feedback_view(); self.refresh_learning_analysis()
 
     def _build(self):
         hdr=ttk.Frame(self,padding=(10,8)); hdr.pack(fill='x')
-        ttk.Label(hdr,text='Suno Master Prompt Studio v0.4',font=('Segoe UI',16,'bold')).pack(side='left')
-        ttk.Label(hdr,text='  Track Plan LOCK + 최신 마스터 재계산 + 실제 Suno 결과 Feedback DB → Recipe Ranking',font=('Segoe UI',10)).pack(side='left',padx=8)
+        ttk.Label(hdr,text='Suno Master Prompt Studio v0.5-dev',font=('Segoe UI',16,'bold')).pack(side='left')
+        ttk.Label(hdr,text='  Track Plan LOCK + Feedback Learning + 15곡 A/B 실험 제안(PROPOSAL ONLY)',font=('Segoe UI',10)).pack(side='left',padx=8)
         nb=ttk.Notebook(self); nb.pack(fill='both',expand=True,padx=10,pady=(0,10))
         self.market_tab=ttk.Frame(nb,padding=8); self.ref_tab=ttk.Frame(nb,padding=8); self.directive_tab=ttk.Frame(nb,padding=8)
-        self.plan_tab=ttk.Frame(nb,padding=8); self.master_tab=ttk.Frame(nb,padding=8); self.output_tab=ttk.Frame(nb,padding=8); self.feedback_tab=ttk.Frame(nb,padding=8); self.qa_tab=ttk.Frame(nb,padding=8)
-        for tab,label in [(self.market_tab,'1. 시장/장르 추천'),(self.ref_tab,'2. Reference DNA'),(self.directive_tab,'3. 사용자 지시문'),(self.plan_tab,'4. 15곡 Track Plan'),(self.master_tab,'5. 마스터/현재 지시'),(self.output_tab,'6. ChatGPT 최종지시문'),(self.feedback_tab,'7. Suno 결과 Feedback'),(self.qa_tab,'8. QA / 결과검증')]: nb.add(tab,text=label)
+        self.plan_tab=ttk.Frame(nb,padding=8); self.master_tab=ttk.Frame(nb,padding=8); self.output_tab=ttk.Frame(nb,padding=8); self.feedback_tab=ttk.Frame(nb,padding=8); self.learning_tab=ttk.Frame(nb,padding=8); self.qa_tab=ttk.Frame(nb,padding=8)
+        for tab,label in [(self.market_tab,'1. 시장/장르 추천'),(self.ref_tab,'2. Reference DNA'),(self.directive_tab,'3. 사용자 지시문'),(self.plan_tab,'4. 15곡 Track Plan'),(self.master_tab,'5. 마스터/현재 지시'),(self.output_tab,'6. ChatGPT 최종지시문'),(self.feedback_tab,'7. Suno 결과 Feedback'),(self.learning_tab,'8. 학습/A-B 실험'),(self.qa_tab,'9. QA / 결과검증')]: nb.add(tab,text=label)
         self.nb=nb
-        self._build_market(); self._build_reference(); self._build_directive(); self._build_plan(); self._build_master(); self._build_output(); self._build_feedback(); self._build_qa()
+        self._build_market(); self._build_reference(); self._build_directive(); self._build_plan(); self._build_master(); self._build_output(); self._build_feedback(); self._build_learning(); self._build_qa()
 
     def _build_market(self):
         ctrl=ttk.Frame(self.market_tab); ctrl.pack(fill='x')
@@ -92,11 +97,11 @@ class App(tk.Tk):
         ttk.Button(top,text='Plan JSON 저장',command=self.save_track_plan).pack(side='left',padx=5)
         self.plan_status=tk.StringVar(value='아직 Track Plan이 없습니다.'); ttk.Label(top,textvariable=self.plan_status).pack(side='left',padx=15)
 
-        cols=('no','lock','title','act','scene','oldbpm','newbpm','oldgenre','newgenre','role','structure')
+        cols=('no','lock','arm','axis','title','act','scene','oldbpm','newbpm','oldgenre','newgenre','role','structure')
         self.plan_tree=ttk.Treeview(self.plan_tab,columns=cols,show='headings',height=14)
-        labels={'no':'#','lock':'LOCK','title':'제목','act':'Story Act','scene':'장면','oldbpm':'Old BPM','newbpm':'NEW BPM','oldgenre':'Old Genre','newgenre':'NEW Genre','role':'Music Role','structure':'NEW Structure'}
-        widths={'no':38,'lock':62,'title':145,'act':105,'scene':260,'oldbpm':65,'newbpm':70,'oldgenre':145,'newgenre':185,'role':80,'structure':300}
-        for c in cols: self.plan_tree.heading(c,text=labels[c]); self.plan_tree.column(c,width=widths[c],anchor='center' if c in ('no','lock','oldbpm','newbpm','role') else 'w')
+        labels={'no':'#','lock':'LOCK','arm':'A/B','axis':'실험축','title':'제목','act':'Story Act','scene':'장면','oldbpm':'Old BPM','newbpm':'NEW BPM','oldgenre':'Old Genre','newgenre':'NEW Genre','role':'Music Role','structure':'NEW Structure'}
+        widths={'no':38,'lock':55,'arm':42,'axis':115,'title':145,'act':95,'scene':220,'oldbpm':65,'newbpm':70,'oldgenre':130,'newgenre':165,'role':75,'structure':250}
+        for c in cols: self.plan_tree.heading(c,text=labels[c]); self.plan_tree.column(c,width=widths[c],anchor='center' if c in ('no','lock','arm','axis','oldbpm','newbpm','role') else 'w')
         self.plan_tree.pack(fill='both',expand=True,pady=(8,6)); self.plan_tree.bind('<<TreeviewSelect>>',self.plan_selected)
 
         edit=ttk.Labelframe(self.plan_tab,text='선택 트랙 상세 / 예외 Override',padding=6); edit.pack(fill='x')
@@ -169,6 +174,27 @@ class App(tk.Tk):
         row=ttk.Frame(a); row.pack(fill='x',pady=(4,0)); ttk.Button(row,text='선택 평가 삭제',command=self.delete_feedback_ui).pack(side='left')
         self.fb_summary=tk.Text(b,wrap='word',font=('Consolas',9),height=10); self.fb_summary.pack(fill='both',expand=True)
 
+    def _build_learning(self):
+        top=ttk.Frame(self.learning_tab); top.pack(fill='x')
+        ttk.Label(top,text='현재 preset + market recipe의 실제 Feedback만 사용합니다. 30곡 미만은 관찰 전용이며 A/B 활성화 금지.').pack(side='left')
+        ttk.Button(top,text='학습 분석 새로고침',command=self.refresh_learning_analysis).pack(side='left',padx=8)
+        ttk.Button(top,text='Experiment Manifest 저장',command=self.save_experiment_manifest).pack(side='right')
+        self.learning_status=tk.StringVar(value='학습 분석 대기'); ttk.Label(top,textvariable=self.learning_status).pack(side='right',padx=12)
+
+        split=ttk.Panedwindow(self.learning_tab,orient='horizontal'); split.pack(fill='both',expand=True,pady=(8,0))
+        left=ttk.Labelframe(split,text='성공곡/실패 패턴 분석',padding=6); right=ttk.Labelframe(split,text='15곡 A/B 제안 (실제 음악값 미변경)',padding=6)
+        split.add(left,weight=2); split.add(right,weight=3)
+        self.learning_text=tk.Text(left,wrap='word',font=('Consolas',9)); self.learning_text.pack(fill='both',expand=True)
+
+        cols=('no','arm','axis','title','proposal')
+        self.exp_tree=ttk.Treeview(right,columns=cols,show='headings',height=18)
+        labels={'no':'#','arm':'A/B','axis':'실험축','title':'제목','proposal':'제안 내용'}
+        widths={'no':40,'arm':45,'axis':130,'title':180,'proposal':520}
+        for key in cols:
+            self.exp_tree.heading(key,text=labels[key]); self.exp_tree.column(key,width=widths[key],anchor='center' if key in ('no','arm') else 'w')
+        self.exp_tree.pack(fill='both',expand=True)
+        ttk.Label(right,text='B-arm은 제안만 기록합니다. 현재 recomputed BPM/Genre/Vocal/Structure와 Story LOCK을 자동 변경하지 않습니다.',foreground='#555').pack(anchor='w',pady=(6,0))
+
     def _build_qa(self):
         bar=ttk.Frame(self.qa_tab); bar.pack(fill='x'); ttk.Button(bar,text='ChatGPT 결과 JSON 검증',command=self.validate_result_file).pack(side='left'); ttk.Button(bar,text='현재 QA 새로고침',command=self.render_qa).pack(side='left',padx=5)
         self.qa_text=tk.Text(self.qa_tab,wrap='word',font=('Consolas',9)); self.qa_text.pack(fill='both',expand=True,pady=(8,0))
@@ -208,7 +234,7 @@ class App(tk.Tk):
 
     def parse_track_plan(self):
         raw=self.directive.get('1.0','end').strip(); self.track_plan,self.track_plan_meta=extract_track_plan(raw,int(self.song_count.get()))
-        self.render_track_plan(); self.nb.select(self.plan_tab)
+        self.refresh_learning_analysis(); self.nb.select(self.plan_tab)
         self.plan_status.set(f"파싱 완료: {len(self.track_plan)}곡 / mode={self.track_plan_meta.get('parseMode')} / 장면 {self.track_plan_meta.get('sceneHits',0)}개")
 
     def recompute_plan(self):
@@ -216,16 +242,58 @@ class App(tk.Tk):
         if not self.selected_market_recipe: self.run_recommendations()
         pid=self.preset_var.get(); master=self.master.get('1.0','end').strip()
         self.track_plan, recmeta=recompute_track_plan(self.track_plan,pid,PRESETS[pid],self.selected_market_recipe,master)
-        self.track_plan_meta.update(recmeta); self.render_track_plan(); self.nb.select(self.plan_tab)
+        self.track_plan_meta.update(recmeta); self.refresh_learning_analysis(); self.nb.select(self.plan_tab)
         self.plan_status.set(f"재계산 완료: {len(self.track_plan)}곡 / BPM·Genre·Vocal·Role·Structure 갱신 / Story·Scene LOCK 유지")
+
+    def refresh_learning_analysis(self):
+        records=list_feedback(self.feedback_db,100000)
+        pid=self.preset_var.get() if hasattr(self,'preset_var') else ''
+        rid=(self.selected_market_recipe or {}).get('id','')
+        self.learning_scope=select_feedback_scope(records,pid,rid)
+        self.learning_analysis=analyze_feedback_patterns(self.learning_scope.get('records',[]),min_samples=30,min_group=3)
+        context={'presetId':pid,'marketRecipeId':rid,'scope':self.learning_scope.get('scope',''),'feedbackN':self.learning_scope.get('n',0)}
+        self.experiment_manifest=build_experiment_manifest(self.track_plan,self.learning_analysis,context,exploration_count=4)
+        self.experiment_plan=build_ab_experiment_plan(self.track_plan,self.learning_analysis,exploration_count=4)
+
+        if hasattr(self,'learning_text'):
+            payload={
+                'scope':self.learning_scope.get('scope'),
+                'scopeN':self.learning_scope.get('n',0),
+                'totalFeedbackAvailable':self.learning_scope.get('totalAvailable',0),
+                'active':self.learning_analysis.get('active',False),
+                'confidence':self.learning_analysis.get('confidence'),
+                'activationRule':'same preset + same market recipe n>=30',
+                'overall':self.learning_analysis.get('overall',{}),
+                'topBpmWindows':self.learning_analysis.get('topBpmWindows',[]),
+                'topGenres':self.learning_analysis.get('topGenres',[]),
+                'topPerformanceAtoms':self.learning_analysis.get('topPerformanceAtoms',[]),
+                'topIssues':self.learning_analysis.get('topIssues',{}),
+                'policy':self.learning_analysis.get('policy',{}),
+            }
+            self.learning_text.delete('1.0','end'); self.learning_text.insert('1.0',json.dumps(payload,ensure_ascii=False,indent=2))
+            for x in self.exp_tree.get_children(): self.exp_tree.delete(x)
+            for row in self.experiment_manifest.get('tracks',[]):
+                proposal=json.dumps(row.get('proposedChanges',{}),ensure_ascii=False,separators=(',',':'))
+                self.exp_tree.insert('', 'end', iid=f"exp-{row.get('trackNo')}", values=(row.get('trackNo'),row.get('arm'),row.get('axis'),str(row.get('title',''))[:32],proposal[:180]))
+            n=self.learning_scope.get('n',0); active=self.learning_analysis.get('active',False); conf=self.learning_analysis.get('confidence','insufficient')
+            self.learning_status.set(f"{'ACTIVE' if active else 'OBSERVE'} / n={n}/30 / confidence={conf}")
+        if hasattr(self,'plan_tree'): self.render_track_plan()
+
+    def save_experiment_manifest(self):
+        self.refresh_learning_analysis()
+        p=filedialog.asksaveasfilename(defaultextension='.json',initialfile='experiment_manifest_v05.json',filetypes=[('JSON','*.json')])
+        if p:
+            write_json(p,self.experiment_manifest)
+            messagebox.showinfo('저장',f'Experiment Manifest 저장 완료\n{p}')
 
     def render_track_plan(self):
         for x in self.plan_tree.get_children(): self.plan_tree.delete(x)
+        exp_map={int(r.get('trackNo',0)):r.get('experiment',{}) for r in self.experiment_plan}
         for r in self.track_plan:
-            t=r['trusted']; old=r['importedMusic']; new=r['recomputed']; locks=r['locks']
+            t=r['trusted']; old=r['importedMusic']; new=r['recomputed']; locks=r['locks']; exp=exp_map.get(int(r.get('trackNo',0)),{})
             lock='🔒' if locks.get('story') and locks.get('scene') else '⚠'
             scene=t.get('listenerSituation') or t.get('scene') or ''
-            self.plan_tree.insert('', 'end', iid=str(r['trackNo']), values=(r['trackNo'],lock,t.get('title',''),t.get('storyActLabel') or t.get('storyAct',''),scene[:90],old.get('BPM') or '',new.get('BPM') or '',old.get('genre','')[:45],new.get('genre','')[:55],new.get('musicRole',''),new.get('structure','')[:95]))
+            self.plan_tree.insert('', 'end', iid=str(r['trackNo']), values=(r['trackNo'],lock,exp.get('arm','A'),exp.get('axis','baseline'),t.get('title',''),t.get('storyActLabel') or t.get('storyAct',''),scene[:90],old.get('BPM') or '',new.get('BPM') or '',old.get('genre','')[:45],new.get('genre','')[:55],new.get('musicRole',''),new.get('structure','')[:95]))
         if self.track_plan:
             first=str(self.track_plan[0]['trackNo']); self.plan_tree.selection_set(first); self.plan_tree.focus(first); self.plan_selected()
         else:
@@ -275,6 +343,7 @@ class App(tk.Tk):
         raw=self.directive.get('1.0','end').strip(); master=self.master.get('1.0','end').strip(); ep=self.episode.get().strip(); ref=self.reference.get('1.0','end').strip(); pid=self.preset_var.get(); rid=self.recipe_var.get()
         feedback_insights=build_feedback_insights(self.feedback_db,pid,self.selected_market_recipe.get('id',''),min_samples=3)
         self.compiled,self.manifest,self.qa=compile_instruction(raw,pid,PRESETS[pid],RECIPES[rid],PUBLIC,self.model_var.get(),self.mode_var.get(),master,ep,self.selected_market_recipe,self.market_var.get(),self.goal_var.get(),ref,self.ownership_var.get(),int(self.song_count.get()),self.output_mode.get(),self.track_plan,self.track_plan_meta,feedback_insights)
+        self.refresh_learning_analysis()
         self.output.delete('1.0','end'); self.output.insert('1.0',self.compiled); self.render_qa(); self.nb.select(self.output_tab); messagebox.showinfo('완료',f"{len(self.track_plan) if self.track_plan else 0}곡 구조화 Track Plan을 포함한 최종 지시문을 생성했습니다.")
 
     def feedback_from_plan(self):
@@ -342,6 +411,7 @@ class App(tk.Tk):
             recipe_rows.append({'recipe':rid,**st})
         summary={'db':str(self.feedback_db),'totalEvaluations':agg.get('total',0),'recipeRanking':recipe_rows,'recurringIssues':agg.get('issueCounts',{}),'activationRule':'recipe/preset local guidance starts at n>=3; feedback weight grows gradually and caps at 55%'}
         self.fb_summary.delete('1.0','end'); self.fb_summary.insert('1.0',json.dumps(summary,ensure_ascii=False,indent=2))
+        if hasattr(self,'learning_text'): self.refresh_learning_analysis()
 
     def feedback_record_selected(self,event=None):
         sel=self.fb_tree.selection(); self.feedback_selected_id=int(sel[0]) if sel else None
@@ -380,8 +450,9 @@ class App(tk.Tk):
         if not self.compiled: self.compile()
         d=filedialog.askdirectory(title='패키지 저장 폴더 선택')
         if not d: return
-        rid=self.selected_market_recipe.get('id','market'); base=Path(d)/f"suno_v04_package_{rid}"; base.mkdir(parents=True,exist_ok=True)
-        write_text(base/'compiled_chatgpt_instruction.txt',self.compiled); write_json(base/'compile_manifest.json',self.manifest); write_json(base/'structured_track_plan.json',{'meta':self.track_plan_meta,'tracks':self.track_plan}); write_json(base/'selected_market_recipe.json',self.selected_market_recipe); write_json(base/'selected_channel_preset.json',PRESETS[self.preset_var.get()]); write_json(base/'reference_dna.json',self.manifest.get('referenceDNA',{})); write_json(base/'feedback_insights.json',self.manifest.get('performanceInsights',{})); messagebox.showinfo('저장',f'저장 완료\n{base}')
+        self.refresh_learning_analysis()
+        rid=self.selected_market_recipe.get('id','market'); base=Path(d)/f"suno_v05_package_{rid}"; base.mkdir(parents=True,exist_ok=True)
+        write_text(base/'compiled_chatgpt_instruction.txt',self.compiled); write_json(base/'compile_manifest.json',self.manifest); write_json(base/'structured_track_plan.json',{'meta':self.track_plan_meta,'tracks':self.track_plan}); write_json(base/'selected_market_recipe.json',self.selected_market_recipe); write_json(base/'selected_channel_preset.json',PRESETS[self.preset_var.get()]); write_json(base/'reference_dna.json',self.manifest.get('referenceDNA',{})); write_json(base/'feedback_insights.json',self.manifest.get('performanceInsights',{})); write_json(base/'learning_analysis_v05.json',self.learning_analysis); write_json(base/'experiment_manifest_v05.json',self.experiment_manifest); messagebox.showinfo('저장',f'저장 완료\n{base}')
     def validate_result_file(self):
         p=filedialog.askopenfilename(filetypes=[('JSON','*.json'),('Text','*.txt'),('All','*.*')])
         if not p: return
