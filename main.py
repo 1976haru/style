@@ -18,7 +18,7 @@ from core.feedback import (
 )
 from core.learning import (
     analyze_feedback_patterns, build_ab_experiment_plan, validate_lock_preservation,
-    select_feedback_scope, build_experiment_manifest,
+    select_feedback_scope, build_experiment_manifest, analyze_ab_results,
 )
 
 PRESETS = load_json(ROOT/'data'/'channel_presets.json')
@@ -38,7 +38,7 @@ class App(tk.Tk):
         self.track_plan=[]; self.track_plan_meta={}; self.selected_track_no=None
         self.feedback_db=ROOT/'user_data'/'feedback.sqlite3'; init_feedback_db(self.feedback_db)
         self.feedback_tracks=[]; self.feedback_track_map={}; self.feedback_selected_id=None
-        self.learning_analysis={}; self.learning_scope={}; self.experiment_plan=[]; self.experiment_manifest={}
+        self.learning_analysis={}; self.learning_scope={}; self.experiment_plan=[]; self.experiment_manifest={}; self.ab_results={}
         self._build(); self.run_recommendations(); self.refresh_feedback_view(); self.refresh_learning_analysis()
 
     def _build(self):
@@ -165,10 +165,10 @@ class App(tk.Tk):
 
         split=ttk.Panedwindow(self.feedback_tab,orient='vertical'); split.pack(fill='both',expand=True,pady=(4,0))
         a=ttk.Labelframe(split,text='최근 평가',padding=5); b=ttk.Labelframe(split,text='Recipe Ranking / 학습 요약',padding=5); split.add(a,weight=3); split.add(b,weight=2)
-        cols=('id','date','decision','track','title','recipe','role','bpm','overall','vocal','hook','groove','adh')
+        cols=('id','date','decision','arm','axis','track','title','recipe','role','bpm','overall','vocal','hook','groove','adh')
         self.fb_tree=ttk.Treeview(a,columns=cols,show='headings',height=10)
-        heads={'id':'ID','date':'날짜','decision':'판정','track':'#','title':'제목','recipe':'Market Recipe','role':'Role','bpm':'BPM','overall':'전체','vocal':'보컬','hook':'훅','groove':'그루브','adh':'준수'}
-        widths={'id':45,'date':120,'decision':65,'track':38,'title':180,'recipe':180,'role':65,'bpm':55,'overall':45,'vocal':45,'hook':45,'groove':45,'adh':45}
+        heads={'id':'ID','date':'날짜','decision':'판정','arm':'A/B','axis':'실험축','track':'#','title':'제목','recipe':'Market Recipe','role':'Role','bpm':'BPM','overall':'전체','vocal':'보컬','hook':'훅','groove':'그루브','adh':'준수'}
+        widths={'id':45,'date':120,'decision':65,'arm':42,'axis':105,'track':38,'title':170,'recipe':160,'role':60,'bpm':52,'overall':45,'vocal':45,'hook':45,'groove':45,'adh':45}
         for c in cols: self.fb_tree.heading(c,text=heads[c]); self.fb_tree.column(c,width=widths[c],anchor='center' if c not in ('title','recipe') else 'w')
         self.fb_tree.pack(fill='both',expand=True); self.fb_tree.bind('<<TreeviewSelect>>',self.feedback_record_selected)
         row=ttk.Frame(a); row.pack(fill='x',pady=(4,0)); ttk.Button(row,text='선택 평가 삭제',command=self.delete_feedback_ui).pack(side='left')
@@ -251,6 +251,7 @@ class App(tk.Tk):
         rid=(self.selected_market_recipe or {}).get('id','')
         self.learning_scope=select_feedback_scope(records,pid,rid)
         self.learning_analysis=analyze_feedback_patterns(self.learning_scope.get('records',[]),min_samples=30,min_group=3)
+        self.ab_results=analyze_ab_results(self.learning_scope.get('records',[]),min_per_arm=5,min_per_axis=3)
         context={'presetId':pid,'marketRecipeId':rid,'scope':self.learning_scope.get('scope',''),'feedbackN':self.learning_scope.get('n',0)}
         self.experiment_manifest=build_experiment_manifest(self.track_plan,self.learning_analysis,context,exploration_count=4)
         self.experiment_plan=build_ab_experiment_plan(self.track_plan,self.learning_analysis,exploration_count=4)
@@ -268,6 +269,7 @@ class App(tk.Tk):
                 'topGenres':self.learning_analysis.get('topGenres',[]),
                 'topPerformanceAtoms':self.learning_analysis.get('topPerformanceAtoms',[]),
                 'topIssues':self.learning_analysis.get('topIssues',{}),
+                'abResults':self.ab_results,
                 'policy':self.learning_analysis.get('policy',{}),
             }
             self.learning_text.delete('1.0','end'); self.learning_text.insert('1.0',json.dumps(payload,ensure_ascii=False,indent=2))
@@ -349,10 +351,12 @@ class App(tk.Tk):
     def feedback_from_plan(self):
         if not self.track_plan:
             self.parse_track_plan()
+        self.refresh_learning_analysis()
+        exp_map={int(r.get('trackNo',0)):r.get('experiment',{}) for r in self.experiment_plan}
         self.feedback_tracks=[]; self.feedback_track_map={}
         for r in self.track_plan:
-            t=r.get('trusted',{}); new=r.get('recomputed',{}); old=r.get('importedMusic',{})
-            d={'trackNo':r.get('trackNo'), 'title':t.get('title',''), 'BPM':new.get('BPM') or old.get('BPM'), 'genre':new.get('genre') or old.get('genre',''), 'vocal':new.get('vocal') or old.get('vocal',''), 'trackRole':new.get('musicRole',''), 'performanceSignature':new.get('performanceSignature',''), 'stylePrompt':''}
+            t=r.get('trusted',{}); new=r.get('recomputed',{}); old=r.get('importedMusic',{}); exp=exp_map.get(int(r.get('trackNo',0)),{})
+            d={'trackNo':r.get('trackNo'), 'title':t.get('title',''), 'BPM':new.get('BPM') or old.get('BPM'), 'genre':new.get('genre') or old.get('genre',''), 'vocal':new.get('vocal') or old.get('vocal',''), 'trackRole':new.get('musicRole',''), 'performanceSignature':new.get('performanceSignature',''), 'stylePrompt':'', 'experimentArm':exp.get('arm','A'), 'experimentAxis':exp.get('axis','baseline'), 'experimentContext':exp.get('proposedChanges',{})}
             self.feedback_tracks.append(d)
         self._feedback_populate_tracks()
         self.nb.select(self.feedback_tab)
@@ -366,10 +370,13 @@ class App(tk.Tk):
             messagebox.showerror('오류',f'JSON을 읽지 못했습니다.\n{e}'); return
         songs=obj.get('songs') if isinstance(obj,dict) else obj
         if not isinstance(songs,list): messagebox.showerror('오류','songs 배열을 찾지 못했습니다.'); return
+        self.refresh_learning_analysis()
+        exp_map={int(r.get('trackNo',0)):r.get('experiment',{}) for r in self.experiment_plan}
         self.feedback_tracks=[]; self.feedback_track_map={}
         for i,x in enumerate(songs,1):
             if not isinstance(x,dict): continue
-            self.feedback_tracks.append({'trackNo':x.get('trackNo',i),'title':x.get('title',''),'BPM':x.get('BPM',x.get('bpm')),'genre':x.get('genre',x.get('genreText','')),'vocal':x.get('vocalType',x.get('vocalDesign','')),'trackRole':x.get('trackRole',''),'performanceSignature':x.get('performanceSignature',''),'stylePrompt':x.get('stylePrompt','')})
+            no=int(x.get('trackNo',i) or i); exp=exp_map.get(no,{})
+            self.feedback_tracks.append({'trackNo':no,'title':x.get('title',''),'BPM':x.get('BPM',x.get('bpm')),'genre':x.get('genre',x.get('genreText','')),'vocal':x.get('vocalType',x.get('vocalDesign','')),'trackRole':x.get('trackRole',''),'performanceSignature':x.get('performanceSignature',''),'stylePrompt':x.get('stylePrompt',''),'experimentArm':x.get('experimentArm',exp.get('arm','A')),'experimentAxis':x.get('experimentAxis',exp.get('axis','baseline')),'experimentContext':x.get('experimentContext',exp.get('proposedChanges',{}))})
         self._feedback_populate_tracks(); self.nb.select(self.feedback_tab)
 
     def _feedback_populate_tracks(self):
@@ -394,22 +401,22 @@ class App(tk.Tk):
         except ValueError: messagebox.showerror('오류','Runtime은 초 단위 숫자로 입력하세요.'); return
         issues=[k for k,v in self.fb_tag_vars.items() if v.get()]
         mr=self.selected_market_recipe or {}
-        rec={'session_id':self.fb_session.get().strip(),'market':self.market_var.get(),'goal':self.goal_var.get(),'preset_id':self.preset_var.get(),'market_recipe_id':mr.get('id',''),'market_recipe_label':mr.get('label',''),'model':self.model_var.get(),'episode':self.episode.get().strip(),'track_no':tr.get('trackNo'),'title':tr.get('title',''),'music_role':tr.get('trackRole',''),'bpm':tr.get('BPM') or 0,'genre':tr.get('genre',''),'vocal':tr.get('vocal',''),'performance_signature':tr.get('performanceSignature',''),'style_prompt':tr.get('stylePrompt',''),'decision':self.fb_decision.get(),'overall':self.fb_overall.get(),'vocal_identity':self.fb_vocal.get(),'hook':self.fb_hook.get(),'groove':self.fb_groove.get(),'prompt_adherence':self.fb_adherence.get(),'runtime_sec':runtime_val,'issue_tags':issues,'notes':self.fb_notes.get().strip()}
+        rec={'session_id':self.fb_session.get().strip(),'market':self.market_var.get(),'goal':self.goal_var.get(),'preset_id':self.preset_var.get(),'market_recipe_id':mr.get('id',''),'market_recipe_label':mr.get('label',''),'model':self.model_var.get(),'episode':self.episode.get().strip(),'track_no':tr.get('trackNo'),'title':tr.get('title',''),'music_role':tr.get('trackRole',''),'bpm':tr.get('BPM') or 0,'genre':tr.get('genre',''),'vocal':tr.get('vocal',''),'performance_signature':tr.get('performanceSignature',''),'style_prompt':tr.get('stylePrompt',''),'decision':self.fb_decision.get(),'overall':self.fb_overall.get(),'vocal_identity':self.fb_vocal.get(),'hook':self.fb_hook.get(),'groove':self.fb_groove.get(),'prompt_adherence':self.fb_adherence.get(),'runtime_sec':runtime_val,'issue_tags':issues,'notes':self.fb_notes.get().strip(),'experiment_arm':tr.get('experimentArm',''),'experiment_axis':tr.get('experimentAxis',''),'experiment_context':tr.get('experimentContext',{})}
         row_id=add_feedback(self.feedback_db,rec)
         self.refresh_feedback_view(); self.run_recommendations()
-        messagebox.showinfo('저장',f'Feedback #{row_id} 저장 완료. 레시피 표본이 3개 이상이면 다음 추천/컴파일부터 반영됩니다.')
+        messagebox.showinfo('저장',f"Feedback #{row_id} 저장 완료. A/B={tr.get('experimentArm','-')} / axis={tr.get('experimentAxis','-')}. 레시피 가이드는 n>=3, v0.5 A/B 분석은 같은 preset+recipe n>=30에서 활성화됩니다.")
 
     def refresh_feedback_view(self):
         if not hasattr(self,'fb_tree'): return
         for x in self.fb_tree.get_children(): self.fb_tree.delete(x)
         rows=list_feedback(self.feedback_db,300)
         for r in rows:
-            self.fb_tree.insert('', 'end', iid=str(r['id']), values=(r['id'],str(r['created_at'])[:16],r['decision'],r['track_no'],r['title'][:30],(r['market_recipe_label'] or r['market_recipe_id'])[:32],r['music_role'],r['bpm'],r['overall'],r['vocal_identity'],r['hook'],r['groove'],r['prompt_adherence']))
+            self.fb_tree.insert('', 'end', iid=str(r['id']), values=(r['id'],str(r['created_at'])[:16],r['decision'],r.get('experiment_arm',''),r.get('experiment_axis',''),r['track_no'],r['title'][:30],(r['market_recipe_label'] or r['market_recipe_id'])[:32],r['music_role'],r['bpm'],r['overall'],r['vocal_identity'],r['hook'],r['groove'],r['prompt_adherence']))
         agg=aggregate_feedback(self.feedback_db)
         recipe_rows=[]
         for rid,st in sorted(agg.get('byRecipe',{}).items(), key=lambda kv:(kv[1].get('feedbackScore',0),kv[1].get('n',0)), reverse=True):
             recipe_rows.append({'recipe':rid,**st})
-        summary={'db':str(self.feedback_db),'totalEvaluations':agg.get('total',0),'recipeRanking':recipe_rows,'recurringIssues':agg.get('issueCounts',{}),'activationRule':'recipe/preset local guidance starts at n>=3; feedback weight grows gradually and caps at 55%'}
+        summary={'db':str(self.feedback_db),'totalEvaluations':agg.get('total',0),'recipeRanking':recipe_rows,'experimentArms':agg.get('byExperimentArm',{}),'experimentAxes':agg.get('byExperimentAxis',{}),'recurringIssues':agg.get('issueCounts',{}),'activationRule':'recipe/preset local guidance starts at n>=3; v0.5 A/B descriptive analysis requires both arms >=5 within same preset+recipe scope'}
         self.fb_summary.delete('1.0','end'); self.fb_summary.insert('1.0',json.dumps(summary,ensure_ascii=False,indent=2))
         if hasattr(self,'learning_text'): self.refresh_learning_analysis()
 
@@ -452,7 +459,7 @@ class App(tk.Tk):
         if not d: return
         self.refresh_learning_analysis()
         rid=self.selected_market_recipe.get('id','market'); base=Path(d)/f"suno_v05_package_{rid}"; base.mkdir(parents=True,exist_ok=True)
-        write_text(base/'compiled_chatgpt_instruction.txt',self.compiled); write_json(base/'compile_manifest.json',self.manifest); write_json(base/'structured_track_plan.json',{'meta':self.track_plan_meta,'tracks':self.track_plan}); write_json(base/'selected_market_recipe.json',self.selected_market_recipe); write_json(base/'selected_channel_preset.json',PRESETS[self.preset_var.get()]); write_json(base/'reference_dna.json',self.manifest.get('referenceDNA',{})); write_json(base/'feedback_insights.json',self.manifest.get('performanceInsights',{})); write_json(base/'learning_analysis_v05.json',self.learning_analysis); write_json(base/'experiment_manifest_v05.json',self.experiment_manifest); messagebox.showinfo('저장',f'저장 완료\n{base}')
+        write_text(base/'compiled_chatgpt_instruction.txt',self.compiled); write_json(base/'compile_manifest.json',self.manifest); write_json(base/'structured_track_plan.json',{'meta':self.track_plan_meta,'tracks':self.track_plan}); write_json(base/'selected_market_recipe.json',self.selected_market_recipe); write_json(base/'selected_channel_preset.json',PRESETS[self.preset_var.get()]); write_json(base/'reference_dna.json',self.manifest.get('referenceDNA',{})); write_json(base/'feedback_insights.json',self.manifest.get('performanceInsights',{})); write_json(base/'learning_analysis_v05.json',self.learning_analysis); write_json(base/'ab_results_v05.json',self.ab_results); write_json(base/'experiment_manifest_v05.json',self.experiment_manifest); messagebox.showinfo('저장',f'저장 완료\n{base}')
     def validate_result_file(self):
         p=filedialog.askopenfilename(filetypes=[('JSON','*.json'),('Text','*.txt'),('All','*.*')])
         if not p: return

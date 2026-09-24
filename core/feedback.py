@@ -11,7 +11,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
 ISSUE_TAGS = [
     "generic_vocal", "vocal_identity_shift", "too_airy", "too_rnb", "rap_weak",
     "rap_too_hard", "too_slow", "too_fast", "hook_weak", "bridge_weak",
@@ -26,6 +26,19 @@ def _connect(path: str | Path) -> sqlite3.Connection:
     con = sqlite3.connect(p)
     con.row_factory = sqlite3.Row
     return con
+
+
+def _ensure_feedback_columns(con: sqlite3.Connection) -> None:
+    """Backward-compatible schema migration for v0.5 experiment metadata."""
+    existing = {str(row["name"]) for row in con.execute("PRAGMA table_info(feedback)").fetchall()}
+    wanted = {
+        "experiment_arm": "TEXT",
+        "experiment_axis": "TEXT",
+        "experiment_context": "TEXT",
+    }
+    for name, ddl in wanted.items():
+        if name not in existing:
+            con.execute(f"ALTER TABLE feedback ADD COLUMN {name} {ddl}")
 
 
 def init_feedback_db(path: str | Path) -> None:
@@ -59,10 +72,14 @@ def init_feedback_db(path: str | Path) -> None:
                 prompt_adherence INTEGER NOT NULL,
                 runtime_sec REAL,
                 issue_tags TEXT,
-                notes TEXT
+                notes TEXT,
+                experiment_arm TEXT,
+                experiment_axis TEXT,
+                experiment_context TEXT
             )
             """
         )
+        _ensure_feedback_columns(con)
         con.execute("CREATE INDEX IF NOT EXISTS idx_feedback_recipe ON feedback(market_recipe_id)")
         con.execute("CREATE INDEX IF NOT EXISTS idx_feedback_preset ON feedback(preset_id)")
         con.execute("CREATE INDEX IF NOT EXISTS idx_feedback_created ON feedback(created_at)")
@@ -105,6 +122,8 @@ def add_feedback(path: str | Path, record: Dict[str, Any]) -> int:
         _clamp_rating(record.get("prompt_adherence")),
         float(record["runtime_sec"]) if record.get("runtime_sec") not in (None, "") else None,
         json.dumps(tags, ensure_ascii=False), str(record.get("notes") or ""),
+        str(record.get("experiment_arm") or ""), str(record.get("experiment_axis") or ""),
+        json.dumps(record.get("experiment_context") or {}, ensure_ascii=False),
     )
     with closing(_connect(path)) as con:
         cur = con.execute(
@@ -112,8 +131,9 @@ def add_feedback(path: str | Path, record: Dict[str, Any]) -> int:
             INSERT INTO feedback(
                 created_at,session_id,market,goal,preset_id,market_recipe_id,market_recipe_label,model,episode,
                 track_no,title,music_role,bpm,genre,vocal,performance_signature,style_prompt,decision,
-                overall,vocal_identity,hook,groove,prompt_adherence,runtime_sec,issue_tags,notes
-            ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+                overall,vocal_identity,hook,groove,prompt_adherence,runtime_sec,issue_tags,notes,
+                experiment_arm,experiment_axis,experiment_context
+            ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
             """, vals
         )
         con.commit()
@@ -129,6 +149,8 @@ def list_feedback(path: str | Path, limit: int = 500) -> List[Dict[str, Any]]:
         d=dict(r)
         try: d["issue_tags"] = json.loads(d.get("issue_tags") or "[]")
         except Exception: d["issue_tags"] = []
+        try: d["experiment_context"] = json.loads(d.get("experiment_context") or "{}")
+        except Exception: d["experiment_context"] = {}
         out.append(d)
     return out
 
@@ -159,9 +181,15 @@ def aggregate_feedback(path: str | Path) -> Dict[str, Any]:
     by_recipe: Dict[str, List[Dict[str, Any]]] = defaultdict(list)
     by_preset: Dict[str, List[Dict[str, Any]]] = defaultdict(list)
     issue_counts = Counter()
+    by_experiment_arm: Dict[str, List[Dict[str, Any]]] = defaultdict(list)
+    by_experiment_axis: Dict[str, List[Dict[str, Any]]] = defaultdict(list)
     for r in rows:
         by_recipe[r.get("market_recipe_id") or "(none)"].append(r)
         by_preset[r.get("preset_id") or "(none)"].append(r)
+        arm=str(r.get("experiment_arm") or "").strip()
+        axis=str(r.get("experiment_axis") or "").strip()
+        if arm: by_experiment_arm[arm].append(r)
+        if axis: by_experiment_axis[axis].append(r)
         issue_counts.update(r.get("issue_tags") or [])
 
     def summarize(group: Dict[str, List[Dict[str, Any]]]) -> Dict[str, Any]:
@@ -184,6 +212,8 @@ def aggregate_feedback(path: str | Path) -> Dict[str, Any]:
         "total":len(rows),
         "byRecipe":summarize(by_recipe),
         "byPreset":summarize(by_preset),
+        "byExperimentArm":summarize(by_experiment_arm),
+        "byExperimentAxis":summarize(by_experiment_axis),
         "issueCounts":dict(issue_counts.most_common()),
     }
 
@@ -272,11 +302,12 @@ def export_feedback_csv(path: str | Path, out_path: str | Path) -> None:
     fields=[
         "id","created_at","session_id","market","goal","preset_id","market_recipe_id","market_recipe_label","model","episode",
         "track_no","title","music_role","bpm","genre","vocal","performance_signature","decision","overall","vocal_identity",
-        "hook","groove","prompt_adherence","runtime_sec","issue_tags","notes"
+        "hook","groove","prompt_adherence","runtime_sec","issue_tags","notes","experiment_arm","experiment_axis","experiment_context"
     ]
     with Path(out_path).open("w",encoding="utf-8-sig",newline="") as f:
         w=csv.DictWriter(f,fieldnames=fields); w.writeheader()
         for r in rows:
             d={k:r.get(k,"") for k in fields}
             d["issue_tags"]=",".join(r.get("issue_tags") or [])
+            d["experiment_context"]=json.dumps(r.get("experiment_context") or {},ensure_ascii=False)
             w.writerow(d)

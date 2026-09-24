@@ -325,3 +325,71 @@ def build_experiment_manifest(
         "lockViolations": lock_issues,
         "tracks": rows,
     }
+
+
+def analyze_ab_results(
+    records: Iterable[Dict[str, Any]],
+    min_per_arm: int = 5,
+    min_per_axis: int = 3,
+) -> Dict[str, Any]:
+    """Summarize observed A/B outcomes without declaring a winner.
+
+    This is descriptive only. It does not rewrite masters, Track Plans, or
+    recipes. A/B is considered analyzable only when both arms have enough
+    observations.
+    """
+    rows = [dict(r) for r in records if isinstance(r, dict)]
+    a_rows = [r for r in rows if str(r.get("experiment_arm") or "").upper() == "A"]
+    b_rows = [r for r in rows if str(r.get("experiment_arm") or "").upper() == "B"]
+    a = _group_summary(a_rows)
+    b = _group_summary(b_rows)
+    active = a["n"] >= int(min_per_arm) and b["n"] >= int(min_per_arm)
+    baseline_score = float(a.get("avgScore", 0) or 0)
+    baseline_keep = float(a.get("keepRate", 0) or 0)
+
+    by_axis: Dict[str, List[Dict[str, Any]]] = defaultdict(list)
+    for row in b_rows:
+        axis = str(row.get("experiment_axis") or "").strip()
+        if axis and axis != "baseline":
+            by_axis[axis].append(row)
+
+    axis_rows = []
+    for axis, group in by_axis.items():
+        summary = _group_summary(group)
+        if summary["n"] < int(min_per_axis):
+            continue
+        score_delta = round(float(summary["avgScore"]) - baseline_score, 1)
+        keep_delta = round(float(summary["keepRate"]) - baseline_keep, 3)
+        if not active:
+            signal = "insufficient"
+        elif score_delta >= 5 and keep_delta >= 0:
+            signal = "positive_early"
+        elif score_delta <= -5 and keep_delta <= 0:
+            signal = "negative_early"
+        else:
+            signal = "mixed_or_unclear"
+        axis_rows.append({
+            "axis": axis,
+            **summary,
+            "scoreDeltaVsA": score_delta,
+            "keepRateDeltaVsA": keep_delta,
+            "signal": signal,
+        })
+    axis_rows.sort(key=lambda x: (x["scoreDeltaVsA"], x["keepRateDeltaVsA"], x["n"]), reverse=True)
+
+    return {
+        "active": active,
+        "descriptiveSignalOnly": True,
+        "minPerArm": int(min_per_arm),
+        "minPerAxis": int(min_per_axis),
+        "armA": a,
+        "armB": b,
+        "scoreDeltaBvsA": round(float(b.get("avgScore", 0) or 0) - baseline_score, 1) if b["n"] else None,
+        "keepRateDeltaBvsA": round(float(b.get("keepRate", 0) or 0) - baseline_keep, 3) if b["n"] else None,
+        "byAxis": axis_rows,
+        "policy": {
+            "declareWinner": False,
+            "autoApply": False,
+            "autoMasterRewrite": False,
+        },
+    }
