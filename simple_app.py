@@ -7,6 +7,7 @@ from tkinter import ttk, filedialog, messagebox
 
 from core.io_utils import read_text, write_text, write_json
 from core.workflows import (
+    GENRE_CHOICES,
     load_json_text,
     detect_source_profile,
     validate_master_compatibility,
@@ -98,12 +99,24 @@ class SimpleApp(tk.Tk):
         self.existing_detect_var = tk.StringVar(value="원본 JSON을 불러오면 15곡/남성/여성/두사람 여부를 자동 확인합니다.")
         ttk.Label(step1, textvariable=self.existing_detect_var, foreground="#444").pack(anchor="w", pady=(8, 0))
 
+        genre_row = ttk.Frame(step1)
+        genre_row.pack(fill="x", pady=(8, 0))
+        ttk.Label(genre_row, text="장르 선택").pack(side="left")
+        self.existing_genre_var = tk.StringVar(value="자동(원본 유지)")
+        ttk.Combobox(
+            genre_row,
+            textvariable=self.existing_genre_var,
+            state="readonly",
+            width=25,
+            values=list(GENRE_CHOICES),
+        ).pack(side="left", padx=8)
+
         step2 = ttk.Labelframe(self.existing_tab, text="STEP 2  ChatGPT 업그레이드 지시문", padding=10)
         step2.pack(fill="both", expand=True, pady=(10, 0))
 
         bar = ttk.Frame(step2)
         bar.pack(fill="x")
-        ttk.Button(bar, text="업그레이드 지시문 만들기", command=self.make_existing_instruction).pack(side="left")
+        ttk.Button(bar, text="최신 마스터 반영 → 업그레이드 지시문 만들기", command=self.make_existing_instruction).pack(side="left")
         ttk.Button(bar, text="지시문 복사", command=lambda: self._copy_widget(self.existing_output, "업그레이드 지시문")).pack(side="left", padx=5)
         ttk.Button(bar, text="지시문 TXT 저장", command=self.save_existing_instruction).pack(side="left")
         ttk.Label(bar, text="→ ChatGPT에 붙여넣고 완성 JSON을 받은 뒤 STEP 3에서 불러오세요.", foreground="#555").pack(side="left", padx=14)
@@ -177,7 +190,7 @@ class SimpleApp(tk.Tk):
         self.existing_final = None
         self.existing_source_var.set(Path(p).name)
         self.existing_detect_var.set(
-            f"감지: {profile['trackCount']}곡 / vocal={profile['vocalMode']} / genre={profile['genreHint'] or '미확인'} / episode={profile['episodeTitle'] or '-'}"
+            f"감지: {profile['sourceType']} / {profile['trackCount']}곡 / vocal={profile['vocalMode']} / genre={profile['genreHint'] or '미확인'} / episode={profile['episodeTitle'] or '-'}"
         )
 
     def load_existing_master(self):
@@ -201,7 +214,11 @@ class SimpleApp(tk.Tk):
 
     def make_existing_instruction(self):
         try:
-            inst, compat = build_existing_json_upgrade_instruction(self.existing_source_text, self.existing_master_text)
+            inst, compat = build_existing_json_upgrade_instruction(
+                self.existing_source_text,
+                self.existing_master_text,
+                self.existing_genre_var.get(),
+            )
         except Exception as exc:
             messagebox.showerror("지시문 생성 실패", str(exc))
             return
@@ -209,7 +226,7 @@ class SimpleApp(tk.Tk):
         self._put_text(self.existing_output, inst)
         warn = " / ".join(compat.get("warnings") or [])
         self.existing_detect_var.set(
-            f"READY: {compat['source']['trackCount']}곡 / source={compat['source']['vocalMode']} / master={compat['master']['vocalMode']}" +
+            f"READY: {compat['source']['sourceType']} / {compat['source']['trackCount']}곡 / genre={self.existing_genre_var.get()} / master={compat['master']['vocalMode']}" +
             (f" / {warn}" if warn else "")
         )
 

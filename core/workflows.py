@@ -23,6 +23,16 @@ META_MUTABLE_FIELDS = {
     "performanceVariationPolicy", "activeRapPolicy", "durationPolicy",
 }
 
+GENRE_CHOICES = {
+    "자동(원본 유지)": "AUTO_PRESERVE",
+    "Chill Rap": "Chill Rap",
+    "Soft Old Pop Ballad": "Soft Old Pop Ballad",
+    "Soft Soul": "Soft Soul",
+    "Cafe Pop": "Cafe Pop",
+    "French Chanson": "French Chanson",
+    "Deep House": "Deep House",
+}
+
 
 def _strip_fence(text: str) -> str:
     s = (text or "").strip()
@@ -63,7 +73,12 @@ def detect_source_profile(source: Dict[str, Any]) -> Dict[str, Any]:
     hay = " ".join([
         str(meta.get("storyPov", "")), str(meta.get("vocalPolicy", "")),
         str(meta.get("channelLabel", "")), str(meta.get("generationStandardVersion", "")),
-        " ".join(str(r.get("vocalType", "")) + " " + str(r.get("vocalDesign", "")) for r in rows[:5]),
+        str(meta.get("genrePolicy", "")), str(meta.get("audience", "")),
+        " ".join(
+            str(r.get("vocalType", "")) + " " + str(r.get("vocalDesign", "")) + " "
+            + str(r.get("genreText", "")) + " " + str(r.get("stylePrompt", ""))
+            for r in rows[:5]
+        ),
     ]).casefold()
 
     if any(x in hay for x in ("instrumental", "no lead vocal", "no vocal")):
@@ -77,12 +92,26 @@ def detect_source_profile(source: Dict[str, Any]) -> Dict[str, Any]:
     else:
         vocal_mode = "unknown"
 
+    if any(x in hay for x in ("senior", "시니어", "soft old pop", "soft old-pop", "adult pop")):
+        source_type = "시니어"
+    elif vocal_mode == "dual":
+        source_type = "두사람"
+    elif vocal_mode == "female":
+        source_type = "여성"
+    elif vocal_mode == "male":
+        source_type = "남성"
+    elif vocal_mode == "instrumental":
+        source_type = "인스트루멘탈"
+    else:
+        source_type = "미확인"
+
     genre_policy = str(meta.get("genrePolicy", ""))
     genre_text = " ".join(str(r.get("genreText", "")) + " " + str(r.get("stylePrompt", "")) for r in rows[:3])
     genre_hint = "Chill Rap" if "chill rap" in (genre_policy + " " + genre_text).casefold() else ""
 
     return {
         "trackCount": len(rows),
+        "sourceType": source_type,
         "vocalMode": vocal_mode,
         "genreHint": genre_hint,
         "episodeTitle": str(meta.get("episodeTitle", "")),
@@ -137,7 +166,11 @@ def validate_master_compatibility(source: Dict[str, Any], master_text: str) -> D
     return {"ok": not errors, "source": src, "master": mst, "errors": errors, "warnings": warnings}
 
 
-def build_existing_json_upgrade_instruction(source_text: str, master_text: str) -> Tuple[str, Dict[str, Any]]:
+def build_existing_json_upgrade_instruction(
+    source_text: str,
+    master_text: str,
+    genre_choice: str = "자동(원본 유지)",
+) -> Tuple[str, Dict[str, Any]]:
     source = load_json_text(source_text)
     compat = validate_master_compatibility(source, master_text)
     if not compat["ok"]:
@@ -145,6 +178,19 @@ def build_existing_json_upgrade_instruction(source_text: str, master_text: str) 
     rows = _songs(source)
     if len(rows) != 15:
         raise ValueError(f"기존 JSON은 15곡이어야 합니다. 현재 {len(rows)}곡입니다.")
+    if genre_choice not in GENRE_CHOICES:
+        raise ValueError(f"지원하지 않는 장르 선택입니다: {genre_choice}")
+    genre_value = GENRE_CHOICES[genre_choice]
+    if genre_value == "AUTO_PRESERVE":
+        genre_rule = (
+            "원본 각 곡의 genreId/genreText/genre/stylePrompt 장르 정체성을 유지한다. "
+            "최신 MASTER가 명시적으로 요구하는 기술적 품질만 반영하고 다른 장르로 바꾸지 마라."
+        )
+    else:
+        genre_rule = (
+            f"선택 장르 '{genre_value}'를 모든 곡의 주 장르로 적용한다. "
+            "원본의 스토리·제목·훅·가사는 유지하고, 보조 색채는 곡별로 하나만 허용한다."
+        )
 
     instruction = """# EXISTING JSON -> LATEST MASTER UPGRADE
 
@@ -163,6 +209,10 @@ def build_existing_json_upgrade_instruction(source_text: str, master_text: str) 
 8. 원본 보컬 성별/역할과 최신 MASTER가 충돌하면 억지 적용하지 마라.
 9. 최종 응답은 설명 없이 JSON object 하나만 출력한다.
 10. songs 15곡을 모두 출력한다.
+
+[SELECTED GENRE POLICY]
+- UI 선택: """ + genre_choice + """
+- 적용 규칙: """ + genre_rule + """
 
 [DETECTED SOURCE]
 """ + json.dumps(compat["source"], ensure_ascii=False, indent=2) + """

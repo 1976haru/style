@@ -6,6 +6,7 @@ from core.workflows import (
     finalize_existing_upgrade,
     finalize_haru_result,
     validate_master_compatibility,
+    detect_source_profile,
 )
 
 
@@ -56,6 +57,34 @@ def test_existing_upgrade_instruction_contains_full_source_and_master():
     assert "LYRICS-15" in inst
     assert "Male Solo ONLY" in inst
     assert "structured_track_plan" in inst
+    assert 'UI 선택: 자동(원본 유지)' in inst
+    assert "다른 장르로 바꾸지 마라" in inst
+
+
+def test_existing_upgrade_selected_genre_is_explicit():
+    inst, _ = build_existing_json_upgrade_instruction(
+        json.dumps(_source(), ensure_ascii=False), MALE_MASTER, "Deep House"
+    )
+    assert 'UI 선택: Deep House' in inst
+    assert "선택 장르 'Deep House'를 모든 곡의 주 장르로 적용" in inst
+
+
+def test_source_profile_detects_male_female_dual_and_senior():
+    male = _source()
+    assert detect_source_profile(male)["sourceType"] == "남성"
+    female = json.loads(json.dumps(male))
+    female["meta"]["storyPov"] = "female"
+    for row in female["songs"]:
+        row["vocalType"] = "Female Solo"
+    assert detect_source_profile(female)["sourceType"] == "여성"
+    dual = json.loads(json.dumps(male))
+    dual["meta"]["storyPov"] = "dual"
+    dual["songs"][0]["vocalType"] = "Male-Female Duet"
+    assert detect_source_profile(dual)["sourceType"] == "두사람"
+    senior = json.loads(json.dumps(male))
+    senior["meta"]["channelLabel"] = "시니어 채널"
+    senior["meta"]["genrePolicy"] = "Soft Old Pop Ballad"
+    assert detect_source_profile(senior)["sourceType"] == "시니어"
 
 
 def test_wrong_instrumental_master_is_blocked_for_male_source():
