@@ -29,7 +29,7 @@ TRACK_MUTABLE_FIELDS = {
 META_MUTABLE_FIELDS = {
     "revision", "generationStandardVersion", "promptIntelligenceVersion", "sunoModelTarget", "recommendedVariety",
     "durationHardRange", "durationPreferred", "songQualityPriority", "genrePolicy",
-    "harmonicPolicy", "vocalPolicy", "bridgePolicy", "highlightPolicy",
+    "harmonicPolicy", "vocalPolicy", "vocalSystem", "bridgePolicy", "highlightPolicy",
     "calibrationTracks", "calibrationNote", "energyArc", "vocalSignaturePolicy",
     "performanceVariationPolicy", "activeRapPolicy", "durationPolicy",
 }
