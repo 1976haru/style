@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "updatedAt": "2026-09-25",
+  "policy": {
+    "maxSecondaryTints": 1,
+    "candidateArms": ["A_CONTROL", "B_GROOVE", "C_CHARACTER"],
+    "note": "Compatibility entries are curated production hypotheses. They guide experiments and do not claim deterministic Suno output."
+  },
+  "genres": {
+    "chill_rap": {
+      "label": "Chill Rap",
+      "stableTints": ["light jazz-hop", "lo-fi soul", "acoustic soul-hop", "soft broken beat", "airy 2-step", "restrained city-pop", "very light urban R&B"],
+      "grooveModules": ["dry head-nod pocket", "syncopated pickup pocket", "light broken-beat pocket", "buoyant restrained 2-step pocket"],
+      "rhythmSection": ["soft punchy kick", "dry rim/snare", "restrained hats", "warm moving bass"],
+      "characterColors": ["muted guitar", "Rhodes", "clean guitar harmonic", "restrained electric piano"],
+      "avoid": ["full R&B ballad", "hard trap", "drill", "festival EDM", "pad-heavy singing"]
+    },
+    "old_pop_ballad": {
+      "label": "Soft Old Pop Ballad",
+      "stableTints": ["soft soul", "adult pop", "folk-pop", "light jazz-pop"],
+      "grooveModules": ["gentle backbeat", "soft brushed pocket", "slow natural pulse"],
+      "rhythmSection": ["soft kick", "warm snare", "round electric bass"],
+      "characterColors": ["warm piano", "clean guitar", "soft strings", "electric piano"],
+      "avoid": ["hard trap", "festival EDM", "aggressive sidechain"]
+    },
+    "soul": {
+      "label": "Soft Soul",
+      "stableTints": ["neo-soul light", "soft R&B", "jazz-soul", "acoustic soul"],
+      "grooveModules": ["laid-back pocket", "light syncopated pocket", "restrained pocket"],
+      "rhythmSection": ["soft kick", "dry snare", "warm electric bass"],
+      "characterColors": ["Rhodes", "clean guitar", "organ accent"],
+      "avoid": ["power belt", "gospel wall", "festival EDM"]
+    },
+    "cafe_pop": {
+      "label": "Cafe Pop",
+      "stableTints": ["acoustic pop", "bossa-pop light", "soft jazz-pop", "indie-pop light"],
+      "grooveModules": ["easy midtempo pocket", "light acoustic pulse", "soft swung pocket"],
+      "rhythmSection": ["soft kick", "light rim", "round bass"],
+      "characterColors": ["acoustic guitar", "piano", "brush texture"],
+      "avoid": ["hard trap", "festival EDM", "giant vocal stack"]
+    },
+    "chanson": {
+      "label": "French Chanson",
+      "stableTints": ["cafe chanson", "acoustic chanson", "light jazz chanson"],
+      "grooveModules": ["gentle chanson pulse", "light waltz-like sway", "restrained cafe groove"],
+      "rhythmSection": ["soft percussion", "round bass", "light brushes"],
+      "characterColors": ["accordion accent", "piano", "nylon guitar"],
+      "avoid": ["festival EDM", "hard trap", "power-pop belt"]
+    },
+    "deep_house": {
+      "label": "Deep House",
+      "stableTints": ["organic house", "melodic deep house", "soft afro-house tint"],
+      "grooveModules": ["steady four-on-floor", "restrained syncopated percussion", "warm rolling house pocket"],
+      "rhythmSection": ["deep kick", "tight clap", "restrained hats", "rolling bass"],
+      "characterColors": ["muted pluck", "warm pad", "electric piano stab"],
+      "avoid": ["festival supersaw", "hard techno kick", "trap hats"]
+    }
+  }
+}
