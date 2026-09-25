@@ -19,6 +19,8 @@
 
 The set report calculates changed/unchanged tracks, per-field change counts, before/after weakness totals, resolved weakness count and `optimizationEffective`. New contradictions, duplicate-heavy prompts, wrong vocal role, genre drift, out-of-range BPM, missing Bridge/Final/performance signature and style prompts above the hard maximum fail finalization. A track with zero actionable findings may use `KEEP` only with a content-based `keepReason`.
 
+Higher-order prompt analysis is conservative and content-based. It detects semantically repeated atoms, verifies that structured Bridge change axes are audible in the Bridge style text, compares repeated Finals with track-specific highlight payoffs, and measures set-level template similarity after removing shared singer-identity tokens. Shared recurring-vocal DNA is therefore allowed; only repeated non-singer groove, instrumentation, performance, Bridge and Final controls are actionable.
+
 Local acceptance uses a sanitized 15-track male-story fixture with 37 exclusions per track. A matching private `남_002_CHILI_LAB_JAPAN_EP002_v15.0...json` may exist outside the repository, but acceptance does not ingest it and no private source JSON is included in the repository.
 
 ## Immutable boundary

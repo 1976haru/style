@@ -259,6 +259,11 @@ def build_existing_json_upgrade_instruction(
         "duration_design": ("add a suitable duration/section target and prevent early ending", ("durationDesign",)),
         "generation_hint": ("add a concise track-specific generation guard", ("generationRunHint",)),
         "model_specific_behavior": ("format explicit musical controls for the target generation model", ("stylePrompt", "generationRunHint")),
+        "information_density": ("collapse semantically repeated style atoms without losing distinct musical controls", ("stylePrompt",)),
+        "track_specificity": ("add a concrete per-track performance cue while retaining the recurring singer", ("performanceSignature", "stylePrompt")),
+        "bridge_specificity": ("align the stylePrompt Bridge with at least two declared audible change axes, or three for an Anchor", ("bridgeDesign", "stylePrompt")),
+        "final_specificity": ("express this track's highlight payoff in the Final instead of a generic repeated ending", ("highlightDesign", "finalDesign", "stylePrompt")),
+        "template_similarity": ("differentiate groove, instrumentation, performance, Bridge or Final while retaining singer identity", ("grooveDesign", "instrumentationDesign", "performanceSignature", "bridgeDesign", "highlightDesign", "finalDesign", "stylePrompt")),
     }
     for analysis_track in current_analysis["tracks"]:
         areas = [x["area"] for x in analysis_track["weaknesses"]]

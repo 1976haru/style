@@ -15,6 +15,8 @@ REQUIRED_AREAS = {
     "bridge_contrast", "final_payoff", "prompt_ordering", "redundancy",
     "contradiction", "exclude_efficiency", "prompt_length", "model_specific_behavior",
     "tempo_design", "performance_signature", "duration_design", "generation_hint",
+    "information_density", "track_specificity", "bridge_specificity", "final_specificity",
+    "template_similarity",
 }
 
 MASTER = """CHILI LAB Male Solo ONLY
@@ -442,3 +444,84 @@ def test_sanitized_nam002_acceptance_compresses_excludes_15_of_15():
     for before, after in zip(source["songs"], final["songs"]):
         for field in ("title", "lyrics", "hookPhrase", "story", "scene"):
             assert before[field] == after[field]
+
+
+def _structured_quality_set(*, generic_template=False, weak_bridge=False, generic_final=False):
+    source = _mature_prompt_source(12)
+    palettes = [
+        "muted guitar harmonics and brushed rim", "Rhodes tremolo and side-stick", "nylon guitar and shaker",
+        "Wurlitzer pulse and dry clap", "piano ostinato and woodblock", "marimba flecks and rim click",
+        "organ stabs and soft kick", "acoustic guitar taps and tambourine", "electric piano and cross-stick",
+        "plucked synth and brushed snare", "vibraphone accents and rim", "clean guitar arpeggio and shaker",
+        "piano dyads and dry backbeat", "Rhodes chords and hand percussion", "muted guitar pulse and soft snare",
+    ]
+    for i, row in enumerate(source["songs"]):
+        palette = "Rhodes loop and dry rim" if generic_template else palettes[i]
+        bridge = "Bridge drops drums" if weak_bridge else "Bridge drops drums, bass holds roots, vocal moves to far-room distance"
+        final = "Final restores the full pocket" if generic_final else f"Final restores {palette} with cadence color {i + 1}"
+        row["stylePrompt"] = (
+            f"Chill Rap, 98 BPM; recurring Japanese male tenor, supported chest and dry grain; {palette}; "
+            f"syncopated pocket; {bridge}; {final}; section target 3:00-3:30"
+        )
+        row["bridgeDesign"] = {
+            "changeAxes": "drums and percussion + bass motion + vocal distance",
+            "purpose": "audible late-song contrast",
+            "mustNot": "do not swap singer",
+        }
+        row["highlightDesign"] = {
+            "shape": f"track payoff shape {i + 1}",
+            "harmonicPayoff": f"cadence color {i + 1}",
+            "rule": "retain singer identity",
+        }
+        row["performanceSignature"] = f"track {i + 1} pickup and phrase-ending behavior"
+    return source
+
+
+def test_good_specific_prompt_is_not_rewritten_by_quality_checks():
+    analysis = analyze_current_prompt(_structured_quality_set())
+    advanced = {"information_density", "track_specificity", "bridge_specificity", "final_specificity", "template_similarity"}
+    assert not (advanced & set(analysis["weaknessCounts"]))
+
+
+def test_semantically_repetitive_style_atoms_reduce_information_density():
+    source = _structured_quality_set()
+    source["songs"][0]["stylePrompt"] += "; muted guitar harmonics with brushed rim detail"
+    analysis = analyze_current_prompt(source)
+    assert "information_density" in {x["area"] for x in analysis["tracks"][0]["weaknesses"]}
+
+
+def test_generic_bridge_missing_declared_axes_is_detected():
+    analysis = analyze_current_prompt(_structured_quality_set(weak_bridge=True))
+    assert analysis["weaknessCounts"]["bridge_specificity"] == 15
+
+
+def test_track_specific_bridge_axes_are_accepted():
+    analysis = analyze_current_prompt(_structured_quality_set())
+    assert "bridge_specificity" not in analysis["weaknessCounts"]
+
+
+def test_generic_final_omitting_distinct_highlight_is_detected():
+    analysis = analyze_current_prompt(_structured_quality_set(generic_final=True))
+    assert analysis["weaknessCounts"]["final_specificity"] == 15
+
+
+def test_shared_singer_identity_alone_is_not_template_similarity():
+    analysis = analyze_current_prompt(_structured_quality_set())
+    assert "template_similarity" not in analysis["weaknessCounts"]
+
+
+def test_repeated_instrument_groove_bridge_final_template_is_detected():
+    source = _structured_quality_set(generic_template=True)
+    for row in source["songs"]:
+        row["performanceSignature"] = "same clipped pickup and ending"
+    analysis = analyze_current_prompt(source)
+    assert analysis["weaknessCounts"]["template_similarity"] == 15
+    assert analysis["weaknessCounts"]["track_specificity"] == 15
+
+
+def test_advanced_quality_analysis_still_ignores_version_label():
+    old = _structured_quality_set(weak_bridge=True)
+    latest = json.loads(json.dumps(old))
+    old["meta"]["version"] = "v15.0"
+    latest["meta"]["version"] = "v99.0"
+    assert analyze_current_prompt(old) == analyze_current_prompt(latest)

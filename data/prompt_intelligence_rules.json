@@ -31,6 +31,11 @@
     "model_specific_behavior": {"priority": 80, "rule": "Adapt syntax only to the explicitly selected target model; do not treat a source JSON version label as a quality signal."},
     "performance_signature": {"priority": 85, "rule": "Give each track a concrete, track-specific delivery behavior while retaining the recurring vocal identity."},
     "duration_design": {"priority": 75, "rule": "Specify a duration or section-length target appropriate to the song format and avoid premature endings."},
-    "generation_hint": {"priority": 75, "rule": "Give concise track-specific generation and rejection guidance for the most likely failure mode."}
+    "generation_hint": {"priority": 75, "rule": "Give concise track-specific generation and rejection guidance for the most likely failure mode."},
+    "information_density": {"priority": 85, "rule": "Detect semantically duplicated prompt atoms and retain each distinct musical instruction only once."},
+    "track_specificity": {"priority": 90, "rule": "Require a concrete per-track performance cue; recurring singer identity alone is not track specificity."},
+    "bridge_specificity": {"priority": 95, "rule": "Represent at least two declared audible Bridge change axes in stylePrompt, or three for Anchor tracks."},
+    "final_specificity": {"priority": 95, "rule": "Reflect the track's highlight payoff in its Final instead of repeating a generic set-wide ending."},
+    "template_similarity": {"priority": 90, "rule": "Ignore shared singer identity but detect excessive set-wide reuse of groove, instrumentation, performance, Bridge and Final controls."}
   }
 }

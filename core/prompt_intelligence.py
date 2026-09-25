@@ -50,6 +50,75 @@ def _duplicates(text: str) -> List[str]:
     return dupes
 
 
+_QUALITY_STOPWORDS = {
+    "the", "and", "with", "from", "into", "then", "that", "this", "only",
+    "track", "style", "prompt", "section", "desired", "before", "after",
+}
+_SINGER_IDENTITY_TOKENS = {
+    "male", "female", "tenor", "baritone", "soprano", "alto", "mezzo", "singer",
+    "vocal", "voice", "recurring", "japanese", "solo", "duet",
+}
+
+
+def _quality_tokens(text: Any, *, omit_singer: bool = False) -> set[str]:
+    tokens = {
+        token for token in re.findall(r"[a-z0-9]+", str(text or "").casefold())
+        if len(token) > 2 and token not in _QUALITY_STOPWORDS
+    }
+    return tokens - _SINGER_IDENTITY_TOKENS if omit_singer else tokens
+
+
+def _section_text(style: str, section: str) -> str:
+    # Semicolons/pipes delimit major controls; commas often continue the same
+    # Bridge or Final instruction and must remain available for axis matching.
+    atoms = [re.sub(r"\s+", " ", x).strip() for x in re.split(r"[;|]+", style or "") if x.strip()]
+    return " ".join(atom for atom in atoms if section.casefold() in atom.casefold())
+
+
+def _near_duplicate_atoms(style: str) -> bool:
+    atoms = [_quality_tokens(atom) for atom in _split_atoms(style)]
+    for i, left in enumerate(atoms):
+        if len(left) < 3:
+            continue
+        for right in atoms[i + 1:]:
+            if len(right) < 3:
+                continue
+            if len(left & right) / len(left | right) >= 0.72:
+                return True
+    return False
+
+
+def _axis_parts(value: Any) -> List[str]:
+    if isinstance(value, list):
+        return [str(x).strip() for x in value if str(x).strip()]
+    return [x.strip() for x in re.split(r"\s*\+\s*|[;,|/]+", str(value or "")) if x.strip()]
+
+
+def _axis_is_represented(axis: str, section_text: str) -> bool:
+    axis_tokens = _quality_tokens(axis)
+    section_tokens = _quality_tokens(section_text)
+    if axis_tokens & section_tokens:
+        return True
+    semantic_groups = (
+        r"drum|kick|snare|rim|hat|percussion|backbeat|rhythm",
+        r"bass|sub|lowend",
+        r"texture|instrument|guitar|piano|rhodes|keys|pad|density|sparse|layer",
+        r"harmon|chord|key|modal|progress|voic|cadence",
+        r"register|octave|pitch|range",
+        r"vocal|voice|delivery|distance|whisper|spoken|speech|phrase|diction",
+        r"space|reverb|dry|wide|mono|stereo|room|mix|filter",
+        r"dynamic|energy|loud|soft|intens|volume",
+        r"melod|motif|hook|counter",
+    )
+    return any(re.search(group, axis, re.I) and re.search(group, section_text, re.I) for group in semantic_groups)
+
+
+def _append_weakness(track: Dict[str, Any], area: str, reason: str, improvement: str) -> None:
+    if area not in {x.get("area") for x in track["weaknesses"]}:
+        track["weaknesses"].append({"area": area, "reason": reason, "expectedImprovement": improvement})
+        track["qualityOpportunityCount"] = len(track["weaknesses"])
+
+
 def _track_analysis(row: Dict[str, Any], rules: Dict[str, Any], target_model: str = "") -> Dict[str, Any]:
     style = str(row.get("stylePrompt", ""))
     exclude = str(row.get("excludePrompt") or row.get("negativeStyleText", ""))
@@ -161,7 +230,85 @@ def analyze_current_prompt(source: Dict[str, Any], rules: Dict[str, Any] | None 
     rules = rules or load_prompt_intelligence_rules()
     meta = source.get("meta") if isinstance(source.get("meta"), dict) else {}
     target_model = str(meta.get("sunoModelTarget", meta.get("model", "")))
-    tracks = [_track_analysis(row, rules, target_model) for row in _songs(source)]
+    rows = _songs(source)
+    tracks = [_track_analysis(row, rules, target_model) for row in rows]
+
+    # Higher-order checks are conservative: shared singer identity is expected
+    # across a set and is removed from similarity scoring.
+    for row, track in zip(rows, tracks):
+        style = str(row.get("stylePrompt", ""))
+        if _near_duplicate_atoms(style):
+            _append_weakness(
+                track, "information_density",
+                "Semantically overlapping stylePrompt atoms repeat the same control.",
+                "More musical control per prompt atom without removing distinct behavior.",
+            )
+        bridge = row.get("bridgeDesign")
+        if isinstance(bridge, dict):
+            axes = _axis_parts(bridge.get("changeAxes"))
+            bridge_text = _section_text(style, "bridge")
+            covered = sum(_axis_is_represented(axis, bridge_text) for axis in axes)
+            required = 3 if str(row.get("trackRole", "")).casefold() == "anchor" else 2
+            if len(axes) >= required and covered < required:
+                _append_weakness(
+                    track, "bridge_specificity",
+                    f"Bridge style text represents {covered} of {len(axes)} declared audible change axes; {required} are required.",
+                    "A track-specific Bridge whose audible axes agree with bridgeDesign.",
+                )
+
+    has_structured_sections = all(
+        isinstance(row.get("bridgeDesign"), dict) and isinstance(row.get("highlightDesign"), dict)
+        for row in rows
+    )
+    if len(rows) >= 3 and has_structured_sections:
+        styles = [str(row.get("stylePrompt", "")) for row in rows]
+        distinctive = [_quality_tokens(style, omit_singer=True) for style in styles]
+        overly_similar: set[int] = set()
+        for i, left in enumerate(distinctive):
+            peers = 0
+            for j, right in enumerate(distinctive):
+                if i == j or not (left | right):
+                    continue
+                if len(left & right) / len(left | right) >= 0.82:
+                    peers += 1
+            if peers >= max(2, len(rows) // 3):
+                overly_similar.add(i)
+        for i in overly_similar:
+            _append_weakness(
+                tracks[i], "template_similarity",
+                "Non-singer groove, instrumentation, performance, Bridge and Final controls are overly similar across the set.",
+                "More track-level musical differentiation while retaining the recurring singer.",
+            )
+
+        final_sections = [_section_text(style, "final") or _section_text(style, "outro") for style in styles]
+        final_counts = {text: final_sections.count(text) for text in set(final_sections) if text}
+        highlight_variants = {
+            json.dumps(row.get("highlightDesign"), ensure_ascii=False, sort_keys=True) for row in rows
+            if row.get("highlightDesign")
+        }
+        if len(highlight_variants) > 1:
+            for i, (row, section) in enumerate(zip(rows, final_sections)):
+                if not section or final_counts.get(section, 0) < max(3, len(rows) // 2):
+                    continue
+                highlight = row.get("highlightDesign")
+                payoff = highlight.get("harmonicPayoff", "") if isinstance(highlight, dict) else ""
+                payoff_tokens = _quality_tokens(payoff)
+                if payoff_tokens and not payoff_tokens.intersection(_quality_tokens(section)):
+                    _append_weakness(
+                        tracks[i], "final_specificity",
+                        "A repeated generic Final omits this track's declared highlight payoff.",
+                        "A Final instruction tied to the track-specific highlight behavior.",
+                    )
+
+        signatures = [str(row.get("performanceSignature", "")).strip().casefold() for row in rows]
+        signature_counts = {value: signatures.count(value) for value in set(signatures) if value}
+        for i, signature in enumerate(signatures):
+            if i in overly_similar and signature_counts.get(signature, 0) >= max(3, len(rows) // 2):
+                _append_weakness(
+                    tracks[i], "track_specificity",
+                    "The same performance signature and high-similarity style template recur across the set.",
+                    "A concrete track-specific performance cue without changing singer identity.",
+                )
     counts: Dict[str, int] = {}
     for track in tracks:
         for item in track["weaknesses"]:
@@ -247,6 +394,11 @@ WEAKNESS_FIELDS = {
     "performance_signature": {"performanceSignature", "stylePrompt"},
     "duration_design": {"durationDesign", "stylePrompt"},
     "generation_hint": {"generationRunHint"},
+    "information_density": {"stylePrompt"},
+    "track_specificity": {"performanceSignature", "stylePrompt"},
+    "bridge_specificity": {"bridgeDesign", "stylePrompt"},
+    "final_specificity": {"highlightDesign", "finalDesign", "stylePrompt"},
+    "template_similarity": {"grooveDesign", "instrumentationDesign", "performanceSignature", "bridgeDesign", "highlightDesign", "finalDesign", "stylePrompt"},
 }
 
 
