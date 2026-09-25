@@ -16,7 +16,7 @@ REQUIRED_AREAS = {
     "contradiction", "exclude_efficiency", "prompt_length", "model_specific_behavior",
     "tempo_design", "performance_signature", "duration_design", "generation_hint",
     "information_density", "track_specificity", "bridge_specificity", "final_specificity",
-    "template_similarity",
+    "template_similarity", "jp_native_positive_controls", "vocal_design_consistency",
 }
 
 MASTER = """CHILI LAB Male Solo ONLY
@@ -55,9 +55,10 @@ def _optimized(source):
     for row in result["songs"]:
         old = row["stylePrompt"]
         new = (
-            "Chill Rap, 98 BPM; recurring male speech-forward tenor, supported warm chest and dry grain; "
-            "syncopated pocket; dry rim and light hats; moving bass; Rhodes and muted guitar; seventh-chord motion; "
-            "narrow rhythmic Verse; melodic Chorus lift; Bridge with rhythm and texture contrast; Final A+B payoff"
+            "Chill Rap, 98 BPM syncopated pocket; recurring male speech-forward tenor, supported warm chest and dry grain; "
+            "close-mic native Japanese diction, mora timing, natural sentence accent; dry rim and light hats; moving bass; "
+            "Rhodes and muted guitar; seventh-chord motion; narrow rhythmic Verse; melodic Chorus lift; "
+            "Bridge with rhythm and texture contrast; Final A+B payoff; section target 3:00-3:30"
         )
         row.update({
             "BPM": 98, "grooveDesign": "syncopated behind-beat pocket", "instrumentationDesign": "Rhodes and muted guitar",
@@ -115,10 +116,11 @@ def _mature_prompt_source(exclude_count=37):
     source = _source()
     source["meta"]["sunoModelTarget"] = "v6"
     style = (
-        "Chill Rap, 98 BPM; young Japanese male tenor, speech-forward supported chest and subtle dry grain; "
-        "syncopated relaxed pocket; dry rim, soft kick and light hats; moving warm bass; Rhodes and muted guitar; "
-        "seventh-chord tension and release; narrow rhythmic Verse; melodic Chorus lift; Bridge drops drums and changes texture; "
-        "Final A+B sustained payoff; section target 3:00-3:30"
+        "Chill Rap, 98 BPM relaxed syncopated pocket; young Japanese male tenor, close-mic speech-forward supported warm-light chest, "
+        "breath 10-20%, dry grain 5-12%; native Japanese diction, mora timing, natural sentence accent; "
+        "dry rim, soft kick and light hats; moving warm bass; Rhodes and muted guitar; seventh-chord tension and release; "
+        "narrow rhythmic Verse; melodic Chorus lift; Bridge drops drums and changes texture; Final A+B sustained payoff; "
+        "section target 3:00-3:30"
     )
     excludes = [
         "generic polished AI tenor", "generic Suno male pop vocal", "hyper-polished K-pop idol tenor", "power belt",
@@ -133,7 +135,7 @@ def _mature_prompt_source(exclude_count=37):
         row.update({
             "BPM": 98,
             "genreText": "Chill Rap",
-            "vocalDesign": "recurring young Japanese male tenor, speech-forward supported chest, subtle dry grain",
+            "vocalDesign": "recurring young Japanese male tenor, close-mic speech-forward warm-light chest, breath 10-20%, dry grain 5-12%, native Japanese diction, mora-timed phrasing, natural sentence accent",
             "harmonicDesign": "seventh-chord tension and release",
             "stylePrompt": style,
             "excludePrompt": "; ".join(excludes),
