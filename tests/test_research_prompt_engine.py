@@ -92,7 +92,7 @@ def test_style_matrix_has_all_current_genres_and_one_tint_policy():
 def test_candidate_pack_builds_three_research_arms_for_all_tracks():
     source = _source()
     pack = build_research_candidate_pack(source, "chill_rap")
-    assert pack["engineVersion"] == "0.6.0-dev"
+    assert pack["engineVersion"] == "0.6.1-dev"
     assert pack["candidatePolicy"]["onePrimaryAxisPerExperiment"] is True
     assert pack["candidatePolicy"]["noWinnerBeforeAudioFeedback"] is True
     assert len(pack["tracks"]) == 15
