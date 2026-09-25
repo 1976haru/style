@@ -1,6 +1,17 @@
-> Current development build: **v0.6-dev** — Research-Driven Prompt Engine. See `ARCHITECTURE_v06.md`.
+> Current development build: **v0.6.1-dev** — Research-Driven Prompt Engine + Channel Consistency Finalizer. See `ARCHITECTURE_v06.md`.
 
-# Suno Master Prompt Studio v0.6 — Research-Driven Prompt Engine
+# Suno Master Prompt Studio v0.6.1 — Research + Channel Consistency Finalizer
+
+## v0.6.1 핵심
+
+v0.6에서 발견된 실제 결과 검증 한계를 보완합니다. 프로그램이 이제 stylePrompt만 보는 것이 아니라 **stylePrompt ↔ vocalDesign 내부 일관성**과 **일본어 보컬의 positive controls**까지 검사합니다.
+
+- 일본어 보컬 actual stylePrompt에 close-mic + JP-native/native Japanese diction + mora timing + natural sentence/pitch-accent를 요구
+- stylePrompt와 vocalDesign의 breath/grain 범위가 충돌하면 FAIL
+- Chill Rap compiler 순서를 **genre/tint → BPM+groove → singer hard lock → channel voice/phonation → JP-native/rap pocket → rhythm/instruments → Hook → Bridge → Final → money chord → scene/runtime**로 교정
+- 72-88 words 권장, 65-95 words 허용 목표는 지시문에 반영하되 하드 실패는 기존 char hard max 중심으로 유지
+- ChatGPT 결과 JSON 불러오기 단계에서 위 두 consistency gate를 통과해야 최종 저장 가능
+- Research A/B/C candidate engine도 v0.6.1 버전으로 올리고 일본어 소스에 JP-native positive control을 추가
 
 ## v0.6 핵심
 
