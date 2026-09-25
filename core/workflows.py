@@ -11,6 +11,8 @@ from .prompt_intelligence import (
     validate_optimization_effectiveness, verify_immutable_fields,
 )
 
+from .v061_quality_gate import v061_result_failures
+
 
 TRACK_MUTABLE_FIELDS = {
     "BPM", "bpm", "trackRole", "musicRole", "rapRatio", "rapForwardRatio",
@@ -264,6 +266,8 @@ def build_existing_json_upgrade_instruction(
         "bridge_specificity": ("align the stylePrompt Bridge with at least two declared audible change axes, or three for an Anchor", ("bridgeDesign", "stylePrompt")),
         "final_specificity": ("express this track's highlight payoff in the Final instead of a generic repeated ending", ("highlightDesign", "finalDesign", "stylePrompt")),
         "template_similarity": ("differentiate groove, instrumentation, performance, Bridge or Final while retaining singer identity", ("grooveDesign", "instrumentationDesign", "performanceSignature", "bridgeDesign", "highlightDesign", "finalDesign", "stylePrompt")),
+        "jp_native_positive_controls": ("restore explicit close-mic + JP-native diction + mora timing + natural sentence/pitch-accent behavior in the actual stylePrompt", ("vocalDesign", "stylePrompt")),
+        "vocal_design_consistency": ("align vocalDesign and stylePrompt to one fixed channel fingerprint; remove conflicting breath/grain coordinates", ("vocalDesign", "stylePrompt")),
     }
     for analysis_track in current_analysis["tracks"]:
         areas = [x["area"] for x in analysis_track["weaknesses"]]
@@ -321,6 +325,11 @@ def build_existing_json_upgrade_instruction(
 17. promptOptimization은 status, changedFields, resolvedWeaknesses, remainingWeaknesses, changeReasons, expectedImprovements, oldStylePrompt, newStylePrompt, oldExcludePrompt, newExcludePrompt를 포함한다.
 18. 변경이 없고 actionable weakness가 전혀 없는 트랙만 status=KEEP을 쓸 수 있으며, keepReason="No actionable weakness remained after analysis"와 구체적인 내용 근거를 쓴다.
 19. CHILI 남성 exclude는 8-16개의 의미 범주로 압축하되 female/duet 오염, generic polished male-pop tenor, K-pop belt, mature/dark crooner, whisper-only, falsetto hook/final, rock rasp/gravel, 일본어 발음 오류, fully-sung R&B Verse, hard trap/drill, festival EDM, static bass 등 현재 마스터의 실제 실패 방어를 유지한다.
+20. 일본어 보컬 채널은 actual stylePrompt에 close-mic + JP-native/native Japanese diction + mora timing + natural sentence accent/pitch-accent를 positive control로 직접 넣는다. exclude에만 의존하지 마라.
+21. vocalDesign과 stylePrompt의 breath/grain/resonance 좌표가 서로 충돌하면 안 된다. 최신 MASTER의 고정 channel fingerprint를 vocalDesign의 Verse/Chorus/Bridge/Final까지 일관되게 반영하고, 섹션 차이는 phrase density/rap ratio/brightness/공간감으로 만든다.
+22. Chill Rap stylePrompt 순서는 genre + secondary tint → BPM+groove → gender hard lock → channel voice/phonation → JP-native + rap pocket → drum/moving bass → focused instruments → Hook → Bridge → Final → compact money chord → short scene/runtime로 한다.
+23. Chill Rap stylePrompt는 기본 72-88 words, 허용 65-95 words, 가능하면 900 chars 이하를 목표로 한다.
+24. 스토리/장면을 바꾸지 않는 범위에서 짧은 scene anchor를 actual stylePrompt 말미에 유지한다.
 
 [DETECTED SOURCE]
 """ + json.dumps(compat["source"], ensure_ascii=False, indent=2) + """
@@ -487,9 +496,11 @@ def _optimization_regression_issues(source: Dict[str, Any], result: Dict[str, An
     hard_max = int(load_prompt_intelligence_rules()["policy"]["targetPromptChars"]["hardMax"])
     source_rows = {str(x.get("trackNo", i)): x for i, x in enumerate(_songs(source), 1)}
 
+    source_context = source.get("meta") if isinstance(source.get("meta"), dict) else {}
     for i, row in enumerate(_songs(result), 1):
         no = row.get("trackNo", i)
         old = source_rows.get(str(no), {})
+        issues.extend(v061_result_failures(row, source_context))
         voice_role, old_voice_role = _vocal_role(row), _vocal_role(old)
         if old_voice_role != "unknown" and voice_role != old_voice_role:
             issues.append({"level": "FAIL", "code": "WRONG_VOCAL_ROLE", "trackNo": no, "message": f"Expected {old_voice_role}; found {voice_role}."})
