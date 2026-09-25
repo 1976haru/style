@@ -124,7 +124,7 @@ class SimpleApp(tk.Tk):
             values=list(GENRE_CHOICES),
         )
         self.existing_genre_cb.pack(side="left", padx=8)
-        self.existing_genre_cb.bind("<<ComboboxSelected>>", lambda _e: self._refresh_existing_master_label())
+        self.existing_genre_cb.bind("<<ComboboxSelected>>", lambda _e: self._on_existing_genre_change())
         self.existing_active_master_var = tk.StringVar(value="사용 마스터: 미등록")
         ttk.Label(genre_row, textvariable=self.existing_active_master_var, foreground="#333").pack(side="left", padx=16)
 
@@ -220,6 +220,10 @@ class SimpleApp(tk.Tk):
         text, path = read_registered_master(channel_id, self.registry_path)
         return text, path
 
+    def _on_existing_genre_change(self):
+        self.research_candidate_pack = None
+        self._refresh_existing_master_label()
+
     def _refresh_existing_master_label(self):
         label = CHANNEL_LABELS[self.existing_channel_id]
         registered = bool(self.existing_master_text)
@@ -270,6 +274,7 @@ class SimpleApp(tk.Tk):
             return
         self.existing_source_text = text
         self.existing_final = None
+        self.research_candidate_pack = None
         self.existing_source_var.set(Path(p).name)
         self.existing_channel_id = profile["channelId"]
         if profile["genreHint"] in GENRE_CHOICES:
@@ -289,6 +294,7 @@ class SimpleApp(tk.Tk):
         if not text:
             return
         self.existing_master_text = text
+        self.research_candidate_pack = None
         self.existing_master_var.set(path.name)
         self.existing_active_master_var.set(
             f"사용 마스터: {CHANNEL_LABELS[self.existing_channel_id]} 최신 마스터 + {self.existing_genre_var.get()} Genre Master"
@@ -327,6 +333,10 @@ class SimpleApp(tk.Tk):
             return
         try:
             source = load_json_text(self.existing_source_text)
+            if self.existing_master_text:
+                compat = validate_master_compatibility(source, self.existing_master_text)
+                if not compat["ok"]:
+                    raise ValueError("\n".join(compat["errors"]))
             genre_id = GENRE_CHOICES.get(self.existing_genre_var.get(), "auto")
             pack = build_research_candidate_pack(source, genre_id)
         except Exception as exc:
