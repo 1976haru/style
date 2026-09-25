@@ -132,3 +132,16 @@ def test_finalizer_blocks_v06_style_conflict_until_v061_fixed():
     _, issues = finalize_existing_upgrade(json.dumps(source, ensure_ascii=False), json.dumps(upgraded, ensure_ascii=False), "Chill Rap")
     codes = {x["code"] for x in issues if x.get("level") == "FAIL"}
     assert "JP_NATIVE_POSITIVE_CONTROLS_MISSING" in codes or "VOCAL_DESIGN_CONFLICT" in codes
+
+
+def test_english_lyric_tokyo_channel_does_not_require_jp_native_controls():
+    source = _jp_male_source()
+    source["meta"]["lyricLanguage"] = "english"
+    source["meta"]["channelLabel"] = "Tokyo Chill Love Story"
+    row = source["songs"][0]
+    row["stylePrompt"] = row["stylePrompt"].replace(
+        "JP-native diction, mora timing, natural sentence accent; ",
+        "natural connected English, relaxed consonants, idiomatic reductions; ",
+    )
+    findings = v061_track_findings(row, source["meta"])
+    assert "jp_native_positive_controls" not in {x["area"] for x in findings}
