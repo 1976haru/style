@@ -6,6 +6,8 @@ from copy import deepcopy
 from pathlib import Path
 from typing import Any, Dict, List
 
+from .v061_quality_gate import v061_track_findings
+
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_RULES_PATH = ROOT / "data" / "prompt_intelligence_rules.json"
@@ -178,12 +180,12 @@ def _track_analysis(row: Dict[str, Any], rules: Dict[str, Any], target_model: st
     order_terms = [
         re.search(r"\b(?:rap|pop|rock|soul|house|jazz|ballad|chanson|ambient|folk)\b", order_text),
         re.search(r"\b\d{2,3}\s*bpm\b", order_text),
+        re.search(r"\b(?:groove|pocket|syncopat|swing|backbeat|head-nod|2-step|broken-beat|boom-bap)\w*\b", order_text),
         re.search(r"\b(?:male|female|duet|instrumental|tenor|baritone|mezzo|soprano)\b", order_text),
-        re.search(r"\b(?:groove|pocket|syncopat|swing|backbeat)\w*\b", order_text),
     ]
     positions = [m.start() for m in order_terms if m]
     if len(positions) >= 2 and positions != sorted(positions):
-        weak("prompt_ordering", "Key prompt atoms are not ordered from genre/tempo/vocal into groove.", "Improved attention to the dominant identity and more reliable prompt parsing.")
+        weak("prompt_ordering", "Key prompt atoms are not ordered from genre/tempo/groove into singer/phonation.", "Improved attention to the dominant genre and rhythmic pocket before dense vocal controls.")
     if target_model and not re.search(r"\b(?:section|bar|bpm|style prompt|exclude)\b", style, re.I):
         weak("model_specific_behavior", f"Prompt has no structured musical cues for target model {target_model}.", "More reliable interpretation by the selected generation model.")
     elif not target_model:
@@ -232,6 +234,18 @@ def analyze_current_prompt(source: Dict[str, Any], rules: Dict[str, Any] | None 
     target_model = str(meta.get("sunoModelTarget", meta.get("model", "")))
     rows = _songs(source)
     tracks = [_track_analysis(row, rules, target_model) for row in rows]
+
+    # v0.6.1 catches cross-field control conflicts that a stylePrompt-only
+    # analyzer misses, especially JP-native positive controls and phonation
+    # coordinates that disagree between stylePrompt and vocalDesign.
+    for row, track in zip(rows, tracks):
+        for finding in v061_track_findings(row, meta):
+            _append_weakness(
+                track,
+                finding["area"],
+                finding["reason"],
+                finding["expectedImprovement"],
+            )
 
     # Higher-order checks are conservative: shared singer identity is expected
     # across a set and is removed from similarity scoring.
