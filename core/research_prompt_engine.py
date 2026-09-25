@@ -210,6 +210,19 @@ def _duration(song: Dict[str, Any]) -> str:
     return _clip(text, 90)
 
 
+def _language_control(source: Dict[str, Any]) -> str:
+    meta = source.get("meta") if isinstance(source.get("meta"), dict) else {}
+    blob = " ".join([
+        str(meta.get("lyricLanguage", "")),
+        str(meta.get("language", "")),
+        str(meta.get("channelId", "")),
+        str(meta.get("channelLabel", "")),
+    ]).casefold()
+    if any(token in blob for token in ("japanese", "日本語", "tokyo chill", "jp-chili")):
+        return "JP-NATIVE close-mic native Japanese diction, mora timing, natural sentence accent/pitch-accent feel"
+    return ""
+
+
 def _compose_prompt(
     genre_label: str,
     tint: str,
@@ -217,6 +230,7 @@ def _compose_prompt(
     groove: str,
     role_lock: str,
     voice_core: str,
+    language_control: str,
     performance: str,
     instrumentation: str,
     hook: str,
@@ -237,6 +251,7 @@ def _compose_prompt(
         head,
         role_lock,
         voice_core,
+        language_control,
         f"PERFORMANCE: {performance}" if performance else "",
         instrumentation,
         f"Hook “{hook}” melodic and immediately recognizable" if hook else "",
@@ -343,6 +358,7 @@ def build_research_candidate_pack(
 
         base_kwargs = dict(
             genre_label=genre_label, bpm=bpm, role_lock=role, voice_core=voice,
+            language_control=_language_control(source),
             instrumentation=instr, hook=hook, bridge=bridge, final=final,
             harmony=harmony, duration=duration,
         )
@@ -412,7 +428,7 @@ def build_research_candidate_pack(
         })
 
     return {
-        "engineVersion": "0.6.0-dev",
+        "engineVersion": "0.6.1-dev",
         "mode": "RESEARCH_DRIVEN_AB_CANDIDATES",
         "genreId": resolved_genre_id,
         "genreLabel": genre_label,
