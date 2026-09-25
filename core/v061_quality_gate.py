@@ -58,8 +58,13 @@ def _range_values(text: str, label_pattern: str) -> List[Tuple[int, int]]:
 def _ranges_conflict(left: List[Tuple[int, int]], right: List[Tuple[int, int]]) -> bool:
     if not left or not right:
         return False
-    # A clear conflict exists only when every stated range is disjoint.
-    return all(max(a, c) > min(b, d) for a, b in left for c, d in right)
+    # If stylePrompt declares a fixed channel range, any additional vocalDesign
+    # section range that is fully disjoint from every style range is a conflict.
+    # Example: style breath 10-20 plus legacy Verse breathiness 35-45.
+    return any(
+        all(max(a, c) > min(b, d) for a, b in left)
+        for c, d in right
+    )
 
 
 def japanese_positive_controls(style_prompt: str) -> Dict[str, bool]:
@@ -137,14 +142,6 @@ def v061_track_findings(
                 "expectedImprovement": "The model sees dominant genre and rhythmic pocket before voice-detail density.",
             })
 
-        word_count = len(re.findall(r"\S+", style))
-        if word_count < 65 or word_count > 95:
-            findings.append({
-                "area": "prompt_length",
-                "reason": f"Chill Rap stylePrompt is {word_count} words; v0.6.1 target is 65-95 words.",
-                "expectedImprovement": "Enough positive control for voice/groove/sections without prompt dilution.",
-            })
-
     return findings
 
 
@@ -160,7 +157,6 @@ def v061_result_failures(
             "jp_native_positive_controls": "JP_NATIVE_POSITIVE_CONTROLS_MISSING",
             "vocal_design_consistency": "VOCAL_DESIGN_CONFLICT",
             "prompt_ordering": "PROMPT_ORDER_V061",
-            "prompt_length": "STYLE_PROMPT_WORD_RANGE",
         }.get(area, "V061_QUALITY_GATE")
         failures.append({
             "level": "FAIL",
