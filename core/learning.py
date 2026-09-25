@@ -393,3 +393,89 @@ def analyze_ab_results(
             "autoMasterRewrite": False,
         },
     }
+
+
+def analyze_research_abc_results(
+    records: Iterable[Dict[str, Any]],
+    min_per_variant: int = 5,
+    min_per_axis: int = 3,
+) -> Dict[str, Any]:
+    """Describe v0.6 A_CONTROL/B_GROOVE/C_CHARACTER outcomes conservatively.
+
+    This function does not choose a winner, auto-apply a candidate, or rewrite
+    any master. It only reports observed local feedback once each variant has
+    enough evidence for a fair three-way comparison.
+    """
+    rows = [dict(r) for r in records if isinstance(r, dict)]
+    aliases = {
+        "A": "A_CONTROL",
+        "B": "B_GROOVE",
+        "C": "C_CHARACTER",
+        "A_CONTROL": "A_CONTROL",
+        "B_GROOVE": "B_GROOVE",
+        "C_CHARACTER": "C_CHARACTER",
+    }
+    grouped: Dict[str, List[Dict[str, Any]]] = defaultdict(list)
+    for row in rows:
+        raw = str(row.get("experiment_arm") or "").strip().upper()
+        variant = aliases.get(raw)
+        if variant:
+            grouped[variant].append(row)
+
+    summaries = {
+        variant: _group_summary(grouped.get(variant, []))
+        for variant in ("A_CONTROL", "B_GROOVE", "C_CHARACTER")
+    }
+    active = all(
+        int(summaries[variant]["n"]) >= int(min_per_variant)
+        for variant in ("A_CONTROL", "B_GROOVE", "C_CHARACTER")
+    )
+    baseline = summaries["A_CONTROL"]
+
+    variants = []
+    for variant in ("A_CONTROL", "B_GROOVE", "C_CHARACTER"):
+        summary = summaries[variant]
+        score_delta = round(float(summary["avgScore"]) - float(baseline["avgScore"]), 1) if summary["n"] else None
+        keep_delta = round(float(summary["keepRate"]) - float(baseline["keepRate"]), 3) if summary["n"] else None
+        variants.append({
+            "variant": variant,
+            **summary,
+            "scoreDeltaVsControl": 0.0 if variant == "A_CONTROL" and summary["n"] else score_delta,
+            "keepRateDeltaVsControl": 0.0 if variant == "A_CONTROL" and summary["n"] else keep_delta,
+        })
+
+    by_axis: Dict[str, List[Dict[str, Any]]] = defaultdict(list)
+    for row in rows:
+        axis = str(row.get("experiment_axis") or "").strip()
+        if axis and axis != "control_baseline":
+            by_axis[axis].append(row)
+
+    axis_rows = []
+    for axis, group in by_axis.items():
+        summary = _group_summary(group)
+        if summary["n"] < int(min_per_axis):
+            continue
+        axis_rows.append({
+            "axis": axis,
+            **summary,
+            "scoreDeltaVsControl": round(float(summary["avgScore"]) - float(baseline["avgScore"]), 1)
+            if baseline["n"] else None,
+            "keepRateDeltaVsControl": round(float(summary["keepRate"]) - float(baseline["keepRate"]), 3)
+            if baseline["n"] else None,
+        })
+    axis_rows.sort(key=lambda x: (x["n"], x["avgScore"]), reverse=True)
+
+    return {
+        "active": active,
+        "descriptiveSignalOnly": True,
+        "minPerVariant": int(min_per_variant),
+        "minPerAxis": int(min_per_axis),
+        "variants": variants,
+        "byAxis": axis_rows,
+        "policy": {
+            "declareWinner": False,
+            "autoApply": False,
+            "autoMasterRewrite": False,
+            "requiresAudioFeedback": True,
+        },
+    }
