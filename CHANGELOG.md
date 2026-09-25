@@ -8,7 +8,7 @@
 - Added safe variant application that deep-copies the source and changes only style/exclude prompt fields plus research audit metadata.
 - Added Simple UI actions for research candidate generation and A/B/C JSON export.
 - Added dedicated v0.6 research-engine regression tests.
-
+- Added feedbackBinding metadata to exported research variants and descriptive A_CONTROL/B_GROOVE/C_CHARACTER feedback analysis with no auto-winner or auto-apply behavior.\n
 ## 0.5.0-dev — Prompt Intelligence Optimizer
 - Replaced the existing-JSON “latest master” framing with content-based prompt analysis and optimization.
 - Added version-neutral analysis rules in `data/prompt_intelligence_rules.json` across required music/prompt areas.
