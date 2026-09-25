@@ -105,6 +105,7 @@ def v061_track_findings(
     findings: List[Dict[str, str]] = []
     style = str(row.get("stylePrompt", ""))
     vocal_design = _text(row.get("vocalDesign", ""))
+    phonation_design = _text(row.get("phonationDesign", ""))
     role = _vocal_role(row)
 
     if _is_japanese_source(source_context, row) and role not in {"instrumental", "unknown"}:
@@ -118,9 +119,9 @@ def v061_track_findings(
             })
 
     style_breath = _range_values(style, r"breath(?:iness)?|breath texture")
-    design_breath = _range_values(vocal_design, r"breath(?:iness)?|breath texture")
+    design_breath = _range_values(vocal_design + " " + phonation_design, r"breath(?:iness)?|breath texture")
     style_grain = _range_values(style, r"grain|dry grain")
-    design_grain = _range_values(vocal_design, r"grain|dry grain")
+    design_grain = _range_values(vocal_design + " " + phonation_design, r"grain|dry grain")
 
     conflict_bits: List[str] = []
     if _ranges_conflict(style_breath, design_breath):
