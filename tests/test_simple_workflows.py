@@ -47,10 +47,18 @@ def _source():
                 "BPM": 96,
                 "trackRole": "general",
                 "vocalType": "Male Solo",
+                "vocalDesign": {
+                    "base": "young Japanese male tenor, close-mic speech-forward warm-light chest, breath 10-20%, dry grain 5-12%, native Japanese diction, mora-timed phrasing, natural sentence accent",
+                    "verse": "40-55% rap-forward, breath 10-20%, clipped endings",
+                    "chorus": "same singer, breath 10-20%, brighter melodic hook",
+                    "bridge": "same singer, breath 10-20%, closer/drier",
+                    "final": "same singer, breath 10-20%, supported male self-response"
+                },
                 "stylePrompt": (
-                    f"Chill Rap, 98 BPM; recurring male speech-forward tenor, supported warm chest and dry grain; "
-                    f"syncopated pocket; dry rim and light hats; moving bass; Rhodes and muted guitar; "
-                    f"seventh-chord motion; narrow rhythmic Verse; melodic Chorus lift; Bridge with rhythm and texture contrast; "
+                    f"Chill Rap, 98 BPM syncopated pocket; HARD LOCK young Japanese male tenor only; "
+                    f"VOICE close-mic speech-forward warm-light chest, breath 10-20%, dry grain 5-12%, JP-native diction, mora timing, natural sentence accent; "
+                    f"RAP Verse40-55% half-rap, micro-rests; dry rim and light hats; moving bass; Rhodes and muted guitar; "
+                    f"seventh-chord motion; melodic Chorus lift; Bridge with rhythm and texture contrast; "
                     f"Final A+B payoff; section length 3:00-3:30; exclude early ending"
                 ),
                 "excludePrompt": "; ".join(f"legacy failure category {n}" for n in range(37)),
