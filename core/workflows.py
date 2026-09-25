@@ -21,7 +21,7 @@ TRACK_MUTABLE_FIELDS = {
     "durationDesign", "bridgeDesign", "highlightDesign", "killingPointDesign",
     "diversityDesign", "generationRunHint", "performanceSignature",
     "groove", "grooveDesign", "drums", "drumDesign", "bass", "bassDesign",
-    "instrumentation", "instrumentationDesign", "harmony", "phonation",
+    "instrumentation", "instrumentationDesign", "harmony", "phonation", "phonationDesign",
     "verseBehavior", "chorusBehavior", "finalDesign", "promptOptimization",
     "qualityScore", "warnings",
 }
