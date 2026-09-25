@@ -127,7 +127,7 @@ def _track_analysis(row: Dict[str, Any], rules: Dict[str, Any], target_model: st
     all_excludes = " ".join(str(row.get(k, "")) for k in ("excludePrompt", "negativeStyleText"))
     music_fields = " ".join(
         str(row.get(key, "")) for key in (
-            "genreText", "genre", "vocalDesign", "vocalType", "phonation", "groove", "grooveDesign",
+            "genreText", "genre", "vocalDesign", "vocalType", "phonation", "phonationDesign", "groove", "grooveDesign",
             "drums", "drumDesign", "bass", "bassDesign", "instrumentation", "instrumentationDesign",
             "harmonicDesign", "verseBehavior", "chorusBehavior", "bridgeDesign", "finalDesign",
             "durationDesign", "performanceSignature", "generationRunHint",
@@ -379,7 +379,7 @@ def build_old_new_comparison(source: Dict[str, Any], result: Dict[str, Any]) -> 
 
 
 OPTIMIZED_MUSIC_FIELDS = (
-    "BPM", "genreId", "genreText", "vocalDesign", "harmonicDesign", "stylePrompt",
+    "BPM", "genreId", "genreText", "vocalDesign", "phonationDesign", "harmonicDesign", "stylePrompt",
     "excludePrompt", "negativeStyleText", "performanceSignature", "generationRunHint",
     "bridgeDesign", "highlightDesign", "finalDesign", "durationDesign", "grooveDesign",
     "drumDesign", "bassDesign", "instrumentationDesign", "verseBehavior", "chorusBehavior",
@@ -389,7 +389,7 @@ WEAKNESS_FIELDS = {
     "tempo_design": {"BPM"},
     "genre_clarity": {"genreId", "genreText", "stylePrompt"},
     "vocal_identity": {"vocalDesign", "stylePrompt"},
-    "phonation": {"vocalDesign", "stylePrompt"},
+    "phonation": {"vocalDesign", "phonationDesign", "stylePrompt"},
     "groove": {"grooveDesign", "stylePrompt"},
     "drums": {"drumDesign", "stylePrompt"},
     "bass": {"bassDesign", "stylePrompt"},
