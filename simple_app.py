@@ -23,6 +23,7 @@ from core.workflows import (
     finalize_haru_result,
 )
 from core.prompt_intelligence import analyze_current_prompt
+from core.research_prompt_engine import build_research_candidate_pack, apply_research_candidate_variant
 
 CHANNEL_OPTIONS = {label: channel_id for channel_id, label in CHANNEL_LABELS.items()}
 
@@ -32,7 +33,7 @@ class SimpleApp(tk.Tk):
 
     def __init__(self):
         super().__init__()
-        self.title("Suno Master Prompt Studio v0.5 - Simple Workflow")
+        self.title("Suno Master Prompt Studio v0.6 - Research-Driven Workflow")
         self.geometry("1320x900")
         self.minsize(1080, 720)
 
@@ -41,6 +42,7 @@ class SimpleApp(tk.Tk):
         self.existing_instruction = ""
         self.existing_final = None
         self.existing_channel_id = "custom"
+        self.research_candidate_pack = None
 
         self.haru_text = ""
         self.haru_master_text = ""
@@ -54,7 +56,7 @@ class SimpleApp(tk.Tk):
         header = ttk.Frame(self, padding=(14, 12))
         header.pack(fill="x")
         ttk.Label(header, text="Suno Master Prompt Studio", font=("Segoe UI", 18, "bold")).pack(side="left")
-        ttk.Label(header, text="  실제 작업은 2가지만 사용합니다.", font=("Segoe UI", 10)).pack(side="left", padx=8)
+        ttk.Label(header, text="  v0.6 Research-Driven Prompt Engine", font=("Segoe UI", 10)).pack(side="left", padx=8)
 
         ttk.Label(
             self,
@@ -132,10 +134,14 @@ class SimpleApp(tk.Tk):
         bar = ttk.Frame(step2)
         bar.pack(fill="x")
         ttk.Button(bar, text="현재 프롬프트 분석", command=self.analyze_existing_prompt).pack(side="left")
+        ttk.Button(bar, text="연구 기반 A/B/C 후보", command=self.make_research_candidates).pack(side="left", padx=5)
         ttk.Button(bar, text="AI 음악 프롬프트 업그레이드", command=self.make_existing_instruction).pack(side="left", padx=5)
         ttk.Button(bar, text="지시문 복사", command=lambda: self._copy_widget(self.existing_output, "업그레이드 지시문")).pack(side="left", padx=5)
         ttk.Button(bar, text="지시문 TXT 저장", command=self.save_existing_instruction).pack(side="left")
-        ttk.Label(bar, text="→ ChatGPT에 붙여넣고 완성 JSON을 받은 뒤 STEP 3에서 불러오세요.", foreground="#555").pack(side="left", padx=14)
+        ttk.Button(bar, text="A 저장", command=lambda: self.save_research_variant("A_CONTROL")).pack(side="left", padx=(12, 2))
+        ttk.Button(bar, text="B 저장", command=lambda: self.save_research_variant("B_GROOVE")).pack(side="left", padx=2)
+        ttk.Button(bar, text="C 저장", command=lambda: self.save_research_variant("C_CHARACTER")).pack(side="left", padx=2)
+        ttk.Label(bar, text="→ A/B/C는 실제 Suno 비교용 연구 후보입니다.", foreground="#555").pack(side="left", padx=10)
 
         self.existing_output = tk.Text(step2, wrap="word", font=("Consolas", 9), height=18)
         self.existing_output.pack(fill="both", expand=True, pady=(8, 0))
@@ -314,6 +320,50 @@ class SimpleApp(tk.Tk):
         self.existing_detect_var.set(
             f"현재 설계 분석 완료: {analysis['trackCount']}곡 / version 품질판단 미사용 / 주요 개선영역: {areas}"
         )
+
+    def make_research_candidates(self):
+        if not self.existing_source_text:
+            messagebox.showwarning("순서 확인", "원본 JSON을 먼저 불러오세요.")
+            return
+        try:
+            source = load_json_text(self.existing_source_text)
+            genre_id = GENRE_CHOICES.get(self.existing_genre_var.get(), "auto")
+            pack = build_research_candidate_pack(source, genre_id)
+        except Exception as exc:
+            messagebox.showerror("Research 후보 생성 실패", str(exc))
+            return
+        self.research_candidate_pack = pack
+        self._put_text(self.existing_output, json.dumps(pack, ensure_ascii=False, indent=2))
+        self.existing_detect_var.set(
+            f"RESEARCH READY: {len(pack['tracks'])}곡 × A/B/C 3안 / genre={pack['genreLabel']} / model={pack['modelTarget']}"
+        )
+
+    def save_research_variant(self, variant_id):
+        if not self.existing_source_text:
+            messagebox.showwarning("순서 확인", "원본 JSON을 먼저 불러오세요.")
+            return
+        if not self.research_candidate_pack:
+            self.make_research_candidates()
+            if not self.research_candidate_pack:
+                return
+        try:
+            source = load_json_text(self.existing_source_text)
+            result = apply_research_candidate_variant(source, self.research_candidate_pack, variant_id)
+        except Exception as exc:
+            messagebox.showerror("Research JSON 생성 실패", str(exc))
+            return
+        suffix = {"A_CONTROL": "A_CONTROL", "B_GROOVE": "B_GROOVE", "C_CHARACTER": "C_CHARACTER"}[variant_id]
+        stem = Path(self.existing_source_var.get()).stem or "suno"
+        p = filedialog.asksaveasfilename(
+            title=f"{suffix} Research JSON 저장",
+            defaultextension=".json",
+            initialfile=f"{stem}_RESEARCH_{suffix}.json",
+            filetypes=[("JSON", "*.json")],
+        )
+        if not p:
+            return
+        write_json(p, result)
+        messagebox.showinfo("저장 완료", f"{suffix} 후보 JSON을 저장했습니다.\n{p}")
 
     def make_existing_instruction(self):
         if not self.existing_source_text:
