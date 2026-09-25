@@ -325,7 +325,7 @@ def build_existing_json_upgrade_instruction(
 17. promptOptimization은 status, changedFields, resolvedWeaknesses, remainingWeaknesses, changeReasons, expectedImprovements, oldStylePrompt, newStylePrompt, oldExcludePrompt, newExcludePrompt를 포함한다.
 18. 변경이 없고 actionable weakness가 전혀 없는 트랙만 status=KEEP을 쓸 수 있으며, keepReason="No actionable weakness remained after analysis"와 구체적인 내용 근거를 쓴다.
 19. CHILI 남성 exclude는 8-16개의 의미 범주로 압축하되 female/duet 오염, generic polished male-pop tenor, K-pop belt, mature/dark crooner, whisper-only, falsetto hook/final, rock rasp/gravel, 일본어 발음 오류, fully-sung R&B Verse, hard trap/drill, festival EDM, static bass 등 현재 마스터의 실제 실패 방어를 유지한다.
-20. 일본어 보컬 채널은 actual stylePrompt에 close-mic + JP-native/native Japanese diction + mora timing + natural sentence accent/pitch-accent를 positive control로 직접 넣는다. exclude에만 의존하지 마라.
+20. lyricLanguage가 Japanese인 보컬 세트만 actual stylePrompt에 close-mic + JP-native/native Japanese diction + mora timing + natural sentence accent/pitch-accent를 positive control로 직접 넣는다. Tokyo/Japan 타깃이라도 lyricLanguage=English이면 이 규칙을 적용하지 말고 natural connected English / relaxed consonants / idiomatic reductions / natural stress를 우선한다.
 21. vocalDesign과 stylePrompt의 breath/grain/resonance 좌표가 서로 충돌하면 안 된다. 최신 MASTER의 고정 channel fingerprint를 vocalDesign의 Verse/Chorus/Bridge/Final까지 일관되게 반영하고, 섹션 차이는 phrase density/rap ratio/brightness/공간감으로 만든다.
 22. Chill Rap stylePrompt 순서는 genre + secondary tint → BPM+groove → gender hard lock → channel voice/phonation → JP-native + rap pocket → drum/moving bass → focused instruments → Hook → Bridge → Final → compact money chord → short scene/runtime로 한다.
 23. Chill Rap stylePrompt는 기본 72-88 words, 허용 65-95 words, 가능하면 900 chars 이하를 목표로 한다.
