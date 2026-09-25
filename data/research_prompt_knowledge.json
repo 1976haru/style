@@ -1,0 +1,108 @@
+{
+  "schemaVersion": 1,
+  "updatedAt": "2026-09-25",
+  "purpose": "Curated evidence for Suno v6 generation recipes. Official Suno sources outrank community observations. Community rules are hypotheses for controlled A/B tests, not guarantees.",
+  "sources": [
+    {
+      "id": "suno_v6_faq",
+      "type": "official",
+      "title": "Suno v6 FAQ",
+      "url": "https://help.suno.com/en/articles/13924481",
+      "confidence": 1.0
+    },
+    {
+      "id": "suno_v6_models",
+      "type": "official",
+      "title": "What's new in v6?",
+      "url": "https://help.suno.com/en/articles/13924801",
+      "confidence": 1.0
+    },
+    {
+      "id": "suno_inspire",
+      "type": "official",
+      "title": "Inspire",
+      "url": "https://help.suno.com/en/articles/6882753",
+      "confidence": 1.0
+    },
+    {
+      "id": "suno_style_influence",
+      "type": "official",
+      "title": "Creative Sliders / Style Influence",
+      "url": "https://help.suno.com/en/articles/6141377",
+      "confidence": 1.0
+    },
+    {
+      "id": "suno_custom_models",
+      "type": "official",
+      "title": "Using Custom Models",
+      "url": "https://help.suno.com/en/articles/11362497",
+      "confidence": 1.0
+    },
+    {
+      "id": "community_style_mesh",
+      "type": "community",
+      "title": "Suno Prompt Engineering Guide — style co-occurrence research",
+      "url": "https://github.com/theelderemo/suno-prompt-engineering-guide",
+      "confidence": 0.65
+    },
+    {
+      "id": "community_suno_lab",
+      "type": "community",
+      "title": "Suno Music Prompt Laboratory — iterative prompt experiments",
+      "url": "https://github.com/danlex/suno-lab",
+      "confidence": 0.65
+    }
+  ],
+  "rules": [
+    {
+      "id": "v6_default_production",
+      "sourceIds": ["suno_v6_models"],
+      "rule": "Use v6 as the default production model; use v6-wild for deliberate exploration and v6-mini for fast ideation.",
+      "appliesTo": ["generationRecipe"]
+    },
+    {
+      "id": "variety_zero_for_control",
+      "sourceIds": ["suno_v6_faq"],
+      "rule": "When exact style-tag control matters, reduce Variety to 0.",
+      "appliesTo": ["control", "channelIdentity"]
+    },
+    {
+      "id": "max_mode_for_long_consistent_tracks",
+      "sourceIds": ["suno_v6_faq"],
+      "rule": "Prefer Max Mode for songs longer than two minutes and when vocal/style consistency across the full track matters.",
+      "appliesTo": ["production", "finalRender"]
+    },
+    {
+      "id": "inspire_short_playlist",
+      "sourceIds": ["suno_inspire"],
+      "rule": "For tighter Inspire control, use a short playlist of roughly 3-5 approved songs made by the user.",
+      "appliesTo": ["reference", "channelIdentity"]
+    },
+    {
+      "id": "style_influence_strong_for_identity",
+      "sourceIds": ["suno_style_influence"],
+      "rule": "Use stronger Style Influence when preserving a channel sound is more important than exploration.",
+      "appliesTo": ["control", "channelIdentity"]
+    },
+    {
+      "id": "custom_model_after_six_approved_tracks",
+      "sourceIds": ["suno_custom_models"],
+      "rule": "Once at least six approved tracks exist, consider a Custom Model for a recurring channel sound.",
+      "appliesTo": ["channelIdentity", "longTermLearning"]
+    },
+    {
+      "id": "style_pair_compatibility",
+      "sourceIds": ["community_style_mesh"],
+      "rule": "Treat style tags as a probabilistic blend. Prefer one dominant genre plus one compatible secondary color; use exclusions to resist unwanted default gravity.",
+      "appliesTo": ["stylePrompt", "genreCombination"],
+      "experimental": true
+    },
+    {
+      "id": "controlled_iteration",
+      "sourceIds": ["community_suno_lab"],
+      "rule": "Change one primary musical axis per experiment arm so the result teaches you which prompt decision mattered.",
+      "appliesTo": ["abTest", "feedback"],
+      "experimental": true
+    }
+  ]
+}
