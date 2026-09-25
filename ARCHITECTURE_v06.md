@@ -75,6 +75,8 @@ The existing JSON tab now adds:
 
 The original v0.5 analysis → ChatGPT upgrade → validation workflow remains available. v0.6 research candidates are an additional experimental path, not a replacement for the safe optimizer.
 
-## Next learning step
+## Feedback linkage
 
-v0.6.1 should connect candidate IDs to the existing Feedback DB so actual Suno ratings can estimate which prompt modules work for each channel/genre. Learning must remain descriptive until enough paired A/B/C samples exist; no automatic winner should be applied from tiny samples.
+Saved research variants now include a `researchRecipe.feedbackBinding` block with `experiment_arm`, `experiment_axis`, and provenance-aware context. `core.learning.analyze_research_abc_results()` can summarize A_CONTROL / B_GROOVE / C_CHARACTER observations while explicitly refusing to declare or auto-apply a winner.
+
+The next v0.6.1 UI step is to auto-prefill those fields in the existing Feedback screen and show the descriptive three-way comparison in the application. Tiny samples remain observation-only.
