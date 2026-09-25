@@ -1,6 +1,12 @@
-> Current verified build: **v0.4.2 Stable** — full E2E validation + Windows/Linux CI verified. See `STRESS_TEST_REPORT.md` and `core/e2e.py`.
+> Current development build: **v0.5-dev** — Prompt Intelligence Optimizer for existing Suno JSON. See `ARCHITECTURE_v05.md`.
 
-# Suno Master Prompt Studio v0.4.2 Stable — Feedback Learning + E2E Validation
+# Suno Master Prompt Studio v0.5 — Prompt Intelligence Optimizer
+
+## v0.5 기존 JSON workflow
+
+기존 JSON의 버전명(v14/v15/v16 등)을 품질 근거로 사용하지 않고 현재 음악 설계 자체를 분석합니다. Title/Lyrics/Hook/Story/Scene/relationship boundaries는 강제 보존하며 BPM, Genre, Vocal Design, Style Prompt, Exclude, Performance Signature, Groove, Instrumentation, Harmony, Bridge, Final, Duration, Generation Hint를 개선 대상으로 다룹니다.
+
+UI의 `현재 프롬프트 분석`은 곡별 약점과 전체 개선 영역을 보여주고, `AI 음악 프롬프트 업그레이드`는 Channel Master + Genre Master + `data/prompt_intelligence_rules.json`을 결합한 10단계 제작 지시문을 생성합니다. 결과 JSON에는 곡별 기존/new stylePrompt, 변경 이유, 예상 개선점이 포함되며 최종 저장 전에 immutable 필드를 원본으로 강제 복원하고 검증합니다.
 
 ## v0.4.2 Stable 검증 상태
 

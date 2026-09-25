@@ -188,6 +188,13 @@ def test_finalize_existing_preserves_content_and_full_schema_but_updates_music()
         row["stylePrompt"] = "Chill Rap, NEW MASTER PROMPT"
         row["vocalType"] = "Male Solo"
         row["performanceSignature"] = "speech-forward dry pickup"
+        row["promptOptimization"] = {
+            "existingStylePrompt": f"Chill Rap, OLD-{row['trackNo']}",
+            "newStylePrompt": "Chill Rap, NEW MASTER PROMPT",
+            "changeReasons": ["groove and structure made explicit"],
+            "expectedImprovements": ["more stable musical output"],
+            "weaknessesAddressed": ["groove", "bridge_contrast"],
+        }
     final, issues = finalize_existing_upgrade(
         json.dumps(source, ensure_ascii=False),
         json.dumps(upgraded, ensure_ascii=False),
@@ -210,6 +217,9 @@ def test_finalize_existing_preserves_content_and_full_schema_but_updates_music()
         assert row["customField"] == {"keep": i}
         assert row["BPM"] == 100
         assert row["stylePrompt"] == "Chill Rap, NEW MASTER PROMPT"
+        assert row["promptOptimization"]["changeReasons"]
+    assert final["promptOptimizationReport"]["immutableFieldsVerified"] is True
+    assert len(final["promptOptimizationReport"]["comparisons"]) == 15
 
 
 def test_haru_instruction_requires_complete_suno_json():

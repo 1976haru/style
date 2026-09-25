@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.5.0-dev — Prompt Intelligence Optimizer
+- Replaced the existing-JSON “latest master” framing with content-based prompt analysis and optimization.
+- Added version-neutral analysis rules in `data/prompt_intelligence_rules.json` across required music/prompt areas.
+- Added UI actions for current prompt analysis and AI music prompt upgrade.
+- Added per-track old/new stylePrompt, change reasons and expected-improvement audit data.
+- Expanded mutable music fields while retaining deep-copy/allow-list protection for all content fields.
+- Added immutable verification for title, lyrics, hook, story, scene and relationship boundaries.
+
 ## 0.4.2 — Stable E2E validation
 - Added full E2E validation harness in `core/e2e.py`.
 - Added male / female / dual-story end-to-end fixtures.

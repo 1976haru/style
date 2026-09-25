@@ -6,6 +6,10 @@ from copy import deepcopy
 from typing import Any, Dict, List, Tuple
 
 from .master_registry import build_active_master, load_genre_profiles
+from .prompt_intelligence import (
+    analyze_current_prompt, build_old_new_comparison, load_prompt_intelligence_rules,
+    verify_immutable_fields,
+)
 
 
 TRACK_MUTABLE_FIELDS = {
@@ -14,6 +18,9 @@ TRACK_MUTABLE_FIELDS = {
     "harmonicDesign", "stylePrompt", "excludePrompt", "negativeStyleText",
     "durationDesign", "bridgeDesign", "highlightDesign", "killingPointDesign",
     "diversityDesign", "generationRunHint", "performanceSignature",
+    "groove", "grooveDesign", "drums", "drumDesign", "bass", "bassDesign",
+    "instrumentation", "instrumentationDesign", "harmony", "phonation",
+    "verseBehavior", "chorusBehavior", "finalDesign", "promptOptimization",
     "qualityScore", "warnings",
 }
 
@@ -74,7 +81,7 @@ def detect_source_profile(source: Dict[str, Any]) -> Dict[str, Any]:
     rows = _songs(source)
     hay = " ".join([
         str(meta.get("storyPov", "")), str(meta.get("vocalPolicy", "")),
-        str(meta.get("channelLabel", "")), str(meta.get("generationStandardVersion", "")),
+        str(meta.get("channelLabel", "")),
         str(meta.get("genrePolicy", "")), str(meta.get("audience", "")),
         " ".join(
             str(r.get("vocalType", "")) + " " + str(r.get("vocalDesign", "")) + " "
@@ -226,12 +233,32 @@ def build_existing_json_upgrade_instruction(
     if not genre_profile:
         raise ValueError(f"Genre Master Profile을 찾을 수 없습니다: {genre_id}")
     active_master = build_active_master(master_text, genre_profile, compat["source"])
+    intelligence_rules = load_prompt_intelligence_rules()
+    current_analysis = analyze_current_prompt(source, intelligence_rules)
 
-    instruction = """# EXISTING JSON -> LATEST MASTER UPGRADE
+    instruction = """# EXISTING JSON -> PROMPT INTELLIGENCE OPTIMIZER
 
 목표:
-아래 ORIGINAL JSON을 최신 MASTER 기준으로 음악 설계만 업그레이드하고,
+아래 ORIGINAL JSON의 현재 음악 설계를 baseline으로 분석하고 Prompt Intelligence로 최적화하여,
 완성형 Suno 복붙용 JSON 전체를 반환한다.
+
+중요 평가 원칙:
+- 입력 JSON의 version/revision/generationStandardVersion 값(v14/v15/v16 등)은 품질 판단 근거가 아니다.
+- "이미 최신 버전"이라는 이유로 KEEP하거나 변경 없음을 선언하지 마라.
+- 실제 stylePrompt와 음악 설계의 명료성, 구체성, 충돌, 중복, 구조적 완성도만 평가한다.
+- 실제 개선 가능성이 없는 개별 필드는 유지할 수 있지만 그 이유는 내용 기반이어야 한다.
+
+처리 단계:
+1. Analyze Current Prompt
+2. Detect weaknesses
+3. Apply Channel Master
+4. Apply Genre Master
+5. Apply Prompt Intelligence Knowledge
+6. Remove redundancy/conflicts
+7. Generate optimized music fields
+8. Compare Old vs New
+9. Verify immutable fields unchanged
+10. Save full Suno-ready JSON
 
 절대 규칙:
 1. ORIGINAL JSON의 전체 구조와 기존 필드를 삭제하지 마라.
@@ -244,9 +271,19 @@ def build_existing_json_upgrade_instruction(
 8. 원본 보컬 성별/역할과 최신 MASTER가 충돌하면 억지 적용하지 마라.
 9. 최종 응답은 설명 없이 JSON object 하나만 출력한다.
 10. songs 15곡을 모두 출력한다.
+11. 적극 개선 대상은 BPM/Genre/Vocal Design/Style Prompt/Exclude/Performance Signature/Groove/Instrumentation/Harmony/Bridge/Final/Duration/Generation Hint이다.
+12. 각 song에 promptOptimization object를 추가한다: existingStylePrompt, newStylePrompt, changeReasons[], expectedImprovements[], weaknessesAddressed[].
+13. existingStylePrompt는 ORIGINAL의 값을 정확히 복사하고 newStylePrompt는 최종 stylePrompt와 정확히 같아야 한다.
+14. 중복 형용사 나열보다 들리는 음악 행동을 우선하고, positive prompt와 exclude의 충돌을 제거한다.
 
 [DETECTED SOURCE]
 """ + json.dumps(compat["source"], ensure_ascii=False, indent=2) + """
+
+[CURRENT PROMPT ANALYSIS - VERSION-AGNOSTIC]
+""" + json.dumps(current_analysis, ensure_ascii=False, indent=2) + """
+
+[PROMPT INTELLIGENCE RULES]
+""" + json.dumps(intelligence_rules, ensure_ascii=False, indent=2) + """
 
 [ACTIVE MASTER - CHANNEL + GENRE]
 """ + active_master + """
@@ -377,6 +414,27 @@ def finalize_existing_upgrade(source_text: str, upgraded_text: str) -> Tuple[Dic
     final = merge_existing_upgrade(source_text, upgraded_text)
     source = load_json_text(source_text)
     issues = validate_complete_json(final, len(_songs(source)), source)
+    issues.extend(verify_immutable_fields(source, final))
+    source_by_no = {int(x.get("trackNo", i)): x for i, x in enumerate(_songs(source), 1)}
+    for i, row in enumerate(_songs(final), 1):
+        no = int(row.get("trackNo", i))
+        audit = row.get("promptOptimization")
+        if not isinstance(audit, dict):
+            issues.append({"level": "FAIL", "code": "MISSING_OPTIMIZATION_AUDIT", "trackNo": no, "message": "promptOptimization 없음"})
+            continue
+        old_style = str(source_by_no.get(no, {}).get("stylePrompt", ""))
+        if audit.get("existingStylePrompt") != old_style:
+            issues.append({"level": "FAIL", "code": "OLD_PROMPT_MISMATCH", "trackNo": no, "message": "기존 stylePrompt 비교값 불일치"})
+        if audit.get("newStylePrompt") != row.get("stylePrompt"):
+            issues.append({"level": "FAIL", "code": "NEW_PROMPT_MISMATCH", "trackNo": no, "message": "신규 stylePrompt 비교값 불일치"})
+        for field, code in (("changeReasons", "MISSING_CHANGE_REASONS"), ("expectedImprovements", "MISSING_EXPECTED_IMPROVEMENTS")):
+            if not isinstance(audit.get(field), list) or not audit[field]:
+                issues.append({"level": "FAIL", "code": code, "trackNo": no, "message": f"{field} 없음"})
+    final["promptOptimizationReport"] = {
+        "versionUsedAsQualitySignal": False,
+        "immutableFieldsVerified": not any(x.get("level") == "FAIL" and str(x.get("code", "")).startswith("IMMUTABLE") for x in issues),
+        "comparisons": build_old_new_comparison(source, final),
+    }
     return final, issues
 
 

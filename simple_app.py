@@ -22,6 +22,7 @@ from core.workflows import (
     finalize_existing_upgrade,
     finalize_haru_result,
 )
+from core.prompt_intelligence import analyze_current_prompt
 
 CHANNEL_OPTIONS = {label: channel_id for channel_id, label in CHANNEL_LABELS.items()}
 
@@ -130,7 +131,8 @@ class SimpleApp(tk.Tk):
 
         bar = ttk.Frame(step2)
         bar.pack(fill="x")
-        ttk.Button(bar, text="최신 마스터 반영 → 업그레이드 지시문 만들기", command=self.make_existing_instruction).pack(side="left")
+        ttk.Button(bar, text="현재 프롬프트 분석", command=self.analyze_existing_prompt).pack(side="left")
+        ttk.Button(bar, text="AI 음악 프롬프트 업그레이드", command=self.make_existing_instruction).pack(side="left", padx=5)
         ttk.Button(bar, text="지시문 복사", command=lambda: self._copy_widget(self.existing_output, "업그레이드 지시문")).pack(side="left", padx=5)
         ttk.Button(bar, text="지시문 TXT 저장", command=self.save_existing_instruction).pack(side="left")
         ttk.Label(bar, text="→ ChatGPT에 붙여넣고 완성 JSON을 받은 뒤 STEP 3에서 불러오세요.", foreground="#555").pack(side="left", padx=14)
@@ -298,6 +300,21 @@ class SimpleApp(tk.Tk):
             except Exception as exc:
                 self.existing_detect_var.set(f"마스터 확인 오류: {exc}")
 
+    def analyze_existing_prompt(self):
+        if not self.existing_source_text:
+            messagebox.showwarning("순서 확인", "원본 JSON을 먼저 불러오세요.")
+            return
+        try:
+            analysis = analyze_current_prompt(load_json_text(self.existing_source_text))
+        except Exception as exc:
+            messagebox.showerror("현재 프롬프트 분석 실패", str(exc))
+            return
+        self._put_text(self.existing_output, json.dumps(analysis, ensure_ascii=False, indent=2))
+        areas = ", ".join(f"{k}({v})" for k, v in list(analysis["weaknessCounts"].items())[:6]) or "뚜렷한 약점 없음"
+        self.existing_detect_var.set(
+            f"현재 설계 분석 완료: {analysis['trackCount']}곡 / version 품질판단 미사용 / 주요 개선영역: {areas}"
+        )
+
     def make_existing_instruction(self):
         if not self.existing_source_text:
             messagebox.showwarning("순서 확인", "원본 JSON을 먼저 불러오세요.")
@@ -360,6 +377,19 @@ class SimpleApp(tk.Tk):
         else:
             size = len(json.dumps(final, ensure_ascii=False).encode("utf-8"))
             self.existing_result_var.set(f"PASS / 15곡 / 원본 콘텐츠 강제보존 / 최종 JSON 약 {size/1024:.1f} KB")
+            comparisons = final.get("promptOptimizationReport", {}).get("comparisons", [])
+            self._put_text(
+                self.existing_output,
+                json.dumps(
+                    {
+                        "결과": "Prompt Intelligence Optimization 완료",
+                        "immutableFieldsVerified": final.get("promptOptimizationReport", {}).get("immutableFieldsVerified"),
+                        "비교": comparisons,
+                    },
+                    ensure_ascii=False,
+                    indent=2,
+                ),
+            )
             messagebox.showinfo("검증 완료", "최종 Suno JSON을 저장할 수 있습니다.\n제목/가사/훅/스토리는 원본으로 강제 보존되었습니다.")
 
     def save_existing_final(self):
