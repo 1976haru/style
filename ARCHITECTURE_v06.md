@@ -80,3 +80,14 @@ The original v0.5 analysis → ChatGPT upgrade → validation workflow remains a
 Saved research variants now include a `researchRecipe.feedbackBinding` block with `experiment_arm`, `experiment_axis`, and provenance-aware context. `core.learning.analyze_research_abc_results()` can summarize A_CONTROL / B_GROOVE / C_CHARACTER observations while explicitly refusing to declare or auto-apply a winner.
 
 The next v0.6.1 UI step is to auto-prefill those fields in the existing Feedback screen and show the descriptive three-way comparison in the application. Tiny samples remain observation-only.
+
+## v0.6.1 — Channel consistency finalizer
+
+v0.6.1 adds a cross-field quality gate after real-file review showed that a result can look optimized while still carrying contradictory channel controls. The finalizer now checks:
+
+- Japanese vocal prompts: positive close-mic + native diction + mora timing + natural sentence/pitch-accent controls must appear in the actual `stylePrompt`.
+- `stylePrompt` and `vocalDesign`: disjoint breath/grain ranges are treated as a consistency failure.
+- Chill Rap compiler order: genre/tint → BPM+groove → singer hard lock → phonation/JP-native → active rap pocket → rhythm/instruments → Hook/Bridge/Final → harmony → scene/runtime.
+- Word-count targets remain advisory; hard rejection continues to use the established character hard maximum plus semantic quality gates.
+
+This closes the gap that allowed a v0.6 JSON to pass structural checks while retaining legacy section breath ranges that contradicted the newer fixed channel fingerprint.
