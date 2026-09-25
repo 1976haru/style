@@ -14,15 +14,25 @@ def _text(value: Any) -> str:
 
 def _is_japanese_source(source_context: Dict[str, Any] | None, row: Dict[str, Any]) -> bool:
     context = source_context or {}
+    explicit_language = str(
+        context.get("lyricLanguage") or context.get("language") or ""
+    ).strip().casefold()
+    # Explicit lyric language outranks market/channel naming. Tokyo Chill Love
+    # Story can intentionally publish English-lyric sets; those must not be
+    # forced into Japanese mora/pitch-accent controls.
+    if explicit_language:
+        if explicit_language in {"english", "en", "eng"}:
+            return False
+        if explicit_language in {"japanese", "ja", "jp", "jpn", "日本語"}:
+            return True
+
     blob = " ".join([
-        str(context.get("lyricLanguage", "")),
-        str(context.get("language", "")),
         str(context.get("channelId", "")),
         str(context.get("channelLabel", "")),
         str(row.get("vocalDesign", "")),
         str(row.get("stylePrompt", "")),
     ]).casefold()
-    return any(token in blob for token in ("japanese", "日本語", "jp-native", "jp native", "tokyo chill"))
+    return any(token in blob for token in ("japanese", "日本語", "jp-native", "jp native"))
 
 
 def _vocal_role(row: Dict[str, Any]) -> str:
