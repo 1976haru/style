@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.6.0-dev — Research-Driven Prompt Engine
+- Added provenance-aware `data/research_prompt_knowledge.json` with official Suno v6/Variety/Max Mode/Inspire/Style Influence/Custom Model guidance and clearly-labeled community hypotheses.
+- Added `data/style_compatibility_matrix.json` for one-dominant-genre + one-secondary-tint controlled exploration across all current genres.
+- Added `core/research_prompt_engine.py` to produce three controlled experiment arms per track: A_CONTROL, B_GROOVE, C_CHARACTER.
+- Added generation recipes that hold model/settings stable so prompt-axis changes can be evaluated cleanly.
+- Added safe variant application that deep-copies the source and changes only style/exclude prompt fields plus research audit metadata.
+- Added Simple UI actions for research candidate generation and A/B/C JSON export.
+- Added dedicated v0.6 research-engine regression tests.
+
 ## 0.5.0-dev — Prompt Intelligence Optimizer
 - Replaced the existing-JSON “latest master” framing with content-based prompt analysis and optimization.
 - Added version-neutral analysis rules in `data/prompt_intelligence_rules.json` across required music/prompt areas.
