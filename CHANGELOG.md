@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.6.1-dev — Channel Consistency Finalizer
+- Added `core/v061_quality_gate.py` for JP-native positive-control checks and stylePrompt↔vocalDesign phonation consistency.
+- Corrected Chill Rap prompt ordering to genre/tint → BPM+groove → singer/phonation → JP-native/rap pocket → arrangement/sections/harmony/runtime.
+- Optimizer instructions now explicitly require close-mic, native Japanese diction, mora timing and natural sentence/pitch-accent behavior in actual Japanese vocal prompts.
+- Final import validation rejects missing JP-native positive controls and conflicting breath/grain coordinates.
+- Updated v0.6 Research A/B/C engine to `0.6.1-dev` and inject JP-native controls for Japanese source metadata.
+- Preserved immutable title/lyrics/hook/story/scene protections and main branch stability.
+
 ## 0.6.0-dev — Research-Driven Prompt Engine
 - Added provenance-aware `data/research_prompt_knowledge.json` with official Suno v6/Variety/Max Mode/Inspire/Style Influence/Custom Model guidance and clearly-labeled community hypotheses.
 - Added `data/style_compatibility_matrix.json` for one-dominant-genre + one-secondary-tint controlled exploration across all current genres.
