@@ -33,7 +33,7 @@ class SimpleApp(tk.Tk):
 
     def __init__(self):
         super().__init__()
-        self.title("Suno Master Prompt Studio v0.6 - Research-Driven Workflow")
+        self.title("Suno Master Prompt Studio v0.6.1 - Research + Consistency Gate")
         self.geometry("1320x900")
         self.minsize(1080, 720)
 
@@ -56,7 +56,7 @@ class SimpleApp(tk.Tk):
         header = ttk.Frame(self, padding=(14, 12))
         header.pack(fill="x")
         ttk.Label(header, text="Suno Master Prompt Studio", font=("Segoe UI", 18, "bold")).pack(side="left")
-        ttk.Label(header, text="  v0.6 Research-Driven Prompt Engine", font=("Segoe UI", 10)).pack(side="left", padx=8)
+        ttk.Label(header, text="  v0.6.1 Research + Channel Consistency Gate", font=("Segoe UI", 10)).pack(side="left", padx=8)
 
         ttk.Label(
             self,
@@ -158,7 +158,7 @@ class SimpleApp(tk.Tk):
             step3,
             text=(
                 "안전장치: ChatGPT가 제목/가사/훅/스토리/YouTube 메타를 바꿔도 최종 저장 시 원본으로 강제 복원합니다. "
-                "BPM/장르/보컬/stylePrompt 등 허용된 음악 필드만 새 결과에서 가져옵니다."
+                "BPM/장르/보컬/stylePrompt 등 허용된 음악 필드만 새 결과에서 가져옵니다. v0.6.1은 JP-native positive controls와 vocalDesign↔stylePrompt 발성 좌표 충돌도 FAIL 처리합니다."
             ),
             foreground="#444",
             wraplength=1180,
