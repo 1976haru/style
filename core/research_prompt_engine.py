@@ -212,13 +212,19 @@ def _duration(song: Dict[str, Any]) -> str:
 
 def _language_control(source: Dict[str, Any]) -> str:
     meta = source.get("meta") if isinstance(source.get("meta"), dict) else {}
+    explicit_language = str(
+        meta.get("lyricLanguage") or meta.get("language") or ""
+    ).strip().casefold()
+    if explicit_language in {"english", "en", "eng"}:
+        return "ENGLISH close-mic natural connected English, relaxed consonants, idiomatic reductions, natural stress"
+    if explicit_language in {"japanese", "ja", "jp", "jpn", "日本語"}:
+        return "JP-NATIVE close-mic native Japanese diction, mora timing, natural sentence accent/pitch-accent feel"
+
     blob = " ".join([
-        str(meta.get("lyricLanguage", "")),
-        str(meta.get("language", "")),
         str(meta.get("channelId", "")),
         str(meta.get("channelLabel", "")),
     ]).casefold()
-    if any(token in blob for token in ("japanese", "日本語", "tokyo chill", "jp-chili")):
+    if any(token in blob for token in ("japanese", "日本語", "jp-chili")):
         return "JP-NATIVE close-mic native Japanese diction, mora timing, natural sentence accent/pitch-accent feel"
     return ""
 
