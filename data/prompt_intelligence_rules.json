@@ -26,7 +26,7 @@
     "prompt_ordering": {"priority": 90, "rule": "Order prompt atoms: dominant genre, BPM/energy, vocal/phonation, groove, drums/bass, instrumentation/harmony, section behavior, mix."},
     "redundancy": {"priority": 85, "rule": "Collapse repeated synonyms and duplicated instructions into one precise musical behavior."},
     "contradiction": {"priority": 100, "rule": "Remove mutually exclusive vocal, energy, genre, instrumentation and positive/exclude instructions."},
-    "exclude_efficiency": {"priority": 85, "rule": "Use a short deduplicated exclude list containing only realistic failure modes not already contradicted by positive instructions."},
+    "exclude_efficiency": {"priority": 85, "rule": "Use 8-16 short semantic failure-mode categories; retain channel hard-lock protections and remove overlapping wording."},
     "prompt_length": {"priority": 90, "rule": "Keep stylePrompt information-dense, normally 120-900 characters and never above 1000."},
     "model_specific_behavior": {"priority": 80, "rule": "Adapt syntax only to the explicitly selected target model; do not treat a source JSON version label as a quality signal."},
     "performance_signature": {"priority": 85, "rule": "Give each track a concrete, track-specific delivery behavior while retaining the recurring vocal identity."},

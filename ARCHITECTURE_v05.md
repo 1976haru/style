@@ -13,6 +13,14 @@
 9. Restore and verify immutable content fields.
 10. Save the complete Suno-ready JSON.
 
+## Effectiveness gate
+
+`validate_optimization_effectiveness(source, optimized, before_analysis, after_analysis)` compares the allow-listed music fields and checks that every actionable area has at least one related field change. An unresolved `exclude_efficiency` finding is a hard failure; an exclusion list over 16 atoms must be compressed to 16 or fewer. Claimed field changes and resolved weaknesses must match actual diffs and the after-analysis.
+
+The set report calculates changed/unchanged tracks, per-field change counts, before/after weakness totals, resolved weakness count and `optimizationEffective`. New contradictions, duplicate-heavy prompts, wrong vocal role, genre drift, out-of-range BPM, missing Bridge/Final/performance signature and style prompts above the hard maximum fail finalization. A track with zero actionable findings may use `KEEP` only with a content-based `keepReason`.
+
+Local acceptance uses a sanitized 15-track male-story fixture with 37 exclusions per track. A matching private `남_002_CHILI_LAB_JAPAN_EP002_v15.0...json` may exist outside the repository, but acceptance does not ingest it and no private source JSON is included in the repository.
+
 ## Immutable boundary
 
 Title, localized title, lyrics, hook, story fields, scene/listener situation, emotion arc, episode boundary and relationship boundary fields are content authority. `merge_existing_upgrade` starts from a deep copy of the source and copies only allow-listed music fields from the proposed result. Therefore unrecognized content and private schema fields are also retained.

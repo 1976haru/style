@@ -365,25 +365,49 @@ class SimpleApp(tk.Tk):
         if not p:
             return
         try:
-            final, issues = finalize_existing_upgrade(self.existing_source_text, read_text(p))
+            final, issues = finalize_existing_upgrade(
+                self.existing_source_text, read_text(p), self.existing_genre_var.get()
+            )
         except Exception as exc:
             messagebox.showerror("결과 검증 실패", str(exc))
             return
-        self.existing_final = final
         fails = [x for x in issues if x.get("level") == "FAIL"]
         if fails:
-            self.existing_result_var.set(f"FAIL {len(fails)}건: " + " | ".join(x.get("code", "") for x in fails[:5]))
-            messagebox.showerror("검증 실패", "\n".join(str(x) for x in fails[:12]))
+            self.existing_final = None
+            report = final.get("promptOptimizationReport", {})
+            before_count = report.get("totalWeaknessBefore", 0)
+            changed_tracks = report.get("changedTrackCount", 0)
+            failure_text = (
+                f"FAIL\n\n분석에서 개선점 {before_count}개를 찾았고 실제 변경 트랙은 {changed_tracks}개입니다.\n"
+                + "\n".join(f"- {x.get('code')}: track {x.get('trackNo', '?')} {x.get('unresolvedAreas', '')}" for x in fails[:12])
+            )
+            self.existing_result_var.set(f"FAIL: 개선 검증 {len(fails)}건 / 변경 {changed_tracks}/15곡")
+            messagebox.showerror("최적화 검증 실패", failure_text + "\n\nChatGPT 결과를 수정해 다시 검증하세요.")
         else:
+            self.existing_final = final
             size = len(json.dumps(final, ensure_ascii=False).encode("utf-8"))
-            self.existing_result_var.set(f"PASS / 15곡 / 원본 콘텐츠 강제보존 / 최종 JSON 약 {size/1024:.1f} KB")
-            comparisons = final.get("promptOptimizationReport", {}).get("comparisons", [])
+            report = final.get("promptOptimizationReport", {})
+            resolved = report.get("resolvedWeaknessCount", 0)
+            changed_fields = report.get("changedFieldCounts", {})
+            style_changed = changed_fields.get("stylePrompt", 0)
+            exclude_changed = changed_fields.get("excludePrompt", 0) + changed_fields.get("negativeStyleText", 0)
+            self.existing_result_var.set(
+                f"PASS / 개선 {report.get('changedTrackCount', 0)}/15곡 / stylePrompt {style_changed}곡 / "
+                f"excludePrompt {exclude_changed}곡 / 해결 약점 {resolved}개 / 원본 보존 15/15 / {size/1024:.1f} KB"
+            )
+            comparisons = report.get("comparisons", [])
             self._put_text(
                 self.existing_output,
                 json.dumps(
                     {
                         "결과": "Prompt Intelligence Optimization 완료",
-                        "immutableFieldsVerified": final.get("promptOptimizationReport", {}).get("immutableFieldsVerified"),
+                        "immutableFieldsVerified": report.get("immutableFieldsVerified"),
+                        "changedTrackCount": report.get("changedTrackCount"),
+                        "unchangedTrackCount": report.get("unchangedTrackCount"),
+                        "changedFieldCounts": report.get("changedFieldCounts"),
+                        "totalWeaknessBefore": report.get("totalWeaknessBefore"),
+                        "totalWeaknessAfter": report.get("totalWeaknessAfter"),
+                        "resolvedWeaknessCount": resolved,
                         "비교": comparisons,
                     },
                     ensure_ascii=False,

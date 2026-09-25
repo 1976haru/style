@@ -52,7 +52,8 @@ def _duplicates(text: str) -> List[str]:
 
 def _track_analysis(row: Dict[str, Any], rules: Dict[str, Any], target_model: str = "") -> Dict[str, Any]:
     style = str(row.get("stylePrompt", ""))
-    exclude = str(row.get("negativeStyleText", row.get("excludePrompt", "")))
+    exclude = str(row.get("excludePrompt") or row.get("negativeStyleText", ""))
+    all_excludes = " ".join(str(row.get(k, "")) for k in ("excludePrompt", "negativeStyleText"))
     music_fields = " ".join(
         str(row.get(key, "")) for key in (
             "genreText", "genre", "vocalDesign", "vocalType", "phonation", "groove", "grooveDesign",
@@ -125,21 +126,25 @@ def _track_analysis(row: Dict[str, Any], rules: Dict[str, Any], target_model: st
     dupes = _duplicates(style)
     if dupes:
         weak("redundancy", "Repeated prompt atoms: " + ", ".join(dupes[:5]), "Higher information density.")
-    contradiction_pairs = (
-        (r"\bwhisper\w*\b", r"\b(?:power belt|belting|shout\w*)\b"),
-        (r"\bsparse\b", r"\bdense\b"),
-        (r"\bslow\b", r"\bfast\b"),
-        (r"\bacoustic\b", r"\bfully electronic\b"),
-        (r"\binstrumental\b", r"\blead vocal\b"),
-        (r"\bno (?:reverb|echo)\b", r"\b(?:large|long) (?:reverb|echo)\b"),
+    # Only mutually exclusive desired states count as contradictions. Ordinary
+    # shared words between a positive style and an exclusion are not conflicts:
+    # e.g. “male tenor” + “exclude generic polished tenor” is coherent.
+    semantic_conflicts = (
+        (r"\binstrumental(?:-only)?\b", r"\blead vocal(?:s)?\b", "instrumental and lead vocal both desired"),
+        (r"\bsparse (?:arrangement|texture|production)\b", r"\bdense (?:wall|arrangement|texture)\b", "sparse and dense arrangement both desired"),
+        (r"\bacoustic-only\b", r"\bfully-electronic-only\b", "acoustic-only and fully-electronic-only both desired"),
+        (r"\bno reverb\b", r"\b(?:long|large) reverb\b", "no reverb and long/large reverb both desired"),
+        (r"\bslow(?:-tempo)?\b", r"\bfast(?:-tempo)?\b", "slow and fast tempo both desired"),
     )
-    contradictions = [f"{a}/{b}" for a, b in contradiction_pairs if re.search(a, blob) and re.search(b, blob)]
-    positive_tokens = {token for atom in style_atoms for token in re.findall(r"[\w-]+", atom.casefold())}
-    negative_tokens = {token for atom in _split_atoms(exclude) for token in re.findall(r"[\w-]+", atom.casefold())}
-    overlap = sorted(positive_tokens & negative_tokens)
-    if contradictions or overlap:
-        details = contradictions + overlap[:5]
-        weak("contradiction", "Conflicting instructions: " + ", ".join(details[:8]), "Fewer mutually cancelling instructions.")
+    contradictions = [label for left, right, label in semantic_conflicts if re.search(left, style, re.I) and re.search(right, style, re.I)]
+    if re.search(r"\bwhisper[- ]only\b", style, re.I) and re.search(r"\bwhisper[- ]only\b", all_excludes, re.I):
+        contradictions.append("whisper-only desired and excluded")
+    contradictions.extend(
+        label for left, right, label in semantic_conflicts
+        if re.search(left, style, re.I) and re.search(right, all_excludes, re.I)
+    )
+    if contradictions:
+        weak("contradiction", "Semantic conflicts: " + "; ".join(dict.fromkeys(contradictions)), "Fewer mutually cancelling instructions.")
     if len(_split_atoms(exclude)) > 16 or _duplicates(exclude):
         weak("exclude_efficiency", "Exclude list is long or repetitive.", "More targeted negative conditioning.")
     return {
@@ -210,3 +215,174 @@ def build_old_new_comparison(source: Dict[str, Any], result: Dict[str, Any]) -> 
             "expectedImprovements": audit.get("expectedImprovements", []),
         })
     return comparisons
+
+
+OPTIMIZED_MUSIC_FIELDS = (
+    "BPM", "genreId", "genreText", "vocalDesign", "harmonicDesign", "stylePrompt",
+    "excludePrompt", "negativeStyleText", "performanceSignature", "generationRunHint",
+    "bridgeDesign", "highlightDesign", "finalDesign", "durationDesign", "grooveDesign",
+    "drumDesign", "bassDesign", "instrumentationDesign", "verseBehavior", "chorusBehavior",
+)
+
+WEAKNESS_FIELDS = {
+    "tempo_design": {"BPM"},
+    "genre_clarity": {"genreId", "genreText", "stylePrompt"},
+    "vocal_identity": {"vocalDesign", "stylePrompt"},
+    "phonation": {"vocalDesign", "stylePrompt"},
+    "groove": {"grooveDesign", "stylePrompt"},
+    "drums": {"drumDesign", "stylePrompt"},
+    "bass": {"bassDesign", "stylePrompt"},
+    "instrumentation": {"instrumentationDesign", "stylePrompt"},
+    "harmony": {"harmonicDesign", "stylePrompt"},
+    "verse_behavior": {"verseBehavior", "stylePrompt"},
+    "chorus_behavior": {"chorusBehavior", "stylePrompt"},
+    "bridge_contrast": {"bridgeDesign", "stylePrompt"},
+    "final_payoff": {"finalDesign", "highlightDesign", "stylePrompt"},
+    "prompt_ordering": {"stylePrompt"},
+    "redundancy": {"stylePrompt", "excludePrompt", "negativeStyleText"},
+    "contradiction": {"stylePrompt", "excludePrompt", "negativeStyleText"},
+    "exclude_efficiency": {"excludePrompt", "negativeStyleText"},
+    "prompt_length": {"stylePrompt"},
+    "model_specific_behavior": {"stylePrompt", "generationRunHint"},
+    "performance_signature": {"performanceSignature", "stylePrompt"},
+    "duration_design": {"durationDesign", "stylePrompt"},
+    "generation_hint": {"generationRunHint"},
+}
+
+
+def _analysis_by_track(analysis: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
+    return {str(x.get("trackNo", i)): x for i, x in enumerate(analysis.get("tracks", []), 1)}
+
+
+def _rows_by_track(source: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
+    return {str(row.get("trackNo", i)): row for i, row in enumerate(_songs(source), 1)}
+
+
+def validate_optimization_effectiveness(
+    source: Dict[str, Any],
+    optimized: Dict[str, Any],
+    before_analysis: Dict[str, Any],
+    after_analysis: Dict[str, Any],
+) -> Dict[str, Any]:
+    """Compare actual music-field diffs with actionable weaknesses and model claims."""
+    old_rows, new_rows = _rows_by_track(source), _rows_by_track(optimized)
+    before_tracks = _analysis_by_track(before_analysis)
+    after_tracks = _analysis_by_track(after_analysis)
+    issues: List[Dict[str, Any]] = []
+    comparisons: List[Dict[str, Any]] = []
+    changed_counts: Dict[str, int] = {}
+    changed_track_count = 0
+    total_before = total_after = resolved_count = 0
+
+    for no, old in old_rows.items():
+        new = new_rows.get(no)
+        if new is None:
+            issues.append({"level": "FAIL", "code": "OPTIMIZATION_TRACK_MISSING", "trackNo": no})
+            continue
+        before = before_tracks.get(no, {})
+        after = after_tracks.get(no, {})
+        before_items = before.get("weaknesses", [])
+        after_items = after.get("weaknesses", [])
+        before_areas = {str(x.get("area")) for x in before_items}
+        after_areas = {str(x.get("area")) for x in after_items}
+        total_before += len(before_items)
+        total_after += len(after_items)
+        resolved = sorted(before_areas - after_areas)
+        remaining = sorted(before_areas & after_areas)
+        resolved_count += sum(1 for x in before_items if x.get("area") not in after_areas)
+
+        newly_added = sorted(after_areas - before_areas)
+        if "contradiction" in newly_added:
+            issues.append({"level": "FAIL", "code": "NEW_CONTRADICTION_REGRESSION", "trackNo": no})
+        if "redundancy" in newly_added:
+            issues.append({"level": "FAIL", "code": "DUPLICATE_HEAVY_PROMPT_REGRESSION", "trackNo": no})
+        if "exclude_efficiency" in before_areas and "exclude_efficiency" in after_areas:
+            issues.append({"level": "FAIL", "code": "EXCLUDE_COMPRESSION_INCOMPLETE", "trackNo": no})
+
+        changed = [field for field in OPTIMIZED_MUSIC_FIELDS if old.get(field) != new.get(field)]
+        if changed:
+            changed_track_count += 1
+            for field in changed:
+                changed_counts[field] = changed_counts.get(field, 0) + 1
+
+        unresolved_areas = []
+        for area in sorted(before_areas):
+            related = WEAKNESS_FIELDS.get(area, set())
+            if not related.intersection(changed):
+                unresolved_areas.append(area)
+        if before.get("qualityOpportunityCount", len(before_items)) > 0 and not changed:
+            issues.append({
+                "level": "FAIL", "code": "OPTIMIZATION_NOOP", "trackNo": no,
+                "unresolvedAreas": sorted(before_areas),
+                "message": "Actionable weaknesses were found but no music field changed.",
+            })
+        elif unresolved_areas:
+            issues.append({
+                "level": "FAIL", "code": "OPTIMIZATION_NOOP", "trackNo": no,
+                "unresolvedAreas": unresolved_areas,
+                "message": "No field related to one or more actionable weaknesses changed.",
+            })
+        if before_items and not resolved:
+            issues.append({
+                "level": "FAIL", "code": "OPTIMIZATION_NO_GAIN", "trackNo": no,
+                "unresolvedAreas": sorted(before_areas),
+                "message": "Music fields changed but the analysis found no resolved weakness.",
+            })
+
+        audit = new.get("promptOptimization") if isinstance(new.get("promptOptimization"), dict) else {}
+        claimed_changed = audit.get("changedFields")
+        if claimed_changed is not None and sorted(set(claimed_changed)) != sorted(changed):
+            issues.append({"level": "FAIL", "code": "CLAIMED_CHANGED_FIELDS_MISMATCH", "trackNo": no, "actual": changed, "claimed": claimed_changed})
+        claimed_resolved = audit.get("resolvedWeaknesses")
+        if isinstance(claimed_resolved, list):
+            false_claims = sorted(set(str(x) for x in claimed_resolved) - set(resolved))
+            if false_claims:
+                issues.append({"level": "FAIL", "code": "CLAIMED_WEAKNESS_UNRESOLVED", "trackNo": no, "unresolvedAreas": false_claims})
+        if audit.get("status") == "KEEP":
+            if before_items:
+                issues.append({"level": "FAIL", "code": "KEEP_WITH_ACTIONABLE_WEAKNESS", "trackNo": no, "unresolvedAreas": sorted(before_areas)})
+            if changed:
+                issues.append({"level": "FAIL", "code": "KEEP_WITH_CHANGED_FIELDS", "trackNo": no})
+            if not str(audit.get("keepReason", "")).strip():
+                issues.append({"level": "FAIL", "code": "KEEP_REASON_MISSING", "trackNo": no})
+
+        for prompt_key, field in (("oldStylePrompt", "stylePrompt"), ("newStylePrompt", "stylePrompt"), ("oldExcludePrompt", "excludePrompt"), ("newExcludePrompt", "excludePrompt")):
+            if prompt_key in audit:
+                if prompt_key == "oldStylePrompt":
+                    expected = old.get("stylePrompt", "")
+                elif prompt_key == "oldExcludePrompt":
+                    expected = old.get("excludePrompt") or old.get("negativeStyleText", "")
+                elif prompt_key == "newExcludePrompt":
+                    expected = new.get("excludePrompt") or new.get("negativeStyleText", "")
+                else:
+                    expected = new.get(field, "")
+                if audit[prompt_key] != expected:
+                    issues.append({"level": "FAIL", "code": f"{prompt_key.upper()}_MISMATCH", "trackNo": no})
+        if "stylePrompt" in changed and (new.get("stylePrompt") == old.get("stylePrompt")):
+            issues.append({"level": "FAIL", "code": "STYLE_PROMPT_CLAIM_WITHOUT_DIFF", "trackNo": no})
+        if (audit.get("changeReasons") or audit.get("expectedImprovements")) and not changed:
+            issues.append({"level": "FAIL", "code": "AUDIT_WITHOUT_FIELD_DIFF", "trackNo": no})
+
+        comparisons.append({
+            "trackNo": new.get("trackNo", no),
+            "changedFields": changed,
+            "beforeOpportunityCount": len(before_items),
+            "afterOpportunityCount": len(after_items),
+            "resolvedAreas": resolved,
+            "remainingAreas": sorted(after_areas),
+            "unresolvedAreas": remaining,
+        })
+
+    report = {
+        "changedTrackCount": changed_track_count,
+        "unchangedTrackCount": max(0, len(old_rows) - changed_track_count),
+        "changedFieldCounts": dict(sorted(changed_counts.items())),
+        "totalWeaknessBefore": total_before,
+        "totalWeaknessAfter": total_after,
+        "resolvedWeaknessCount": resolved_count,
+        "optimizationEffective": not issues and (total_before == 0 or total_after < total_before),
+    }
+    if total_before and total_after >= total_before:
+        issues.append({"level": "FAIL", "code": "SET_NO_IMPROVEMENT", "message": "Set-level weakness count did not decrease."})
+        report["optimizationEffective"] = False
+    return {"issues": issues, "comparisons": comparisons, "report": report}

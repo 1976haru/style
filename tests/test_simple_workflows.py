@@ -24,6 +24,7 @@ def _source():
     return {
         "meta": {
             "storyPov": "male",
+            "sunoModelTarget": "v6",
             "channelLabel": "Tokyo Chill Love Story",
             "genrePolicy": "All stylePrompts start with Chill Rap",
             "episodeTitle": "傘を閉じたくなかった",
@@ -46,7 +47,18 @@ def _source():
                 "BPM": 96,
                 "trackRole": "general",
                 "vocalType": "Male Solo",
-                "stylePrompt": f"Chill Rap, OLD-{i}",
+                "stylePrompt": (
+                    f"Chill Rap, 98 BPM; recurring male speech-forward tenor, supported warm chest and dry grain; "
+                    f"syncopated pocket; dry rim and light hats; moving bass; Rhodes and muted guitar; "
+                    f"seventh-chord motion; narrow rhythmic Verse; melodic Chorus lift; Bridge with rhythm and texture contrast; "
+                    f"Final A+B payoff; section length 3:00-3:30; exclude early ending"
+                ),
+                "excludePrompt": "; ".join(f"legacy failure category {n}" for n in range(37)),
+                "performanceSignature": "dry immediate pickup; clipped endings; one-beat hook pause",
+                "durationDesign": "3:00-3:30",
+                "generationRunHint": "reject early ending",
+                "bridgeDesign": "drop kick and rim; sparse root bass; close-mic return before Final",
+                "finalDesign": "full backbeat return; doubled hook only on final two lines",
                 "youtube": {"title": f"YT-{i}"},
                 "customField": {"keep": i},
             }
@@ -185,15 +197,24 @@ def test_finalize_existing_preserves_content_and_full_schema_but_updates_music()
         row["youtube"] = {}
         row["customField"] = {}
         row["BPM"] = 100
-        row["stylePrompt"] = "Chill Rap, NEW MASTER PROMPT"
-        row["vocalType"] = "Male Solo"
+        row["excludePrompt"] = "; ".join([
+            "female or duet contamination", "generic polished male-pop tenor", "K-pop idol belt",
+            "dark mature crooner", "whisper-only vocal", "falsetto-led hook/final", "rock rasp or gravel",
+            "non-native Japanese pronunciation", "fully sung R&B Verse", "hard trap or drill",
+            "festival EDM", "static bass",
+        ])
         row["performanceSignature"] = "speech-forward dry pickup"
         row["promptOptimization"] = {
-            "existingStylePrompt": f"Chill Rap, OLD-{row['trackNo']}",
-            "newStylePrompt": "Chill Rap, NEW MASTER PROMPT",
-            "changeReasons": ["groove and structure made explicit"],
-            "expectedImprovements": ["more stable musical output"],
-            "weaknessesAddressed": ["groove", "bridge_contrast"],
+            "status": "IMPROVED",
+            "changedFields": ["BPM", "excludePrompt", "performanceSignature"],
+            "resolvedWeaknesses": ["exclude_efficiency"],
+            "remainingWeaknesses": [],
+            "changeReasons": ["Condensed overlapping exclusion categories", "Added a track-specific dry pickup cue"],
+            "expectedImprovements": ["Lower instruction dilution", "Cleaner channel-specific failure prevention"],
+            "oldStylePrompt": source["songs"][row["trackNo"] - 1]["stylePrompt"],
+            "newStylePrompt": row["stylePrompt"],
+            "oldExcludePrompt": source["songs"][row["trackNo"] - 1]["excludePrompt"],
+            "newExcludePrompt": row["excludePrompt"],
         }
     final, issues = finalize_existing_upgrade(
         json.dumps(source, ensure_ascii=False),
@@ -216,10 +237,11 @@ def test_finalize_existing_preserves_content_and_full_schema_but_updates_music()
         assert row["youtube"] == {"title": f"YT-{i}"}
         assert row["customField"] == {"keep": i}
         assert row["BPM"] == 100
-        assert row["stylePrompt"] == "Chill Rap, NEW MASTER PROMPT"
+        assert row["stylePrompt"] == source["songs"][i - 1]["stylePrompt"]
         assert row["promptOptimization"]["changeReasons"]
     assert final["promptOptimizationReport"]["immutableFieldsVerified"] is True
     assert len(final["promptOptimizationReport"]["comparisons"]) == 15
+    assert final["promptOptimizationReport"]["changedFieldCounts"]["excludePrompt"] == 15
 
 
 def test_haru_instruction_requires_complete_suno_json():

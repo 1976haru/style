@@ -8,7 +8,7 @@ from typing import Any, Dict, List, Tuple
 from .master_registry import build_active_master, load_genre_profiles
 from .prompt_intelligence import (
     analyze_current_prompt, build_old_new_comparison, load_prompt_intelligence_rules,
-    verify_immutable_fields,
+    validate_optimization_effectiveness, verify_immutable_fields,
 )
 
 
@@ -235,6 +235,42 @@ def build_existing_json_upgrade_instruction(
     active_master = build_active_master(master_text, genre_profile, compat["source"])
     intelligence_rules = load_prompt_intelligence_rules()
     current_analysis = analyze_current_prompt(source, intelligence_rules)
+    contract_lines = []
+    guidance_by_area = {
+        "exclude_efficiency": ("shorten and deduplicate exclusion list", ("excludePrompt", "negativeStyleText")),
+        "redundancy": ("remove repeated instructions while retaining distinct musical intent", ("stylePrompt", "excludePrompt")),
+        "prompt_ordering": ("order prompt by genre, BPM/energy, singer, phonation, groove, rhythm section, instruments, sections, harmony, runtime", ("stylePrompt",)),
+        "bridge_contrast": ("write a track-specific audible Bridge contrast", ("bridgeDesign",)),
+        "final_payoff": ("connect Final payoff to the track highlight instead of reusing a generic ending", ("highlightDesign", "finalDesign")),
+        "performance_signature": ("preserve or strengthen this track's distinct delivery cue", ("performanceSignature",)),
+        "genre_clarity": ("keep one dominant selected genre and at most one compatible tint", ("genreText", "genreId", "stylePrompt")),
+        "vocal_identity": ("preserve the source singer gender and solo/duet role while stating the recurring identity", ("vocalDesign",)),
+        "phonation": ("make phonation concise and internally consistent", ("vocalDesign", "stylePrompt")),
+        "groove": ("state the audible pocket and rhythmic delivery", ("grooveDesign", "stylePrompt")),
+        "drums": ("specify a compact genre-appropriate drum behavior", ("drumDesign", "stylePrompt")),
+        "bass": ("describe bass movement and its relation to the kick", ("bassDesign", "stylePrompt")),
+        "instrumentation": ("select a focused signature palette", ("instrumentationDesign", "stylePrompt")),
+        "harmony": ("describe chord color or tension and release", ("harmonicDesign", "stylePrompt")),
+        "verse_behavior": ("make Verse delivery behavior audible", ("verseBehavior", "stylePrompt")),
+        "chorus_behavior": ("make the Chorus lift perceptible without changing singer identity", ("chorusBehavior", "stylePrompt")),
+        "tempo_design": ("set BPM from the selected Channel and Genre Master ranges", ("BPM",)),
+        "prompt_length": ("compress stylePrompt to high information density and stay below the hard maximum", ("stylePrompt",)),
+        "contradiction": ("remove only semantically incompatible instructions", ("stylePrompt", "excludePrompt", "negativeStyleText")),
+        "duration_design": ("add a suitable duration/section target and prevent early ending", ("durationDesign",)),
+        "generation_hint": ("add a concise track-specific generation guard", ("generationRunHint",)),
+        "model_specific_behavior": ("format explicit musical controls for the target generation model", ("stylePrompt", "generationRunHint")),
+    }
+    for analysis_track in current_analysis["tracks"]:
+        areas = [x["area"] for x in analysis_track["weaknesses"]]
+        actions = list(dict.fromkeys(guidance_by_area[x][0] for x in areas if x in guidance_by_area))
+        fields = list(dict.fromkeys(field for x in areas for field in guidance_by_area.get(x, ("", ()))[1]))
+        contract_lines.append(
+            f"[TRACK {int(analysis_track.get('trackNo') or 0):02d} CURRENT ANALYSIS]\n"
+            + "Actionable weaknesses:\n" + ("\n".join(f"- {x}" for x in areas) or "- none detected")
+            + "\nMUST ADDRESS:\n" + ("\n".join(f"- {x}" for x in actions) or "- no required change; use KEEP only with a content-based keepReason")
+            + "\nMUST PRESERVE:\n- title\n- lyrics\n- hook\n- story\n- scene\n- relationship boundaries\n"
+            + "EXPECTED MUTABLE FIELDS:\n" + ("\n".join(f"- {x}" for x in fields) or "- none required")
+        )
 
     instruction = """# EXISTING JSON -> PROMPT INTELLIGENCE OPTIMIZER
 
@@ -272,9 +308,14 @@ def build_existing_json_upgrade_instruction(
 9. 최종 응답은 설명 없이 JSON object 하나만 출력한다.
 10. songs 15곡을 모두 출력한다.
 11. 적극 개선 대상은 BPM/Genre/Vocal Design/Style Prompt/Exclude/Performance Signature/Groove/Instrumentation/Harmony/Bridge/Final/Duration/Generation Hint이다.
-12. 각 song에 promptOptimization object를 추가한다: existingStylePrompt, newStylePrompt, changeReasons[], expectedImprovements[], weaknessesAddressed[].
-13. existingStylePrompt는 ORIGINAL의 값을 정확히 복사하고 newStylePrompt는 최종 stylePrompt와 정확히 같아야 한다.
+12. 각 song에 promptOptimization object를 추가한다: status, changedFields, resolvedWeaknesses, remainingWeaknesses, changeReasons[], expectedImprovements[], oldStylePrompt, newStylePrompt, oldExcludePrompt, newExcludePrompt.
+13. oldStylePrompt/oldExcludePrompt는 ORIGINAL의 값을 정확히 복사하고 newStylePrompt/newExcludePrompt는 최종 JSON 값과 정확히 같아야 한다.
 14. 중복 형용사 나열보다 들리는 음악 행동을 우선하고, positive prompt와 exclude의 충돌을 제거한다.
+15. 결과가 개선 가능성을 발견한 트랙에서 관련 음악 필드를 하나도 바꾸지 않으면 안 된다. claimed changedFields는 실제 old/new diff와 일치시킨다.
+16. before/after 분석을 모두 실행하고 resolvedWeaknesses는 after 분석에서 사라진 영역만 선언한다.
+17. promptOptimization은 status, changedFields, resolvedWeaknesses, remainingWeaknesses, changeReasons, expectedImprovements, oldStylePrompt, newStylePrompt, oldExcludePrompt, newExcludePrompt를 포함한다.
+18. 변경이 없고 actionable weakness가 전혀 없는 트랙만 status=KEEP을 쓸 수 있으며, keepReason="No actionable weakness remained after analysis"와 구체적인 내용 근거를 쓴다.
+19. CHILI 남성 exclude는 8-16개의 의미 범주로 압축하되 female/duet 오염, generic polished male-pop tenor, K-pop belt, mature/dark crooner, whisper-only, falsetto hook/final, rock rasp/gravel, 일본어 발음 오류, fully-sung R&B Verse, hard trap/drill, festival EDM, static bass 등 현재 마스터의 실제 실패 방어를 유지한다.
 
 [DETECTED SOURCE]
 """ + json.dumps(compat["source"], ensure_ascii=False, indent=2) + """
@@ -284,6 +325,9 @@ def build_existing_json_upgrade_instruction(
 
 [PROMPT INTELLIGENCE RULES]
 """ + json.dumps(intelligence_rules, ensure_ascii=False, indent=2) + """
+
+[TRACK-BY-TRACK OPTIMIZATION CONTRACTS]
+""" + "\n\n".join(contract_lines) + """
 
 [ACTIVE MASTER - CHANNEL + GENRE]
 """ + active_master + """
@@ -410,30 +454,162 @@ def validate_complete_json(result: Dict[str, Any], expected_count: int = 15, sou
     return issues
 
 
-def finalize_existing_upgrade(source_text: str, upgraded_text: str) -> Tuple[Dict[str, Any], List[Dict[str, Any]]]:
+def _vocal_role(row: Dict[str, Any]) -> str:
+    value = str(row.get("vocalType", row.get("vocalDesign", ""))).casefold()
+    if "instrumental" in value or "no lead vocal" in value:
+        return "instrumental"
+    if "duet" in value or (re.search(r"\bfemale\b", value) and re.search(r"\bmale\b", value)):
+        return "duet"
+    if re.search(r"\bfemale\b", value):
+        return "female"
+    if re.search(r"\bmale\b", value):
+        return "male"
+    return "unknown"
+
+
+def _optimization_regression_issues(source: Dict[str, Any], result: Dict[str, Any], genre_choice: str = "") -> List[Dict[str, Any]]:
+    from .master_registry import load_genre_profiles
+    from .prompt_intelligence import load_prompt_intelligence_rules
+
+    issues: List[Dict[str, Any]] = []
+    profiles = load_genre_profiles()
+    genre_id = GENRE_CHOICES.get(genre_choice or "", "")
+    if not genre_id or genre_id == "auto":
+        genre_id = GENRE_CHOICES.get(detect_source_profile(source).get("genreHint", ""), "")
+    profile = profiles.get(genre_id, {})
+    dominant = str(profile.get("dominantGenre", ""))
+    bpm_range = profile.get("bpm", {})
+    hard_max = int(load_prompt_intelligence_rules()["policy"]["targetPromptChars"]["hardMax"])
+    source_rows = {str(x.get("trackNo", i)): x for i, x in enumerate(_songs(source), 1)}
+
+    for i, row in enumerate(_songs(result), 1):
+        no = row.get("trackNo", i)
+        old = source_rows.get(str(no), {})
+        voice_role, old_voice_role = _vocal_role(row), _vocal_role(old)
+        if old_voice_role != "unknown" and voice_role != old_voice_role:
+            issues.append({"level": "FAIL", "code": "WRONG_VOCAL_ROLE", "trackNo": no, "message": f"Expected {old_voice_role}; found {voice_role}."})
+        vocal_blob = str(row.get("vocalDesign", row.get("vocalType", ""))).casefold()
+        if re.search(r"\bgeneric(?: polished)? (?:ai )?(?:male|female)?\s*(?:vocal|singer|tenor)", vocal_blob):
+            issues.append({"level": "FAIL", "code": "GENERIC_VOCAL_REGRESSION", "trackNo": no})
+        try:
+            bpm = int(row.get("BPM", row.get("bpm", 0)))
+        except (TypeError, ValueError):
+            bpm = 0
+        if bpm_range and bpm and not int(bpm_range.get("min", 0)) <= bpm <= int(bpm_range.get("max", 999)):
+            issues.append({"level": "FAIL", "code": "BPM_OUT_OF_GENRE_RANGE", "trackNo": no, "BPM": bpm, "range": bpm_range})
+        genre = str(row.get("genreText", row.get("genre", "")))
+        genre_id_value = str(row.get("genreId", "")).casefold()
+        style = str(row.get("stylePrompt", ""))
+        explicit_genre_ok = (
+            dominant.casefold() in genre.casefold()
+            or (genre_id and genre_id_value == genre_id.casefold())
+        ) if (genre or genre_id_value) else dominant.casefold() in style.casefold()
+        if dominant and not explicit_genre_ok:
+            issues.append({"level": "FAIL", "code": "GENRE_DRIFT", "trackNo": no, "expected": dominant, "actual": genre})
+        if len(style) > hard_max:
+            issues.append({"level": "FAIL", "code": "STYLE_PROMPT_HARD_MAX", "trackNo": no, "length": len(style), "hardMax": hard_max})
+        if voice_role != "instrumental" and not str(row.get("performanceSignature", "")).strip():
+            issues.append({"level": "FAIL", "code": "MISSING_PERFORMANCE_SIGNATURE", "trackNo": no})
+        if not (str(row.get("bridgeDesign", "")).strip() or re.search(r"\bbridge\b", style, re.I)):
+            issues.append({"level": "FAIL", "code": "MISSING_BRIDGE", "trackNo": no})
+        if not (str(row.get("finalDesign", "")).strip() or str(row.get("highlightDesign", "")).strip() or re.search(r"\b(?:final|outro)\b", style, re.I)):
+            issues.append({"level": "FAIL", "code": "MISSING_FINAL", "trackNo": no})
+    return issues
+
+
+def finalize_existing_upgrade(
+    source_text: str,
+    upgraded_text: str,
+    genre_choice: str = "",
+) -> Tuple[Dict[str, Any], List[Dict[str, Any]]]:
     final = merge_existing_upgrade(source_text, upgraded_text)
     source = load_json_text(source_text)
     issues = validate_complete_json(final, len(_songs(source)), source)
     issues.extend(verify_immutable_fields(source, final))
-    source_by_no = {int(x.get("trackNo", i)): x for i, x in enumerate(_songs(source), 1)}
+    before_analysis = analyze_current_prompt(source)
+    after_analysis = analyze_current_prompt(final)
+    effectiveness = validate_optimization_effectiveness(source, final, before_analysis, after_analysis)
+    issues.extend(effectiveness["issues"])
+
+    source_by_no = {str(x.get("trackNo", i)): x for i, x in enumerate(_songs(source), 1)}
+    before_by_no = {str(x.get("trackNo", i)): x for i, x in enumerate(before_analysis["tracks"], 1)}
+    after_by_no = {str(x.get("trackNo", i)): x for i, x in enumerate(after_analysis["tracks"], 1)}
+    comparison_by_no = {str(x["trackNo"]): x for x in effectiveness["comparisons"]}
     for i, row in enumerate(_songs(final), 1):
-        no = int(row.get("trackNo", i))
+        no = row.get("trackNo", i)
+        key = str(no)
+        old = source_by_no.get(key, {})
         audit = row.get("promptOptimization")
         if not isinstance(audit, dict):
-            issues.append({"level": "FAIL", "code": "MISSING_OPTIMIZATION_AUDIT", "trackNo": no, "message": "promptOptimization 없음"})
+            issues.append({"level": "FAIL", "code": "MISSING_OPTIMIZATION_AUDIT", "trackNo": no})
             continue
-        old_style = str(source_by_no.get(no, {}).get("stylePrompt", ""))
-        if audit.get("existingStylePrompt") != old_style:
-            issues.append({"level": "FAIL", "code": "OLD_PROMPT_MISMATCH", "trackNo": no, "message": "기존 stylePrompt 비교값 불일치"})
-        if audit.get("newStylePrompt") != row.get("stylePrompt"):
-            issues.append({"level": "FAIL", "code": "NEW_PROMPT_MISMATCH", "trackNo": no, "message": "신규 stylePrompt 비교값 불일치"})
-        for field, code in (("changeReasons", "MISSING_CHANGE_REASONS"), ("expectedImprovements", "MISSING_EXPECTED_IMPROVEMENTS")):
-            if not isinstance(audit.get(field), list) or not audit[field]:
-                issues.append({"level": "FAIL", "code": code, "trackNo": no, "message": f"{field} 없음"})
+        old_style, new_style = str(old.get("stylePrompt", "")), str(row.get("stylePrompt", ""))
+        old_exclude = str(old.get("excludePrompt") or old.get("negativeStyleText", ""))
+        new_exclude = str(row.get("excludePrompt") or row.get("negativeStyleText", ""))
+        compare = comparison_by_no.get(key, {})
+        actual_changed = compare.get("changedFields", [])
+        before_areas = {x["area"] for x in before_by_no.get(key, {}).get("weaknesses", [])}
+        after_areas = {x["area"] for x in after_by_no.get(key, {}).get("weaknesses", [])}
+        resolved, remaining = sorted(before_areas - after_areas), sorted(after_areas)
+
+        for field, expected, code in (
+            ("oldStylePrompt", old_style, "OLD_PROMPT_MISMATCH"),
+            ("newStylePrompt", new_style, "NEW_PROMPT_MISMATCH"),
+            ("oldExcludePrompt", old_exclude, "OLD_EXCLUDE_MISMATCH"),
+            ("newExcludePrompt", new_exclude, "NEW_EXCLUDE_MISMATCH"),
+        ):
+            if audit.get(field) != expected:
+                issues.append({"level": "FAIL", "code": code, "trackNo": no})
+        claimed_fields = audit.get("changedFields")
+        if not isinstance(claimed_fields, list):
+            issues.append({"level": "FAIL", "code": "CHANGED_FIELDS_MISSING", "trackNo": no})
+        elif sorted(set(claimed_fields)) != sorted(actual_changed):
+            issues.append({"level": "FAIL", "code": "CLAIMED_CHANGED_FIELDS_MISMATCH", "trackNo": no, "actual": actual_changed, "claimed": claimed_fields})
+        for field in ("resolvedWeaknesses", "remainingWeaknesses", "changeReasons", "expectedImprovements"):
+            if not isinstance(audit.get(field), list):
+                issues.append({"level": "FAIL", "code": f"{field.upper()}_MISSING", "trackNo": no})
+        if isinstance(audit.get("resolvedWeaknesses"), list) and set(audit["resolvedWeaknesses"]) != set(resolved):
+            issues.append({"level": "FAIL", "code": "CLAIMED_WEAKNESS_RESOLUTION_MISMATCH", "trackNo": no, "actual": resolved, "claimed": audit["resolvedWeaknesses"]})
+        if isinstance(audit.get("remainingWeaknesses"), list) and set(audit["remainingWeaknesses"]) != set(remaining):
+            issues.append({"level": "FAIL", "code": "REMAINING_WEAKNESSES_MISMATCH", "trackNo": no, "actual": remaining, "claimed": audit["remainingWeaknesses"]})
+        if actual_changed:
+            if audit.get("status") != "IMPROVED":
+                issues.append({"level": "FAIL", "code": "OPTIMIZATION_STATUS_MISMATCH", "trackNo": no})
+            if not audit.get("changeReasons"):
+                issues.append({"level": "FAIL", "code": "MISSING_CHANGE_REASONS", "trackNo": no})
+            if not audit.get("expectedImprovements"):
+                issues.append({"level": "FAIL", "code": "MISSING_EXPECTED_IMPROVEMENTS", "trackNo": no})
+        elif not before_areas:
+            if audit.get("status") != "KEEP" or not str(audit.get("keepReason", "")).strip():
+                issues.append({"level": "FAIL", "code": "KEEP_REASON_MISSING", "trackNo": no})
+        elif audit.get("status") == "KEEP":
+            issues.append({"level": "FAIL", "code": "KEEP_WITH_ACTIONABLE_WEAKNESS", "trackNo": no})
+
+        row["promptOptimization"] = {
+            **audit,
+            "status": audit.get("status"),
+            "changedFields": actual_changed,
+            "resolvedWeaknesses": resolved,
+            "remainingWeaknesses": remaining,
+            "oldStylePrompt": old_style,
+            "newStylePrompt": new_style,
+            "oldExcludePrompt": old_exclude,
+            "newExcludePrompt": new_exclude,
+        }
+
+    issues.extend(_optimization_regression_issues(source, final, genre_choice))
+    if not any(x.get("level") == "FAIL" for x in issues):
+        issues.append({"level": "PASS", "code": "OPTIMIZATION_EFFECTIVE", "message": "Actual field changes and before/after analysis passed."})
+    effectiveness["report"]["optimizationEffective"] = not any(x.get("level") == "FAIL" for x in issues)
     final["promptOptimizationReport"] = {
         "versionUsedAsQualitySignal": False,
         "immutableFieldsVerified": not any(x.get("level") == "FAIL" and str(x.get("code", "")).startswith("IMMUTABLE") for x in issues),
+        **effectiveness["report"],
+        "beforeWeaknessCounts": before_analysis["weaknessCounts"],
+        "afterWeaknessCounts": after_analysis["weaknessCounts"],
         "comparisons": build_old_new_comparison(source, final),
+        "trackComparisons": effectiveness["comparisons"],
+        "qa": issues,
     }
     return final, issues
 
