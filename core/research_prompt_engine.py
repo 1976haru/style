@@ -456,6 +456,14 @@ def apply_research_candidate_variant(
                 song["excludePrompt"] = candidate["excludePrompt"]
             else:
                 song["negativeStyleText"] = candidate["excludePrompt"]
+        feedback_context = {
+            "researchEngineVersion": candidate_pack.get("engineVersion"),
+            "genreId": candidate_pack.get("genreId"),
+            "genreLabel": candidate_pack.get("genreLabel"),
+            "modelTarget": candidate_pack.get("modelTarget"),
+            "variantId": variant_id,
+            "primaryAxis": candidate.get("primaryAxis"),
+        }
         song["researchRecipe"] = {
             "engineVersion": candidate_pack.get("engineVersion"),
             "variantId": variant_id,
@@ -464,5 +472,10 @@ def apply_research_candidate_variant(
             "generationRecipe": deepcopy(candidate.get("generationRecipe") or {}),
             "evidence": deepcopy(candidate.get("evidence") or {}),
             "sourceStylePrompt": pack.get("sourceStylePrompt", ""),
+            "feedbackBinding": {
+                "experiment_arm": variant_id,
+                "experiment_axis": candidate.get("primaryAxis"),
+                "experiment_context": feedback_context,
+            },
         }
     return result
