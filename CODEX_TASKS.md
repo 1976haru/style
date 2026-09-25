@@ -1,9 +1,9 @@
-# Codex Task Queue — v0.6-dev
+# Codex Task Queue — v0.6.1-dev
 
 Read `AGENTS.md`, `ARCHITECTURE_v06.md`, and `ARCHITECTURE_v05.md` before implementation.
 
 ## Current priority — local Windows acceptance
-1. Pull branch `v0.6-dev` without touching `main`.
+1. Pull branch `v0.6.1-dev` without touching `main`.
 2. Run `python -m pytest -q`.
 3. Run `python -m compileall -q .`.
 4. Run `git diff --check`.
@@ -28,7 +28,7 @@ Read `AGENTS.md`, `ARCHITECTURE_v06.md`, and `ARCHITECTURE_v05.md` before implem
 - Fixed channel singer identity and vocal role must not drift.
 - Research mode must work offline after the curated knowledge JSON files are present.
 - No network scraping or private Suno API calls in the local app.
-- `main` remains Stable; development work stays on `v0.6-dev`.
+- `main` remains Stable; development work stays on `v0.6.1-dev`.
 
 ## Next implementation after acceptance — v0.6.1
 1. Link `researchRecipe.variantId` and `primaryAxis` to the existing Feedback DB.
@@ -58,3 +58,9 @@ Read `AGENTS.md`, `ARCHITECTURE_v06.md`, and `ARCHITECTURE_v05.md` before implem
 - Automatic web scraping.
 - Private or unofficial Suno APIs.
 - OpenAI API direct generation until the offline research/feedback loop is stable.
+
+## v0.6.1 acceptance additions
+- Run one real Japanese male JSON with legacy Verse/Bridge breath ranges and confirm `vocal_design_consistency` is detected.
+- Confirm a result without close-mic / JP-native diction / mora / sentence-accent positive controls is rejected at STEP 3.
+- Confirm a corrected v0.6.1 result passes with immutable fields unchanged.
+- Confirm Research A/B/C Japanese candidates contain JP-native positive controls and preserve role locks.
