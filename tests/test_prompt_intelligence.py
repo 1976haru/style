@@ -16,7 +16,7 @@ REQUIRED_AREAS = {
     "contradiction", "exclude_efficiency", "prompt_length", "model_specific_behavior",
     "tempo_design", "performance_signature", "duration_design", "generation_hint",
     "information_density", "track_specificity", "bridge_specificity", "final_specificity",
-    "template_similarity",
+    "money_chord_engine", "bridge_money_chord", "final_highlight_engine", "template_similarity",
 }
 
 MASTER = """CHILI LAB Male Solo ONLY
@@ -56,13 +56,33 @@ def _optimized(source):
         old = row["stylePrompt"]
         new = (
             "Chill Rap, 98 BPM; recurring male speech-forward tenor, supported warm chest and dry grain; "
-            "syncopated pocket; dry rim and light hats; moving bass; Rhodes and muted guitar; seventh-chord motion; "
-            "narrow rhythmic Verse; melodic Chorus lift; Bridge with rhythm and texture contrast; Final A+B payoff"
+            "syncopated pocket; dry rim and light hats; moving bass; Rhodes and muted guitar; narrow rhythmic Verse; "
+            "melodic Chorus lift; Hook money chord I–V–vi–IV; "
+            "Bridge drops hats, bass holds roots, vocal moves closer on IVmaj7–iv6–Imaj7; "
+            "Final A+B restores full pocket with root-bass cadence on I–V–vi–IV → ii7–V7–Imaj7; section target 3:00-3:30"
         )
         row.update({
             "BPM": 98, "grooveDesign": "syncopated behind-beat pocket", "instrumentationDesign": "Rhodes and muted guitar",
-            "harmonicDesign": "seventh-chord tension and release", "bridgeDesign": "rhythm and texture contrast",
-            "finalDesign": "Final A+B payoff", "durationDesign": "3:00-3:30", "generationRunHint": "reject early ending",
+            "harmonicDesign": {
+                "chorusProgression": "I–V–vi–IV",
+                "bridgeColor": "IVmaj7–iv6–Imaj7",
+                "finalResolution": "I–V–vi–IV → ii7–V7–Imaj7",
+            },
+            "moneyChordDesign": {
+                "hook": ["I–V–vi–IV"],
+                "bridge": ["IVmaj7–iv6–Imaj7"],
+                "finalHighlight": ["I–V–vi–IV", "ii7–V7–Imaj7"],
+            },
+            "bridgeDesign": {
+                "changeAxes": ["drum density", "bass motion", "vocal distance"],
+                "harmonicColor": "IVmaj7–iv6–Imaj7",
+            },
+            "highlightDesign": {
+                "shape": "Final A+B sustained payoff",
+                "harmonicPayoff": "I–V–vi–IV → ii7–V7–Imaj7",
+            },
+            "finalDesign": "Final A+B; full-pocket return; root-bass cadence; no early collapse",
+            "durationDesign": "3:00-3:30", "generationRunHint": "reject early ending",
             "stylePrompt": new, "negativeStyleText": "female lead; power belt; early ending",
             "performanceSignature": "dry immediate pickup; clipped endings; one-beat hook pause",
             "promptOptimization": {
@@ -117,8 +137,9 @@ def _mature_prompt_source(exclude_count=37):
     style = (
         "Chill Rap, 98 BPM; young Japanese male tenor, speech-forward supported chest and subtle dry grain; "
         "syncopated relaxed pocket; dry rim, soft kick and light hats; moving warm bass; Rhodes and muted guitar; "
-        "seventh-chord tension and release; narrow rhythmic Verse; melodic Chorus lift; Bridge drops drums and changes texture; "
-        "Final A+B sustained payoff; section target 3:00-3:30"
+        "narrow rhythmic Verse; melodic Chorus lift; Hook money chord I–V–vi–IV; "
+        "Bridge drops hats, bass holds roots, vocal moves closer on IVmaj7–iv6–Imaj7; "
+        "Final A+B restores full pocket with root-bass cadence on I–V–vi–IV → ii7–V7–Imaj7; section target 3:00-3:30"
     )
     excludes = [
         "generic polished AI tenor", "generic Suno male pop vocal", "hyper-polished K-pop idol tenor", "power belt",
@@ -134,13 +155,29 @@ def _mature_prompt_source(exclude_count=37):
             "BPM": 98,
             "genreText": "Chill Rap",
             "vocalDesign": "recurring young Japanese male tenor, speech-forward supported chest, subtle dry grain",
-            "harmonicDesign": "seventh-chord tension and release",
+            "harmonicDesign": {
+                "chorusProgression": "I–V–vi–IV",
+                "bridgeColor": "IVmaj7–iv6–Imaj7",
+                "finalResolution": "I–V–vi–IV → ii7–V7–Imaj7",
+            },
+            "moneyChordDesign": {
+                "hook": ["I–V–vi–IV", "vi–IV–I–V"],
+                "bridge": ["IVmaj7–iv6–Imaj7"],
+                "finalHighlight": ["I–V–vi–IV", "ii7–V7–Imaj7"],
+            },
             "stylePrompt": style,
             "excludePrompt": "; ".join(excludes),
             "performanceSignature": "track-specific dry pickup and clipped phrase endings",
             "generationRunHint": "reject early ending and preserve native Japanese mora",
-            "bridgeDesign": "drop kick and rim; sparse root bass; change vocal distance before Final",
-            "finalDesign": "full backbeat return; hook double only on final two lines",
+            "bridgeDesign": {
+                "changeAxes": ["drum density", "bass motion", "vocal distance"],
+                "purpose": "drop hats, simplify bass, move vocal closer before Final",
+            },
+            "highlightDesign": {
+                "shape": "Final A+B sustained payoff",
+                "harmonicPayoff": "I–V–vi–IV → ii7–V7–Imaj7",
+            },
+            "finalDesign": "Final A+B; restore full pocket; root-bass cadence; sustain payoff to ending",
             "durationDesign": "3:00-3:30",
             "grooveDesign": "relaxed syncopated pocket",
             "drumDesign": "dry rim, soft kick and light hats",
@@ -457,19 +494,32 @@ def _structured_quality_set(*, generic_template=False, weak_bridge=False, generi
     ]
     for i, row in enumerate(source["songs"]):
         palette = "Rhodes loop and dry rim" if generic_template else palettes[i]
-        bridge = "Bridge drops drums" if weak_bridge else "Bridge drops drums, bass holds roots, vocal moves to far-room distance"
-        final = "Final restores the full pocket" if generic_final else f"Final restores {palette} with cadence color {i + 1}"
+        bridge = (
+            "Bridge drops drums on IVmaj7–iv6–Imaj7"
+            if weak_bridge else
+            "Bridge drops drums, bass holds roots, vocal moves to far-room distance on IVmaj7–iv6–Imaj7"
+        )
+        final = (
+            "Final A+B restores the full pocket with root-bass cadence on I–V–vi–IV → ii7–V7–Imaj7"
+            if generic_final else
+            f"Final A+B restores the full pocket with root-bass cadence and cadence color {i + 1} on I–V–vi–IV → ii7–V7–Imaj7"
+        )
         row["stylePrompt"] = (
             f"Chill Rap, 98 BPM; recurring Japanese male tenor, supported chest and dry grain; {palette}; "
-            f"syncopated pocket; {bridge}; {final}; section target 3:00-3:30"
+            f"syncopated pocket; Hook money chord I–V–vi–IV; {bridge}; {final}; section target 3:00-3:30"
         )
+        row["moneyChordDesign"] = {
+            "hook": ["I–V–vi–IV", "IVmaj7–V–iii7–vi7"],
+            "bridge": ["IVmaj7–iv6–Imaj7"],
+            "finalHighlight": ["I–V–vi–IV", "ii7–V7–Imaj7"],
+        }
         row["bridgeDesign"] = {
             "changeAxes": "drums and percussion + bass motion + vocal distance",
             "purpose": "audible late-song contrast",
             "mustNot": "do not swap singer",
         }
         row["highlightDesign"] = {
-            "shape": f"track payoff shape {i + 1}",
+            "shape": "Final A+B sustained payoff",
             "harmonicPayoff": f"cadence color {i + 1}",
             "rule": "retain singer identity",
         }
@@ -525,3 +575,42 @@ def test_advanced_quality_analysis_still_ignores_version_label():
     old["meta"]["version"] = "v15.0"
     latest["meta"]["version"] = "v99.0"
     assert analyze_current_prompt(old) == analyze_current_prompt(latest)
+
+
+def test_multiple_money_chord_progressions_per_section_are_accepted():
+    source = _mature_prompt_source(12)
+    row = source["songs"][0]
+    row["moneyChordDesign"]["hook"] = ["I–V–vi–IV", "IVmaj7–V–iii7–vi7"]
+    row["stylePrompt"] = row["stylePrompt"].replace(
+        "Hook money chord I–V–vi–IV",
+        "Hook money chords I–V–vi–IV and IVmaj7–V–iii7–vi7",
+    )
+    analysis = analyze_current_prompt(source)
+    first = {x["area"] for x in analysis["tracks"][0]["weaknesses"]}
+    assert "money_chord_engine" not in first
+
+
+def test_money_chord_metadata_without_actual_style_prompt_is_rejected():
+    source = _mature_prompt_source(12)
+    source["songs"][0]["stylePrompt"] = (
+        "Chill Rap, 98 BPM; young Japanese male tenor; syncopated pocket; dry rim; moving bass; "
+        "Bridge drops hats and bass, vocal moves closer; Final A+B restores full pocket with root-bass cadence"
+    )
+    analysis = analyze_current_prompt(source)
+    first = {x["area"] for x in analysis["tracks"][0]["weaknesses"]}
+    assert "money_chord_engine" in first
+    assert "final_highlight_engine" in first
+
+
+def test_anchor_requires_three_bridge_axes_and_final_abc():
+    source = _mature_prompt_source(12)
+    row = source["songs"][0]
+    row["trackRole"] = "anchor"
+    row["stylePrompt"] = row["stylePrompt"].replace(
+        "Bridge drops hats, bass holds roots, vocal moves closer",
+        "Bridge drops hats, bass holds roots",
+    ).replace("Final A+B", "Final A+B")
+    analysis = analyze_current_prompt(source)
+    first = {x["area"] for x in analysis["tracks"][0]["weaknesses"]}
+    assert "bridge_money_chord" in first
+    assert "final_highlight_engine" in first
