@@ -113,6 +113,139 @@ def _axis_is_represented(axis: str, section_text: str) -> bool:
     return any(re.search(group, axis, re.I) and re.search(group, section_text, re.I) for group in semantic_groups)
 
 
+_MONEY_CHORD_RE = re.compile(
+    r"(?:\b[ivIV]+(?:maj7|m7|7|6|add9|sus4|sus2)?(?:/[ivIV]+)?\b\s*(?:→|->|–|-)\s*){2,}"
+    r"\b[ivIV]+(?:maj7|m7|7|6|add9|sus4|sus2)?(?:/[ivIV]+)?\b"
+)
+
+_BRIDGE_AXIS_GROUPS = (
+    r"drum|kick|snare|rim|hat|percussion|backbeat|rhythm density",
+    r"bass|sub|low[- ]?end|root bass",
+    r"harmon|chord|modal|progress|cadence|tension",
+    r"vocal distance|voice distance|closer vocal|far-room|far room|dry vocal|vocal space",
+    r"texture|instrument|guitar|piano|rhodes|keys|pad|layer|density",
+    r"space|reverb|wide|narrow|mono|stereo|room|filter",
+    r"lyric viewpoint|lyric angle|perspective",
+)
+
+
+def _flatten_music_values(value: Any) -> List[str]:
+    if isinstance(value, dict):
+        out: List[str] = []
+        for item in value.values():
+            out.extend(_flatten_music_values(item))
+        return out
+    if isinstance(value, (list, tuple, set)):
+        out: List[str] = []
+        for item in value:
+            out.extend(_flatten_music_values(item))
+        return out
+    text = str(value or "").strip()
+    return [text] if text else []
+
+
+def _contains_money_progression(value: Any) -> bool:
+    return any(_MONEY_CHORD_RE.search(text) for text in _flatten_music_values(value))
+
+
+def _money_section_values(money: Any, section: str) -> List[str]:
+    if not isinstance(money, dict):
+        return []
+    aliases = {
+        "hook": ("hook", "hooks", "hookProgression", "hookProgressions", "chorus", "chorusProgression", "chorusProgressions"),
+        "bridge": ("bridge", "bridges", "bridgeColor", "bridgeColors", "bridgeProgression", "bridgeProgressions"),
+        "final": ("final", "finals", "finalHighlight", "finalHighlights", "finalResolution", "finalResolutions", "finalProgression", "finalProgressions"),
+    }
+    values: List[str] = []
+    for key in aliases[section]:
+        if key in money:
+            values.extend(_flatten_music_values(money[key]))
+    return values
+
+
+def _style_section_has_money_progression(style: str, section: str) -> bool:
+    return bool(_MONEY_CHORD_RE.search(_section_text(style, section)))
+
+
+def _audible_bridge_axis_count(bridge_text: str) -> int:
+    return sum(1 for group in _BRIDGE_AXIS_GROUPS if re.search(group, bridge_text or "", re.I))
+
+
+def _final_highlight_ok(style: str, *, anchor: bool) -> bool:
+    final_text = _section_text(style, "final") or _section_text(style, "outro")
+    if not final_text:
+        return False
+    if anchor:
+        structure = bool(
+            re.search(r"\bA\s*\+\s*B\s*\+\s*C\b", final_text, re.I)
+            or (
+                re.search(r"full hook", final_text, re.I)
+                and re.search(r"variation", final_text, re.I)
+                and re.search(r"post[- ]?hook", final_text, re.I)
+            )
+        )
+    else:
+        structure = bool(
+            re.search(r"\bA\s*\+\s*B(?:\s*\+\s*C)?\b", final_text, re.I)
+            or (
+                re.search(r"full hook", final_text, re.I)
+                and re.search(r"variation|same solo|response", final_text, re.I)
+            )
+        )
+    groove_return = bool(re.search(
+        r"full[- ]?(?:pocket|groove)|groove (?:return|returns)|backbeat (?:return|returns)|drums? (?:return|returns)|full rhythm section",
+        final_text,
+        re.I,
+    ))
+    cadence = bool(re.search(r"root[- ]?bass|cadence|resolution|resolve", final_text, re.I))
+    return structure and groove_return and cadence and _style_section_has_money_progression(style, "final")
+
+
+def sectional_music_gate_issues(row: Dict[str, Any]) -> List[Dict[str, str]]:
+    """Hard musical gates for Chill Rap Bridge -> money chord(s) -> Final Highlight."""
+    style = str(row.get("stylePrompt", ""))
+    genre = " ".join(str(row.get(k, "")) for k in ("genreText", "genre", "genreId"))
+    if not (re.match(r"^\s*Chill Rap\b", style, re.I) or re.search(r"\bchill[- ]?rap\b", genre, re.I)):
+        return []
+    if re.search(r"instrumental", str(row.get("vocalType", "")), re.I):
+        return []
+
+    issues: List[Dict[str, str]] = []
+    money = row.get("moneyChordDesign")
+    missing_design = [
+        section for section in ("hook", "bridge", "final")
+        if not any(_contains_money_progression(value) for value in _money_section_values(money, section))
+    ]
+    if missing_design:
+        issues.append({
+            "code": "MONEY_CHORD_DESIGN_INCOMPLETE",
+            "message": "moneyChordDesign needs section-functional progression(s) for: " + ", ".join(missing_design),
+        })
+
+    for section in ("hook", "bridge", "final"):
+        if not _style_section_has_money_progression(style, section):
+            issues.append({
+                "code": f"MONEY_CHORD_STYLE_{section.upper()}_MISSING",
+                "message": f"actual stylePrompt must contain one or more {section} money-chord progressions",
+            })
+
+    bridge_text = _section_text(style, "bridge")
+    required_axes = 3 if str(row.get("trackRole", "")).casefold() == "anchor" else 2
+    axis_count = _audible_bridge_axis_count(bridge_text)
+    if axis_count < required_axes:
+        issues.append({
+            "code": "BRIDGE_AUDIBLE_AXES_WEAK",
+            "message": f"Bridge exposes {axis_count} audible contrast axes; {required_axes} required",
+        })
+
+    if not _final_highlight_ok(style, anchor=str(row.get("trackRole", "")).casefold() == "anchor"):
+        issues.append({
+            "code": "FINAL_HIGHLIGHT_WEAK",
+            "message": "Final Highlight must sustain A+B (Anchor A+B+C), restore the groove/full pocket, use root-bass/cadence motion, and state final money-chord resolution(s)",
+        })
+    return issues
+
+
 def _append_weakness(track: Dict[str, Any], area: str, reason: str, improvement: str) -> None:
     if area not in {x.get("area") for x in track["weaknesses"]}:
         track["weaknesses"].append({"area": area, "reason": reason, "expectedImprovement": improvement})
@@ -157,7 +290,7 @@ def _track_analysis(row: Dict[str, Any], rules: Dict[str, Any], target_model: st
         weak("bass", "Bass motion/register is missing.", "Stronger groove foundation without low-end guesswork.")
     if not re.search(r"guitar|piano|keys|rhodes|synth|strings|accordion|pad|pluck", blob):
         weak("instrumentation", "No focused instrumental palette is stated.", "More distinctive but coherent arrangement color.")
-    if not re.search(r"chord|harmony|harmonic|seventh|ninth|modal|progression|voicing", blob):
+    if not re.search(r"chord|harmony|harmonic|seventh|ninth|modal|progression|voicing", blob) and not _contains_money_progression(blob):
         weak("harmony", "Harmony is described only by mood or not at all.", "More intentional tension and release.")
     if "verse" not in blob:
         weak("verse_behavior", "Verse delivery behavior is missing.", "Better control of density and phrasing.")
@@ -245,7 +378,7 @@ def analyze_current_prompt(source: Dict[str, Any], rules: Dict[str, Any] | None 
             )
         bridge = row.get("bridgeDesign")
         if isinstance(bridge, dict):
-            axes = _axis_parts(bridge.get("changeAxes"))
+            axes = _axis_parts(bridge.get("changeAxes") or bridge.get("axes"))
             bridge_text = _section_text(style, "bridge")
             covered = sum(_axis_is_represented(axis, bridge_text) for axis in axes)
             required = 3 if str(row.get("trackRole", "")).casefold() == "anchor" else 2
@@ -254,6 +387,24 @@ def analyze_current_prompt(source: Dict[str, Any], rules: Dict[str, Any] | None 
                     track, "bridge_specificity",
                     f"Bridge style text represents {covered} of {len(axes)} declared audible change axes; {required} are required.",
                     "A track-specific Bridge whose audible axes agree with bridgeDesign.",
+                )
+
+        for gate_issue in sectional_music_gate_issues(row):
+            code = gate_issue["code"]
+            if code.startswith("MONEY_CHORD_"):
+                _append_weakness(
+                    track, "money_chord_engine", gate_issue["message"],
+                    "Put section-functional Hook, Bridge and Final money chord progression(s) directly in the actual stylePrompt; multiple progressions are allowed.",
+                )
+            elif code == "BRIDGE_AUDIBLE_AXES_WEAK":
+                _append_weakness(
+                    track, "bridge_money_chord", gate_issue["message"],
+                    "Make the Bridge audibly change at least two axes, or three on Anchor tracks, while stating its harmonic progression.",
+                )
+            elif code == "FINAL_HIGHLIGHT_WEAK":
+                _append_weakness(
+                    track, "final_highlight_engine", gate_issue["message"],
+                    "Sustain the Final Highlight with A+B (Anchor A+B+C), full-pocket return, root-bass/cadence motion and explicit final resolution(s).",
                 )
 
     has_structured_sections = all(
@@ -365,7 +516,7 @@ def build_old_new_comparison(source: Dict[str, Any], result: Dict[str, Any]) -> 
 
 
 OPTIMIZED_MUSIC_FIELDS = (
-    "BPM", "genreId", "genreText", "vocalDesign", "harmonicDesign", "stylePrompt",
+    "BPM", "genreId", "genreText", "vocalDesign", "harmonicDesign", "moneyChordDesign", "stylePrompt",
     "excludePrompt", "negativeStyleText", "performanceSignature", "generationRunHint",
     "bridgeDesign", "highlightDesign", "finalDesign", "durationDesign", "grooveDesign",
     "drumDesign", "bassDesign", "instrumentationDesign", "verseBehavior", "chorusBehavior",
@@ -398,6 +549,9 @@ WEAKNESS_FIELDS = {
     "track_specificity": {"performanceSignature", "stylePrompt"},
     "bridge_specificity": {"bridgeDesign", "stylePrompt"},
     "final_specificity": {"highlightDesign", "finalDesign", "stylePrompt"},
+    "money_chord_engine": {"moneyChordDesign", "harmonicDesign", "stylePrompt"},
+    "bridge_money_chord": {"bridgeDesign", "moneyChordDesign", "harmonicDesign", "stylePrompt"},
+    "final_highlight_engine": {"highlightDesign", "finalDesign", "moneyChordDesign", "harmonicDesign", "stylePrompt"},
     "template_similarity": {"grooveDesign", "instrumentationDesign", "performanceSignature", "bridgeDesign", "highlightDesign", "finalDesign", "stylePrompt"},
 }
 
