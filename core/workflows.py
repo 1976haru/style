@@ -8,18 +8,18 @@ from typing import Any, Dict, List, Tuple
 from .master_registry import build_active_master, load_genre_profiles
 from .prompt_intelligence import (
     analyze_current_prompt, build_old_new_comparison, load_prompt_intelligence_rules,
-    validate_optimization_effectiveness, verify_immutable_fields,
+    sectional_music_gate_issues, validate_optimization_effectiveness, verify_immutable_fields,
 )
 
 
 TRACK_MUTABLE_FIELDS = {
     "BPM", "bpm", "trackRole", "musicRole", "rapRatio", "rapForwardRatio",
     "genreId", "genreText", "genre", "vocalDesign", "vocalType", "vocal",
-    "harmonicDesign", "stylePrompt", "excludePrompt", "negativeStyleText",
+    "harmonicDesign", "moneyChordDesign", "stylePrompt", "excludePrompt", "negativeStyleText",
     "durationDesign", "bridgeDesign", "highlightDesign", "killingPointDesign",
     "diversityDesign", "generationRunHint", "performanceSignature",
     "groove", "grooveDesign", "drums", "drumDesign", "bass", "bassDesign",
-    "instrumentation", "instrumentationDesign", "harmony", "phonation",
+    "instrumentation", "instrumentationDesign", "harmony", "phonation", "phonationDesign",
     "verseBehavior", "chorusBehavior", "finalDesign", "promptOptimization",
     "qualityScore", "warnings",
 }
@@ -263,6 +263,9 @@ def build_existing_json_upgrade_instruction(
         "track_specificity": ("add a concrete per-track performance cue while retaining the recurring singer", ("performanceSignature", "stylePrompt")),
         "bridge_specificity": ("align the stylePrompt Bridge with at least two declared audible change axes, or three for an Anchor", ("bridgeDesign", "stylePrompt")),
         "final_specificity": ("express this track's highlight payoff in the Final instead of a generic repeated ending", ("highlightDesign", "finalDesign", "stylePrompt")),
+        "money_chord_engine": ("put section-functional Hook/Bridge/Final money chord progression(s) directly in actual stylePrompt; one or multiple progressions per section are valid", ("moneyChordDesign", "harmonicDesign", "stylePrompt")),
+        "bridge_money_chord": ("make Bridge audibly change at least two axes, three for Anchor, and state its money-chord/harmonic progression in stylePrompt", ("bridgeDesign", "moneyChordDesign", "harmonicDesign", "stylePrompt")),
+        "final_highlight_engine": ("build a sustained Final Highlight: General A+B, Anchor A+B+C, full-pocket/groove return, root-bass/cadence motion, explicit final resolution progression(s)", ("highlightDesign", "finalDesign", "moneyChordDesign", "harmonicDesign", "stylePrompt")),
         "template_similarity": ("differentiate groove, instrumentation, performance, Bridge or Final while retaining singer identity", ("grooveDesign", "instrumentationDesign", "performanceSignature", "bridgeDesign", "highlightDesign", "finalDesign", "stylePrompt")),
     }
     for analysis_track in current_analysis["tracks"]:
@@ -321,6 +324,11 @@ def build_existing_json_upgrade_instruction(
 17. promptOptimization은 status, changedFields, resolvedWeaknesses, remainingWeaknesses, changeReasons, expectedImprovements, oldStylePrompt, newStylePrompt, oldExcludePrompt, newExcludePrompt를 포함한다.
 18. 변경이 없고 actionable weakness가 전혀 없는 트랙만 status=KEEP을 쓸 수 있으며, keepReason="No actionable weakness remained after analysis"와 구체적인 내용 근거를 쓴다.
 19. CHILI 남성 exclude는 8-16개의 의미 범주로 압축하되 female/duet 오염, generic polished male-pop tenor, K-pop belt, mature/dark crooner, whisper-only, falsetto hook/final, rock rasp/gravel, 일본어 발음 오류, fully-sung R&B Verse, hard trap/drill, festival EDM, static bass 등 현재 마스터의 실제 실패 방어를 유지한다.
+20. Chill Rap 보컬 트랙은 actual stylePrompt 안에 Hook money chord progression(s) + Bridge money chord/harmonic progression(s) + Final resolution progression(s)을 모두 직접 쓴다. moneyChordDesign 필드에만 적고 stylePrompt에서 빠뜨리면 실패다.
+21. 머니코드는 트랙당/섹션당 정확히 1개로 제한하지 않는다. 하나 또는 복수 progression을 허용하며, 복수인 경우 배열/list 또는 명확한 연속 progression으로 표현할 수 있다. 곡의 기능상 필요한 만큼만 사용한다.
+22. Bridge는 actual stylePrompt에서 최소 2개의 들리는 변화축을 직접 표현한다. Anchor는 최소 3축이다. 예: drum density, bass motion, harmonic color, vocal distance, texture/instrument, space, lyric viewpoint.
+23. Final Highlight는 순간적인 swell이 아니라 구간 전체의 payoff다. General은 Final A+B, Anchor는 Final A+B+C 또는 동등한 post-hook 구조를 쓰고, Bridge에서 줄인 groove/full pocket의 복귀 + root-bass/cadence motion + 명시적 Final money-chord resolution을 실제 stylePrompt에 넣는다.
+24. Bridge/Highlight/Money Chord는 별도 JSON 필드 존재만으로 PASS하지 않는다. 실제 stylePrompt에서 섹션 기능과 청감 행동이 확인되어야 한다.
 
 [DETECTED SOURCE]
 """ + json.dumps(compat["source"], ensure_ascii=False, indent=2) + """
@@ -377,6 +385,11 @@ def build_haru_txt_instruction(
 7. 메타와 곡별 세부 설계 필드를 가능한 충실하게 유지한다.
 8. 최종 응답은 설명 없이 JSON object 하나만 출력한다.
 9. 정확히 """ + str(expected_count) + """곡을 출력한다.
+10. Chill Rap 보컬곡 actual stylePrompt에는 Hook/Bridge/Final의 section-functional money chord progression(s)을 모두 직접 넣는다.
+11. moneyChordDesign의 각 섹션은 하나 또는 복수 progression을 허용한다. 정확히 하나로 강제하지 않는다.
+12. Bridge는 최소 2개의 들리는 변화축, Anchor는 최소 3축을 actual stylePrompt에서 직접 구현하고 Bridge progression을 함께 명시한다.
+13. Final Highlight는 General A+B, Anchor A+B+C를 기본으로 하며 full-pocket/groove return + root-bass/cadence motion + Final resolution progression(s)이 끝까지 유지되어야 한다.
+14. moneyChordDesign/bridgeDesign/highlightDesign 필드만 채우고 actual stylePrompt에 반영하지 않은 결과는 실패다.
 
 [ACTIVE MASTER - CHANNEL + GENRE]
 """ + active_master + """
@@ -438,6 +451,13 @@ def validate_complete_json(result: Dict[str, Any], expected_count: int = 15, sou
                 issues.append({"level": "FAIL", "code": f"MISSING_{field.upper()}", "trackNo": no, "message": f"{field} 없음"})
         if not row.get("BPM") and not row.get("bpm"):
             issues.append({"level": "FAIL", "code": "MISSING_BPM", "trackNo": no, "message": "BPM 없음"})
+        for gate in sectional_music_gate_issues(row):
+            issues.append({
+                "level": "FAIL",
+                "code": gate["code"],
+                "trackNo": no,
+                "message": gate["message"],
+            })
 
     if source:
         src_rows = _songs(source)
