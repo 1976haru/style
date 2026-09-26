@@ -1,3 +1,21 @@
+# Codex Task Queue — v0.5.2-dev
+
+Use `CODEX_UPGRADE_TEMPLATE.md` as the default execution contract for all new upgrade requests.
+
+## Current release requirements
+1. Preserve source execution and Windows portable desktop execution.
+2. Preserve Story / Scene / Title / Hook and other non-music locks.
+3. Preserve Bridge / Money Chord / Final Highlight hard gates.
+4. Money chord progressions may be singular or multiple per section.
+5. After runtime/core/UI/data changes, run pytest + compileall + git diff --check + startup-check + Windows desktop build.
+6. Do not call an upgrade complete until the desktop EXE/ZIP and CI are verified.
+
+## Desktop outputs
+- `dist/SunoMasterPromptStudio_v0.5.2/SunoMasterPromptStudio_v0.5.2.exe`
+- `dist/SunoMasterPromptStudio_v0.5.2_WINDOWS.zip`
+
+---
+
 # Codex Task Queue — v0.5-dev
 
 Read `AGENTS.md`, `ARCHITECTURE_v04.md`, and `V05_PLAN.md` before implementation.
