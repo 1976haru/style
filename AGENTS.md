@@ -14,7 +14,7 @@ Maintain a conservative, testable compiler that turns large user directives and 
 - Windows remains the primary user environment.
 
 ## Development workflow
-1. Read README.md and ARCHITECTURE_v04.md before changing architecture.
+1. Read README.md and ARCHITECTURE_v05.md before changing architecture.
 2. Make focused changes; avoid large rewrites unless requested.
 3. Run `python -m pytest -q` before finalizing when pytest is available.
 4. Also run `python -m compileall -q .`.
@@ -26,3 +26,20 @@ Maintain a conservative, testable compiler that turns large user directives and 
 - Standard library preferred.
 - Keep core logic in `core/`; UI orchestration stays in `main.py`.
 - Store user-mutable data under `user_data/`, which is gitignored.
+
+
+## Desktop build invariants
+- Windows portable desktop build is a first-class release target.
+- Keep source execution and PyInstaller execution compatible.
+- Bundled read-only assets must resolve through `core.app_paths.RESOURCE_ROOT`.
+- User-mutable registry/settings must resolve through `core.app_paths.USER_DATA_ROOT`, not a temporary PyInstaller extraction directory.
+- Preserve `SunoMasterPromptStudio.spec`, `build_windows_desktop.bat`, and `.github/workflows/windows-desktop.yml`.
+- Runtime/core/UI/data changes are not complete until pytest, compileall, startup-check, and Windows desktop packaging pass.
+- Use `CODEX_UPGRADE_TEMPLATE.md` as the default Codex task contract.
+
+## CHILI sectional music hard gate
+- For vocal Chill Rap tracks, actual `stylePrompt` must expose Hook, Bridge, and Final money-chord progression(s).
+- One or multiple progressions per section are valid; never force exactly one.
+- Bridge requires at least 2 audible axes, or 3 on Anchor tracks.
+- Final Highlight requires General A+B or Anchor A+B+C/equivalent, full-pocket return, root-bass/cadence motion, and explicit Final resolution.
+- Metadata-only Bridge/Money Chord/Highlight controls must fail final QA if absent from the actual stylePrompt.
