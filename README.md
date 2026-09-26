@@ -3,6 +3,17 @@
 # Suno Master Prompt Studio v0.6.1 — Research + Channel Consistency Finalizer
 
 ## v0.6.1 핵심
+### Female Voice Isolation Gate
+
+여성 전용 세트에서 실제 생성 결과에 남성/두 번째 보컬이 섞이는 문제를 막기 위해 v0.6.1 finalizer에 전용 게이트를 추가했습니다.
+
+- Female Solo positive generation fields는 affirmative single-female wording만 허용
+- `male`, `duet`, `self-response`, `self-answer`, `self-double`, `vocal stack` 같은 위험 토큰이 stylePrompt/vocalDesign/Final/generation hint에 남으면 FAIL
+- wrong-gender failure terms는 `excludePrompt` / `negativeStyleText`에만 유지
+- Final B/Post-Chorus는 동일한 single unlayered female voice로 고정
+- 구형 bracket label `Female Self-Response/Self-Answer/Self-Double`은 최종 merge에서 `Same Solo Female Voice`로 자동 정규화하며 가사 본문은 변경하지 않음
+- Research A/B/C female candidates도 legacy negative role wording을 재사용하지 않고 affirmative `SOLO FEMALE ONLY` lock을 생성
+
 
 v0.6에서 발견된 실제 결과 검증 한계를 보완합니다. 프로그램이 이제 stylePrompt만 보는 것이 아니라 **stylePrompt ↔ vocalDesign 내부 일관성**과 **일본어 보컬의 positive controls**까지 검사합니다.
 
