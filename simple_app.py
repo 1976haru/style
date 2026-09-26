@@ -32,7 +32,7 @@ class SimpleApp(tk.Tk):
 
     def __init__(self):
         super().__init__()
-        self.title("Suno Master Prompt Studio v0.5 - Simple Workflow")
+        self.title("Suno Master Prompt Studio v0.5.2 - Desktop Workflow")
         self.geometry("1320x900")
         self.minsize(1080, 720)
 
@@ -53,7 +53,7 @@ class SimpleApp(tk.Tk):
     def _build(self):
         header = ttk.Frame(self, padding=(14, 12))
         header.pack(fill="x")
-        ttk.Label(header, text="Suno Master Prompt Studio", font=("Segoe UI", 18, "bold")).pack(side="left")
+        ttk.Label(header, text="Suno Master Prompt Studio v0.5.2", font=("Segoe UI", 18, "bold")).pack(side="left")
         ttk.Label(header, text="  실제 작업은 2가지만 사용합니다.", font=("Segoe UI", 10)).pack(side="left", padx=8)
 
         ttk.Label(
