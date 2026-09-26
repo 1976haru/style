@@ -49,12 +49,19 @@ def _source():
                 "vocalType": "Male Solo",
                 "stylePrompt": (
                     f"Chill Rap, 98 BPM; recurring male speech-forward tenor, supported warm chest and dry grain; "
-                    f"syncopated pocket; dry rim and light hats; moving bass; Rhodes and muted guitar; "
-                    f"seventh-chord motion; narrow rhythmic Verse; melodic Chorus lift; Bridge with rhythm and texture contrast; "
-                    f"Final A+B payoff; section length 3:00-3:30; exclude early ending"
+                    f"syncopated pocket; dry rim and light hats; moving bass; palette{i:02d} Rhodes and muted guitar; "
+                    f"narrow rhythmic Verse; melodic Chorus lift; Hook money chord I–V–vi–IV; "
+                    f"Bridge bridgecue{i:02d} drops hats, bass holds roots, vocal moves closer on IVmaj7–iv6–Imaj7; "
+                    f"Final A+B finalcue{i:02d} restores full pocket with root-bass cadence on I–V–vi–IV → ii7–V7–Imaj7; "
+                    f"section length 3:00-3:30; exclude early ending"
                 ),
+                "moneyChordDesign": {
+                    "hook": ["I–V–vi–IV", "vi–IV–I–V"],
+                    "bridge": ["IVmaj7–iv6–Imaj7"],
+                    "finalHighlight": ["I–V–vi–IV", "ii7–V7–Imaj7"],
+                },
                 "excludePrompt": "; ".join(f"legacy failure category {n}" for n in range(37)),
-                "performanceSignature": "dry immediate pickup; clipped endings; one-beat hook pause",
+                "performanceSignature": f"pickup{i:02d} dry immediate attack; articulation{i:02d}; ending{i:02d} clipped release",
                 "durationDesign": "3:00-3:30",
                 "generationRunHint": "reject early ending",
                 "bridgeDesign": "drop kick and rim; sparse root bass; close-mic return before Final",
