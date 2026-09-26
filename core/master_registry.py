@@ -5,10 +5,11 @@ from copy import deepcopy
 from pathlib import Path
 from typing import Any, Dict
 
+from .app_paths import RESOURCE_ROOT, USER_DATA_ROOT, ensure_user_data_root
 
-ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_REGISTRY_PATH = ROOT / "user_data" / "master_registry.json"
-GENRE_PROFILES_PATH = ROOT / "data" / "genre_master_profiles.json"
+
+DEFAULT_REGISTRY_PATH = USER_DATA_ROOT / "master_registry.json"
+GENRE_PROFILES_PATH = RESOURCE_ROOT / "data" / "genre_master_profiles.json"
 
 CHANNEL_IDS = ("senior", "chili_male", "chili_female", "chili_dual", "custom")
 CHANNEL_LABELS = {
@@ -43,6 +44,7 @@ def load_master_registry(path: str | Path = DEFAULT_REGISTRY_PATH) -> Dict[str, 
 
 
 def save_master_registry(registry: Dict[str, Any], path: str | Path = DEFAULT_REGISTRY_PATH) -> None:
+    ensure_user_data_root()
     p = Path(path)
     normalized = default_registry()
     masters = registry.get("channelMasters") if isinstance(registry, dict) else {}
