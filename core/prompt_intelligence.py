@@ -110,6 +110,8 @@ def _axis_is_represented(axis: str, section_text: str) -> bool:
         r"dynamic|energy|loud|soft|intens|volume",
         r"melod|motif|hook|counter",
     )
+    if re.search(r"harmon|chord|key|modal|progress|voic|cadence", axis, re.I) and _MONEY_CHORD_RE.search(section_text or ""):
+        return True
     return any(re.search(group, axis, re.I) and re.search(group, section_text, re.I) for group in semantic_groups)
 
 
@@ -122,7 +124,7 @@ _BRIDGE_AXIS_GROUPS = (
     r"drum|kick|snare|rim|hat|percussion|backbeat|rhythm density",
     r"bass|sub|low[- ]?end|root bass",
     r"harmon|chord|modal|progress|cadence|tension",
-    r"vocal distance|voice distance|closer vocal|far-room|far room|dry vocal|vocal space",
+    r"vocal distance|voice distance|closer vocal|vocal.*closer|voice.*closer|lead.*closer|far-room|far room|vocal.*far|voice.*far|lead.*far|near-dry lead|dry vocal|vocal space",
     r"texture|instrument|guitar|piano|rhodes|keys|pad|layer|density",
     r"space|reverb|wide|narrow|mono|stereo|room|filter",
     r"lyric viewpoint|lyric angle|perspective",
@@ -168,7 +170,12 @@ def _style_section_has_money_progression(style: str, section: str) -> bool:
 
 
 def _audible_bridge_axis_count(bridge_text: str) -> int:
-    return sum(1 for group in _BRIDGE_AXIS_GROUPS if re.search(group, bridge_text or "", re.I))
+    text = bridge_text or ""
+    count = sum(1 for group in _BRIDGE_AXIS_GROUPS if re.search(group, text, re.I))
+    # A section-functional Roman-numeral progression is itself an audible harmonic-color axis.
+    if _MONEY_CHORD_RE.search(text) and not re.search(r"harmon|chord|modal|progress|cadence|tension", text, re.I):
+        count += 1
+    return count
 
 
 def _final_highlight_ok(style: str, *, anchor: bool) -> bool:
