@@ -11,13 +11,18 @@ from .prompt_intelligence import (
     validate_optimization_effectiveness, verify_immutable_fields,
 )
 
-from .v061_quality_gate import v061_result_failures
+from .v061_quality_gate import (
+    female_section_labels_equivalent,
+    is_female_only_track,
+    normalize_female_section_labels,
+    v061_result_failures,
+)
 
 
 TRACK_MUTABLE_FIELDS = {
     "BPM", "bpm", "trackRole", "musicRole", "rapRatio", "rapForwardRatio",
-    "genreId", "genreText", "genre", "vocalDesign", "vocalType", "vocal",
-    "harmonicDesign", "stylePrompt", "excludePrompt", "negativeStyleText",
+    "genreId", "genreText", "genre", "voicePalette", "vocalDesign", "vocalType", "vocal",
+    "harmonicDesign", "moneyChordDesign", "stylePrompt", "excludePrompt", "negativeStyleText",
     "durationDesign", "bridgeDesign", "highlightDesign", "killingPointDesign",
     "diversityDesign", "generationRunHint", "performanceSignature",
     "groove", "grooveDesign", "drums", "drumDesign", "bass", "bassDesign",
@@ -268,6 +273,7 @@ def build_existing_json_upgrade_instruction(
         "template_similarity": ("differentiate groove, instrumentation, performance, Bridge or Final while retaining singer identity", ("grooveDesign", "instrumentationDesign", "performanceSignature", "bridgeDesign", "highlightDesign", "finalDesign", "stylePrompt")),
         "jp_native_positive_controls": ("restore explicit close-mic + JP-native diction + mora timing + natural sentence/pitch-accent behavior in the actual stylePrompt", ("vocalDesign", "stylePrompt")),
         "vocal_design_consistency": ("align vocalDesign and stylePrompt to one fixed channel fingerprint; remove conflicting breath/grain coordinates", ("vocalDesign", "stylePrompt")),
+        "female_voice_isolation": ("for female-only tracks, rewrite positive generation controls with affirmative one-singer female wording only; move wrong-gender terms to exclude fields; replace self-response/self-answer/self-double/stack cues with same-solo-female wording", ("voicePalette", "vocalDesign", "phonationDesign", "moneyChordDesign", "highlightDesign", "finalDesign", "generationRunHint", "stylePrompt", "excludePrompt", "negativeStyleText")),
     }
     for analysis_track in current_analysis["tracks"]:
         areas = [x["area"] for x in analysis_track["weaknesses"]]
@@ -330,6 +336,9 @@ def build_existing_json_upgrade_instruction(
 22. Chill Rap stylePrompt 순서는 genre + secondary tint → BPM+groove → gender hard lock → channel voice/phonation → JP-native + rap pocket → drum/moving bass → focused instruments → Hook → Bridge → Final → compact money chord → short scene/runtime로 한다.
 23. Chill Rap stylePrompt는 기본 72-88 words, 허용 65-95 words, 가능하면 900 chars 이하를 목표로 한다.
 24. 스토리/장면을 바꾸지 않는 범위에서 짧은 scene anchor를 actual stylePrompt 말미에 유지한다.
+25. 여성 Female Solo 트랙의 positive generation fields(stylePrompt/vocalDesign/phonationDesign/highlightDesign/finalDesign/moneyChordDesign.executionRule/generationRunHint)에는 affirmative single-female wording만 쓴다. stylePrompt에는 SOLO FEMALE ONLY + same single/unlayered female lead throughout/every section 같은 양성 고정어를 넣고, literal male/duet 금지어는 넣지 않는다.
+26. 여성 Female Solo positive fields에는 self-response/self-answer/self-double/vocal stack/giant stack/second singer 같은 다중 보컬 유도 표현을 쓰지 않는다. Final B/Post-Chorus도 "same solo female voice / identical unlayered female lead"로 표현한다. wrong-gender failure terms는 excludePrompt/negativeStyleText에만 둔다.
+27. AI는 lyrics 본문과 섹션 라벨을 포함해 ORIGINAL lyrics를 그대로 복사한다. 단, 프로그램은 최종 merge 단계에서 여성 전용 구형 bracket label인 "Female Self-Response/Self-Answer/Self-Double"만 "Same Solo Female Voice"로 자동 정규화하며, 가사 본문은 변경하지 않는다.
 
 [DETECTED SOURCE]
 """ + json.dumps(compat["source"], ensure_ascii=False, indent=2) + """
@@ -430,6 +439,13 @@ def merge_existing_upgrade(source_text: str, upgraded_text: str) -> Dict[str, An
         for field in TRACK_MUTABLE_FIELDS:
             if field in new:
                 merged[field] = deepcopy(new[field])
+
+        # Female-only safety normalization is deliberately narrow: only
+        # bracketed vocal-role section labels are changed. Lyric body text is
+        # untouched, and all other immutable content remains source-authority.
+        source_context = source.get("meta") if isinstance(source.get("meta"), dict) else {}
+        if is_female_only_track(src, source_context) and isinstance(merged.get("lyrics"), str):
+            merged["lyrics"] = normalize_female_section_labels(merged["lyrics"])
         merged_rows.append(merged)
     final[key] = merged_rows
     return final
@@ -456,9 +472,17 @@ def validate_complete_json(result: Dict[str, Any], expected_count: int = 15, sou
             cur = by_no.get(no)
             if not cur:
                 continue
+            source_context = source.get("meta") if isinstance(source.get("meta"), dict) else {}
             for field in ("title", "titleLocalized", "hookPhrase", "lyrics"):
-                if field in src and src.get(field) != cur.get(field):
-                    issues.append({"level": "FAIL", "code": f"LOCK_{field.upper()}", "trackNo": no, "message": f"{field}가 원본과 다름"})
+                if field not in src or src.get(field) == cur.get(field):
+                    continue
+                if (
+                    field == "lyrics"
+                    and is_female_only_track(src, source_context)
+                    and female_section_labels_equivalent(str(src.get(field, "")), str(cur.get(field, "")))
+                ):
+                    continue
+                issues.append({"level": "FAIL", "code": f"LOCK_{field.upper()}", "trackNo": no, "message": f"{field}가 원본과 다름"})
             missing_keys = [k for k in src.keys() if k not in cur]
             if missing_keys:
                 issues.append({"level": "FAIL", "code": "SCHEMA_FIELDS_DROPPED", "trackNo": no, "message": f"원본 필드 누락: {missing_keys[:8]}"})
