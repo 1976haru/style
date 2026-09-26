@@ -121,18 +121,22 @@ def _alternate_tint(current: str, profile: Dict[str, Any], track_no: int) -> str
 
 
 def _role_lock(song: Dict[str, Any]) -> str:
+    # Role comes from explicit vocalType before any legacy HARD LOCK atom. This
+    # prevents old negative wording ("no male/duet") from leaking into positive
+    # female-only research prompts.
+    vocal_type = _compact(song.get("vocalType"))
+    low = vocal_type.casefold()
+    if "female" in low and "male" in low:
+        return "DUAL LOCK exactly two young-adult leads, one male and one female, fixed alternating roles"
+    if "female" in low:
+        return "SOLO FEMALE ONLY, one young-adult female singer throughout, same single unlayered lead in every section"
+    if "male" in low:
+        return "SOLO MALE ONLY, one young-adult male singer throughout, same single unlayered lead in every section"
+
     style = _compact(song.get("stylePrompt"))
     hard = _find_atom(style, "HARD LOCK")
     if hard:
         return _clip(hard, 150)
-    vocal_type = _compact(song.get("vocalType"))
-    low = vocal_type.casefold()
-    if "female" in low and "male" in low:
-        return "HARD LOCK exactly two young-adult leads, one male and one female; no third voice"
-    if "female" in low:
-        return "HARD LOCK one young-adult female lead only; no male backing or duet"
-    if "male" in low:
-        return "HARD LOCK one young-adult male lead only; no female backing or duet"
     return vocal_type or "preserve source vocal role"
 
 
@@ -142,7 +146,7 @@ def _voice_core(song: Dict[str, Any]) -> str:
     if channel:
         return _clip(channel, 220)
     vocal = song.get("vocalDesign")
-    text = _dict_text(vocal, ("signature", "phonation", "coordinates"))
+    text = _dict_text(vocal, ("signature", "phonation", "coordinates", "base"))
     return _clip(text, 220)
 
 
@@ -198,8 +202,26 @@ def _bridge(song: Dict[str, Any]) -> str:
     return _clip(text, 150)
 
 
+def _sanitize_female_positive_text(text: str) -> str:
+    value = str(text or "")
+    value = re.sub(r"\bfemale\s+self-(?:response|answer)\b", "same-solo-female tag", value, flags=re.I)
+    value = re.sub(r"\bself-(?:response|answer)\b", "same-solo-female tag", value, flags=re.I)
+    value = re.sub(r"\bself-double\b", "same-solo-female repeat", value, flags=re.I)
+    value = re.sub(r"\b(?:giant\s+)?vocal\s+stack\b", "single unlayered female lead", value, flags=re.I)
+    # Wrong-gender words belong in excludePrompt, not positive candidate text.
+    value = re.sub(r"\bno\s+male(?:\s+backing)?\b", "", value, flags=re.I)
+    value = re.sub(r"\bno\s+duet\b", "", value, flags=re.I)
+    value = re.sub(r"\s{2,}", " ", value)
+    value = re.sub(r"\s*[/,;]+\s*([,;])", r"\1 ", value)
+    return value.strip(" ,;/;-")
+
+
 def _final(song: Dict[str, Any]) -> str:
     value = song.get("highlightDesign") or song.get("finalDesign")
+    vocal_type = _compact(song.get("vocalType")).casefold()
+    if "female" in vocal_type and "male" not in vocal_type:
+        text = _dict_text(value, ("specificCue", "finalHarmony", "structure"))
+        return _clip(_sanitize_female_positive_text(text), 170)
     text = _dict_text(value, ("specificCue", "finalHarmony", "structure", "vocalRule"))
     return _clip(text, 170)
 
