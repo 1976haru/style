@@ -535,9 +535,9 @@ def _optimization_regression_issues(source: Dict[str, Any], result: Dict[str, An
             issues.append({"level": "FAIL", "code": "STYLE_PROMPT_HARD_MAX", "trackNo": no, "length": len(style), "hardMax": hard_max})
         if voice_role != "instrumental" and not str(row.get("performanceSignature", "")).strip():
             issues.append({"level": "FAIL", "code": "MISSING_PERFORMANCE_SIGNATURE", "trackNo": no})
-        if not (str(row.get("bridgeDesign", "")).strip() or re.search(r"\bbridge\b", style, re.I)):
+        if not re.search(r"\bbridge\b", style, re.I):
             issues.append({"level": "FAIL", "code": "MISSING_BRIDGE", "trackNo": no})
-        if not (str(row.get("finalDesign", "")).strip() or str(row.get("highlightDesign", "")).strip() or re.search(r"\b(?:final|outro)\b", style, re.I)):
+        if not re.search(r"\b(?:final|outro)\b", style, re.I):
             issues.append({"level": "FAIL", "code": "MISSING_FINAL", "trackNo": no})
     return issues
 
