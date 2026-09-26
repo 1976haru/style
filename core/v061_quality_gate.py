@@ -36,10 +36,21 @@ def _is_japanese_source(source_context: Dict[str, Any] | None, row: Dict[str, An
 
 
 def _vocal_role(row: Dict[str, Any]) -> str:
-    blob = " ".join([
-        str(row.get("vocalType", "")),
-        _text(row.get("vocalDesign", "")),
-    ]).casefold()
+    # Explicit vocalType outranks descriptive/negative words inside vocalDesign.
+    # A Female Solo track may legitimately have legacy text such as "male 0" in
+    # genderLock; that must not cause the role detector to misclassify it as duet.
+    explicit = str(row.get("vocalType", "")).casefold()
+    if explicit:
+        if "instrumental" in explicit:
+            return "instrumental"
+        if "duet" in explicit or ("male" in explicit and "female" in explicit):
+            return "duet"
+        if "female" in explicit:
+            return "female"
+        if "male" in explicit:
+            return "male"
+
+    blob = _text(row.get("vocalDesign", "")).casefold()
     if "duet" in blob or ("male" in blob and "female" in blob):
         return "duet"
     if "female" in blob:
@@ -49,6 +60,113 @@ def _vocal_role(row: Dict[str, Any]) -> str:
     if "instrumental" in blob:
         return "instrumental"
     return "unknown"
+
+
+
+_FEMALE_POSITIVE_RISK_PATTERNS = {
+    "male": r"\bmale\b",
+    "duet": r"\bduet\b",
+    "self-response": r"\bself-response\b",
+    "self-answer": r"\bself-answer\b",
+    "self-double": r"\bself-double\b",
+    "vocal-stack": r"\bvocal\s+stack\b",
+    "giant-stack": r"\bgiant\s+(?:vocal\s+)?stack\b",
+    "second-singer": r"\bsecond\s+singer\b",
+}
+
+
+def is_female_only_track(
+    row: Dict[str, Any],
+    source_context: Dict[str, Any] | None = None,
+) -> bool:
+    if _vocal_role(row) != "female":
+        return False
+    context = source_context or {}
+    allocation = context.get("vocalAllocation")
+    if isinstance(allocation, dict):
+        try:
+            female = int(allocation.get("Female Solo", allocation.get("female", 0)) or 0)
+            male = int(allocation.get("Male Solo", allocation.get("male", 0)) or 0)
+            duet = int(allocation.get("Duet", allocation.get("duet", 0)) or 0)
+            mixed = int(allocation.get("Mixed", allocation.get("mixed", 0)) or 0)
+            if female and not (male or duet or mixed):
+                return True
+        except (TypeError, ValueError):
+            pass
+    # Per-track Female Solo is sufficient when the set-level allocation is
+    # absent. Explicit vocalType already outranks negative wording in designs.
+    return "female" in str(row.get("vocalType", "")).casefold()
+
+
+def female_single_voice_controls(style_prompt: str) -> Dict[str, bool]:
+    low = str(style_prompt or "").casefold()
+    return {
+        "femaleIdentity": bool(re.search(r"\bfemale\b|\blight[- ]?mezzo\b|\bmezzo[- ]?soprano\b", low)),
+        "soloLock": bool(
+            re.search(r"\bsolo\s+female\b|\bfemale\s+solo\b", low)
+            or re.search(r"\bone\s+(?:recurring\s+|young\s+|japanese\s+){0,4}female\b", low)
+            or re.search(r"\bsingle\s+(?:unlayered\s+)?female\b", low)
+        ),
+        "singleLayer": any(token in low for token in (
+            "single unlayered", "one recurring", "same single", "one singer", "single lead",
+        )),
+        "sectionContinuity": any(token in low for token in (
+            "throughout", "every section", "all sections", "same solo female",
+        )),
+    }
+
+
+def _female_positive_fields(row: Dict[str, Any]) -> Dict[str, str]:
+    vocal = row.get("vocalDesign") if isinstance(row.get("vocalDesign"), dict) else {}
+    phonation = row.get("phonationDesign") if isinstance(row.get("phonationDesign"), dict) else {}
+    highlight = row.get("highlightDesign") if isinstance(row.get("highlightDesign"), dict) else {}
+    final = row.get("finalDesign") if isinstance(row.get("finalDesign"), dict) else {}
+    money = row.get("moneyChordDesign") if isinstance(row.get("moneyChordDesign"), dict) else {}
+    return {
+        "stylePrompt": str(row.get("stylePrompt", "")),
+        "voicePalette": str(row.get("voicePalette", "")),
+        "vocalDesign": " ".join(_text(vocal.get(k, "")) for k in (
+            "system", "genderLock", "base", "signature", "verse", "chorus", "bridge", "final",
+        )),
+        "phonationDesign": " ".join(_text(phonation.get(k, "")) for k in (
+            "coordinates", "fixedSignature", "sectionContrast", "jpNative", "rapPocket", "performanceSignature",
+        )),
+        "highlightDesign": " ".join(_text(highlight.get(k, "")) for k in ("specificCue", "vocalRule")),
+        "finalDesign": " ".join(_text(final.get(k, "")) for k in ("specificCue", "vocalRule", "roleLock")),
+        "moneyChordDesign": _text(money.get("executionRule", "")),
+        "generationRunHint": str(row.get("generationRunHint", "")),
+    }
+
+
+def female_positive_voice_risks(row: Dict[str, Any]) -> List[Tuple[str, str]]:
+    risks: List[Tuple[str, str]] = []
+    for field, text in _female_positive_fields(row).items():
+        for label, pattern in _FEMALE_POSITIVE_RISK_PATTERNS.items():
+            if re.search(pattern, text, re.I):
+                risks.append((field, label))
+    return risks
+
+
+def normalize_female_section_labels(text: str) -> str:
+    """Normalize only bracketed vocal-role labels; lyric body stays byte-for-byte."""
+    value = str(text or "")
+    value = re.sub(
+        r"(\[[^\]\n]*?/\s*)Female\s+Self-(?:Response|Answer|Double)(\s*\])",
+        r"\1Same Solo Female Voice\2",
+        value,
+        flags=re.I,
+    )
+    value = re.sub(
+        r"\[\s*Female\s+Self-(?:Response|Answer|Double)\s*\]",
+        "[Same Solo Female Voice]",
+        value,
+        flags=re.I,
+    )
+    return value
+
+
+def female_section_labels_equivalent(original: str, candidate: str) -> bool:
+    return str(candidate or "") == normalize_female_section_labels(str(original or ""))
 
 
 def _range_values(text: str, label_pattern: str) -> List[Tuple[int, int]]:
@@ -107,6 +225,27 @@ def v061_track_findings(
     vocal_design = _text(row.get("vocalDesign", ""))
     phonation_design = _text(row.get("phonationDesign", ""))
     role = _vocal_role(row)
+
+    if is_female_only_track(row, source_context):
+        controls = female_single_voice_controls(style)
+        missing = [name for name, ok in controls.items() if not ok]
+        risks = female_positive_voice_risks(row)
+        if missing or risks:
+            risk_text = ", ".join(f"{field}:{label}" for field, label in risks[:12])
+            details = []
+            if missing:
+                details.append("missing affirmative controls=" + ", ".join(missing))
+            if risk_text:
+                details.append("risky positive tokens=" + risk_text)
+            findings.append({
+                "area": "female_voice_isolation",
+                "reason": "Female-only generation controls are not isolated to one affirmative solo voice: " + "; ".join(details) + ".",
+                "expectedImprovement": (
+                    "Use affirmative single-female wording in positive generation fields, keep one identical unlayered female timbre "
+                    "through Verse/Chorus/Bridge/Final, move wrong-gender terms to excludePrompt/negativeStyleText only, and replace "
+                    "self-response/self-answer/self-double/stack cues with same-solo-female wording."
+                ),
+            })
 
     if _is_japanese_source(source_context, row) and role not in {"instrumental", "unknown"}:
         controls = japanese_positive_controls(style)
@@ -167,6 +306,7 @@ def v061_result_failures(
         code = {
             "jp_native_positive_controls": "JP_NATIVE_POSITIVE_CONTROLS_MISSING",
             "vocal_design_consistency": "VOCAL_DESIGN_CONFLICT",
+            "female_voice_isolation": "FEMALE_VOICE_ISOLATION_RISK",
             "prompt_ordering": "PROMPT_ORDER_V061",
         }.get(area, "V061_QUALITY_GATE")
         failures.append({
