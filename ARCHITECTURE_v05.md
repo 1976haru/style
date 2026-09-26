@@ -23,6 +23,12 @@ Higher-order prompt analysis is conservative and content-based. It detects seman
 
 Local acceptance uses a sanitized 15-track male-story fixture with 37 exclusions per track. A matching private `남_002_CHILI_LAB_JAPAN_EP002_v15.0...json` may exist outside the repository, but acceptance does not ingest it and no private source JSON is included in the repository.
 
+## Bridge / Money Chord / Final Highlight hard gate
+
+For Chill Rap vocal tracks, `sectional_music_gate_issues()` validates the actual `stylePrompt`, not merely side metadata. Hook, Bridge and Final must each expose section-functional Roman-numeral progression(s); `moneyChordDesign` may hold one progression or a list of multiple progressions per section. Bridge requires at least two audible axes (three for Anchor tracks), with a Roman-numeral Bridge progression counting as the harmonic-color axis. Final Highlight must sustain A+B for General tracks or A+B+C/equivalent post-hook for Anchor tracks, restore the groove/full pocket after the Bridge reduction, and include root-bass/cadence motion plus explicit Final resolution progression(s).
+
+These checks are applied both to existing-JSON upgrades and completed Haru Studio JSON, preventing metadata-only false positives where `moneyChordDesign`, `bridgeDesign`, or `highlightDesign` exist but Suno never sees the behavior in the actual style prompt.
+
 ## Immutable boundary
 
 Title, localized title, lyrics, hook, story fields, scene/listener situation, emotion arc, episode boundary and relationship boundary fields are content authority. `merge_existing_upgrade` starts from a deep copy of the source and copies only allow-listed music fields from the proposed result. Therefore unrecognized content and private schema fields are also retained.
