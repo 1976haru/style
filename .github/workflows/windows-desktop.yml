@@ -33,9 +33,19 @@ jobs:
       - name: Compile check
         run: python -m compileall -q .
 
+      - name: Source UI startup check
+        run: python main.py --startup-check
+
       - name: Build desktop app
         shell: cmd
         run: pyinstaller --noconfirm --clean --distpath dist --workpath build\SunoMasterPromptStudio SunoMasterPromptStudio.spec
+
+      - name: Packaged EXE startup check
+        shell: pwsh
+        run: |
+          $exe = "dist/SunoMasterPromptStudio_v0.5.2/SunoMasterPromptStudio_v0.5.2.exe"
+          $p = Start-Process -FilePath $exe -ArgumentList "--startup-check" -PassThru -Wait
+          if ($p.ExitCode -ne 0) { throw "Packaged startup check failed with exit code $($p.ExitCode)" }
 
       - name: Prepare portable package
         shell: pwsh
