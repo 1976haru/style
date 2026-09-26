@@ -150,7 +150,13 @@ def _mature_prompt_source(exclude_count=37):
         "over-lush strings", "giant vocal stack", "early fade", "abrupt ending", "random genre switch",
         "wide stereo vocal", "excessive reverb", "shouty hook", "slow dragged diction", "third voice", "choir wall",
     ][:exclude_count]
-    for row in source["songs"]:
+    for idx, row in enumerate(source["songs"], 1):
+        track_style = (
+            style.replace("Rhodes and muted guitar", f"palette{idx:02d} Rhodes and muted guitar")
+            .replace("syncopated relaxed pocket", f"groove{idx:02d} syncopated relaxed pocket")
+            .replace("Bridge drops hats", f"Bridge bridgecue{idx:02d} drops hats")
+            .replace("Final A+B", f"Final A+B finalcue{idx:02d}")
+        )
         row.update({
             "BPM": 98,
             "genreText": "Chill Rap",
@@ -165,9 +171,9 @@ def _mature_prompt_source(exclude_count=37):
                 "bridge": ["IVmaj7–iv6–Imaj7"],
                 "finalHighlight": ["I–V–vi–IV", "ii7–V7–Imaj7"],
             },
-            "stylePrompt": style,
+            "stylePrompt": track_style,
             "excludePrompt": "; ".join(excludes),
-            "performanceSignature": "track-specific dry pickup and clipped phrase endings",
+            "performanceSignature": f"pickup{idx:02d} dry attack; articulation{idx:02d}; ending{idx:02d} clipped release",
             "generationRunHint": "reject early ending and preserve native Japanese mora",
             "bridgeDesign": {
                 "changeAxes": ["drum density", "bass motion", "vocal distance"],
@@ -179,10 +185,10 @@ def _mature_prompt_source(exclude_count=37):
             },
             "finalDesign": "Final A+B; restore full pocket; root-bass cadence; sustain payoff to ending",
             "durationDesign": "3:00-3:30",
-            "grooveDesign": "relaxed syncopated pocket",
+            "grooveDesign": f"groove{idx:02d} relaxed syncopated pocket",
             "drumDesign": "dry rim, soft kick and light hats",
             "bassDesign": "warm moving bass locked to kick",
-            "instrumentationDesign": "Rhodes and muted guitar",
+            "instrumentationDesign": f"palette{idx:02d} Rhodes and muted guitar",
             "verseBehavior": "narrow speech-rhythmic verse with clipped endings",
             "chorusBehavior": "melodic hook lift without singer change",
         })
@@ -499,10 +505,11 @@ def _structured_quality_set(*, generic_template=False, weak_bridge=False, generi
             if weak_bridge else
             "Bridge drops drums, bass holds roots, vocal moves to far-room distance on IVmaj7–iv6–Imaj7"
         )
+        payoff = f"cadence motif payoff{i + 1:02d}"
         final = (
             "Final A+B restores the full pocket with root-bass cadence on I–V–vi–IV → ii7–V7–Imaj7"
             if generic_final else
-            f"Final A+B restores the full pocket with root-bass cadence and cadence color {i + 1} on I–V–vi–IV → ii7–V7–Imaj7"
+            f"Final A+B restores the full pocket with root-bass cadence and {payoff} on I–V–vi–IV → ii7–V7–Imaj7"
         )
         row["stylePrompt"] = (
             f"Chill Rap, 98 BPM; recurring Japanese male tenor, supported chest and dry grain; {palette}; "
@@ -520,10 +527,10 @@ def _structured_quality_set(*, generic_template=False, weak_bridge=False, generi
         }
         row["highlightDesign"] = {
             "shape": "Final A+B sustained payoff",
-            "harmonicPayoff": f"cadence color {i + 1}",
+            "harmonicPayoff": payoff,
             "rule": "retain singer identity",
         }
-        row["performanceSignature"] = f"track {i + 1} pickup and phrase-ending behavior"
+        row["performanceSignature"] = f"pickup{i + 1:02d} articulation{i + 1:02d} ending{i + 1:02d} behavior"
     return source
 
 
@@ -608,7 +615,7 @@ def test_anchor_requires_three_bridge_axes_and_final_abc():
     row["trackRole"] = "anchor"
     row["stylePrompt"] = row["stylePrompt"].replace(
         "Bridge drops hats, bass holds roots, vocal moves closer",
-        "Bridge drops hats, bass holds roots",
+        "Bridge drops hats",
     ).replace("Final A+B", "Final A+B")
     analysis = analyze_current_prompt(source)
     first = {x["area"] for x in analysis["tracks"][0]["weaknesses"]}
