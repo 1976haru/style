@@ -1,7 +1,13 @@
 import json
 
 from core.prompt_intelligence import analyze_current_prompt
-from core.v061_quality_gate import japanese_positive_controls, v061_result_failures, v061_track_findings
+from core.v061_quality_gate import (
+    female_section_labels_equivalent,
+    japanese_positive_controls,
+    normalize_female_section_labels,
+    v061_result_failures,
+    v061_track_findings,
+)
 from core.workflows import finalize_existing_upgrade
 
 
@@ -145,3 +151,122 @@ def test_english_lyric_tokyo_channel_does_not_require_jp_native_controls():
     )
     findings = v061_track_findings(row, source["meta"])
     assert "jp_native_positive_controls" not in {x["area"] for x in findings}
+
+
+def _jp_female_source():
+    source = _jp_male_source()
+    source["meta"]["vocalAllocation"] = {"Female Solo": 15, "Male Solo": 0, "Duet": 0, "Mixed": 0}
+    for row in source["songs"]:
+        row["vocalType"] = "Female Solo"
+        row["stylePrompt"] = (
+            "Chill Rap, jazz-hop tint, 96 BPM relaxed head-nod pocket; "
+            "HARD LOCK recurring young Japanese female light-mezzo only, no male/duet; "
+            "VOICE close-mic supported clear core, breath 15-30%, dry husky grain 5-15%; "
+            "JP-native diction, mora timing, natural sentence accent; "
+            "RAP Verse45-60% half-rap, syncopated pickups; soft kick, dry rim, moving bass; Rhodes; "
+            "Hook H melodic; Bridge drums thin; Final A+B clipped self-response; "
+            "Money H I-V-vi-IV; SCENE cafe-window; 2:45-3:30."
+        )
+        row["vocalDesign"] = {
+            "genderLock": "Female Solo 15/15; male lead/backing/response 0; duet 0",
+            "base": "young Japanese female light-mezzo, close-mic clear core, breath 15-30%, dry husky grain 5-15%",
+            "verse": "same singer, 45-60% half-rap",
+            "chorus": "same singer, brighter hook",
+            "bridge": "same singer, closer/drier",
+            "final": "same singer, female self-response only; no male backing or giant vocal stack",
+        }
+        row["highlightDesign"] = {"specificCue": "Final A+B clipped self-response", "vocalRule": "female self-response only; no male backing"}
+        row["finalDesign"] = {"specificCue": "Final A+B clipped self-response", "vocalRule": "female self-response only"}
+        row["moneyChordDesign"] = {"executionRule": "warm cadence and female self-response; no giant vocal stack"}
+        row["generationRunHint"] = "FULL REGEN for male contamination"
+        row["lyrics"] = "[Verse]\n歌詞\n[Final B - Variation / Female Self-Response]\n続き"
+    return source
+
+
+def test_female_voice_isolation_detects_wrong_gender_and_multivoice_tokens():
+    source = _jp_female_source()
+    findings = v061_track_findings(source["songs"][0], source["meta"])
+    areas = {x["area"] for x in findings}
+    assert "female_voice_isolation" in areas
+
+
+def test_female_voice_isolation_accepts_affirmative_single_voice_controls():
+    source = _jp_female_source()
+    row = source["songs"][0]
+    row["stylePrompt"] = (
+        "Chill Rap, jazz-hop tint, 96 BPM relaxed head-nod pocket; "
+        "SOLO FEMALE ONLY, same young Japanese light-mezzo, single unlayered lead throughout; "
+        "VOICE close-mic supported clear core, breath 15-30%, dry husky grain 5-15%; "
+        "JP-native diction, mora timing, natural sentence accent; "
+        "RAP Verse45-60% half-rap; soft kick, dry rim, moving bass; Rhodes; "
+        "Hook H melodic; Bridge drums thin; Final A+B same-solo-female tag; "
+        "Money H I-V-vi-IV; SCENE cafe-window; 2:45-3:30."
+    )
+    row["vocalDesign"] = {
+        "genderLock": "One recurring Japanese female solo singer throughout; identical female timbre in every section",
+        "base": "young Japanese female light-mezzo, close-mic clear core, breath 15-30%, dry husky grain 5-15%",
+        "verse": "same single singer, 45-60% half-rap",
+        "chorus": "same single singer, brighter hook",
+        "bridge": "same single singer, closer/drier",
+        "final": "same single singer, Final B remains one unlayered solo female lead",
+    }
+    row["highlightDesign"] = {"specificCue": "Final A+B same-solo-female tag", "vocalRule": "identical solo female voice, one unlayered lead"}
+    row["finalDesign"] = {"specificCue": "Final A+B same-solo-female tag", "vocalRule": "identical single solo female voice"}
+    row["moneyChordDesign"] = {"executionRule": "warmer cadence with the identical solo female lead"}
+    row["generationRunHint"] = "FULL REGEN for wrong-gender voice"
+    findings = v061_track_findings(row, source["meta"])
+    assert "female_voice_isolation" not in {x["area"] for x in findings}
+
+
+def test_female_section_label_normalization_changes_label_only():
+    original = "[Verse]\n歌詞本文\n[Final B - Variation / Female Self-Response]\n最後の歌詞"
+    normalized = normalize_female_section_labels(original)
+    assert "[Final B - Variation / Same Solo Female Voice]" in normalized
+    assert normalized.replace("[Final B - Variation / Same Solo Female Voice]", "") == original.replace("[Final B - Variation / Female Self-Response]", "")
+    assert female_section_labels_equivalent(original, normalized)
+
+
+def test_finalizer_auto_normalizes_female_vocal_section_label():
+    source = _jp_female_source()
+    upgraded = json.loads(json.dumps(source, ensure_ascii=False))
+    for old, row in zip(source["songs"], upgraded["songs"]):
+        # Make all positive controls safe so the only remaining repair is the
+        # program-owned bracket-label normalization.
+        row["stylePrompt"] = (
+            "Chill Rap, jazz-hop tint, 96 BPM relaxed head-nod pocket; "
+            "SOLO FEMALE ONLY, same young Japanese light-mezzo, single unlayered lead throughout; "
+            "VOICE close-mic supported clear core, breath 15-30%, dry husky grain 5-15%; "
+            "JP-native diction, mora timing, natural sentence accent; RAP Verse45-60% half-rap; "
+            "soft kick, dry rim, moving bass; Rhodes; Hook H melodic; Bridge drums thin; "
+            "Final A+B same-solo-female tag; Money H I-V-vi-IV; SCENE cafe-window; 2:45-3:30."
+        )
+        row["vocalDesign"] = {
+            "genderLock": "One recurring Japanese female solo singer throughout; identical female timbre in every section",
+            "base": "young Japanese female light-mezzo, close-mic clear core, breath 15-30%, dry husky grain 5-15%",
+            "verse": "same single singer, 45-60% half-rap",
+            "chorus": "same single singer, brighter hook",
+            "bridge": "same single singer, closer/drier",
+            "final": "same single singer, Final B remains one unlayered solo female lead",
+        }
+        row["highlightDesign"] = {"specificCue": "Final A+B same-solo-female tag", "vocalRule": "identical solo female voice, one unlayered lead"}
+        row["finalDesign"] = {"specificCue": "Final A+B same-solo-female tag", "vocalRule": "identical single solo female voice"}
+        row["moneyChordDesign"] = {"executionRule": "warmer cadence with the identical solo female lead"}
+        row["generationRunHint"] = "FULL REGEN for wrong-gender voice"
+        row["excludePrompt"] = "male lead; generic airy AI female pop; mature contralto; whisper-only; falsetto hero; non-native Japanese; R&B ballad; hard trap; festival EDM; early fade"
+        row["performanceSignature"] = "track-specific pickup/rest pattern"
+        row["promptOptimization"] = {
+            "status": "IMPROVED",
+            "changedFields": [],
+            "resolvedWeaknesses": [],
+            "remainingWeaknesses": [],
+            "changeReasons": ["test"],
+            "expectedImprovements": ["test"],
+            "oldStylePrompt": old["stylePrompt"],
+            "newStylePrompt": row["stylePrompt"],
+            "oldExcludePrompt": old["excludePrompt"],
+            "newExcludePrompt": row["excludePrompt"],
+        }
+    # We only need to prove the merge-level label sanitation itself here.
+    from core.workflows import merge_existing_upgrade
+    final = merge_existing_upgrade(json.dumps(source, ensure_ascii=False), json.dumps(upgraded, ensure_ascii=False))
+    assert all("[Final B - Variation / Same Solo Female Voice]" in row["lyrics"] for row in final["songs"])
