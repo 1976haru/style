@@ -1,41 +1,153 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "policy": {
     "baseline": "Evaluate the current musical design itself. Never infer quality from source version labels such as v14, v15, or v16.",
     "immutableFields": [
-      "title", "titleLocalized", "lyrics", "hookPhrase", "hook", "story", "storyAct",
-      "storyActLabel", "storyArcRole", "scene", "listenerSituation", "emotionArc",
-      "relationshipBoundary", "relationshipBoundaries", "relationshipState", "episodeBoundary"
+      "title",
+      "titleLocalized",
+      "lyrics",
+      "hookPhrase",
+      "hook",
+      "story",
+      "storyAct",
+      "storyActLabel",
+      "storyArcRole",
+      "scene",
+      "listenerSituation",
+      "emotionArc",
+      "relationshipBoundary",
+      "relationshipBoundaries",
+      "relationshipState",
+      "episodeBoundary"
     ],
-    "targetPromptChars": {"min": 120, "max": 900, "hardMax": 1000}
+    "targetPromptChars": {
+      "min": 120,
+      "max": 900,
+      "hardMax": 1000
+    },
+    "sectionalMoneyChordPolicy": "For Chill Rap vocal tracks, actual stylePrompt must expose section-functional Hook, Bridge and Final money-chord progression(s). A section may use one progression or multiple progressions; do not force exactly one.",
+    "bridgeHighlightPolicy": "Bridge must create at least two audible contrast axes, three for Anchor tracks. Final Highlight must sustain A+B, or A+B+C for Anchor, with full-pocket/groove return plus root-bass or cadence motion."
   },
   "areas": {
-    "tempo_design": {"priority": 95, "rule": "Choose BPM and energy from the current channel and genre design, then verify the intended role range."},
-    "genre_clarity": {"priority": 100, "rule": "Front-load one dominant genre and allow at most one compatible secondary tint."},
-    "vocal_identity": {"priority": 100, "rule": "State a stable recurring singer identity and preserve each track's gender and solo/duet role."},
-    "phonation": {"priority": 95, "rule": "Specify support, resonance, breath/grain limits, diction, attack and ending behavior without contradictory traits."},
-    "groove": {"priority": 95, "rule": "Describe pocket, subdivision, syncopation and timing feel as audible behavior."},
-    "drums": {"priority": 90, "rule": "Name a compact drum language appropriate to the genre; avoid incompatible kit stacks."},
-    "bass": {"priority": 90, "rule": "Define bass motion, register and rhythmic relationship to kick or backbeat."},
-    "instrumentation": {"priority": 85, "rule": "Choose a focused palette with one or two signature colors instead of an inventory list."},
-    "harmony": {"priority": 85, "rule": "Define harmonic motion, chord color or tension/release while avoiding vague mood-only wording."},
-    "verse_behavior": {"priority": 90, "rule": "Specify verse density, pitch span, rhythmic delivery, rests and phrase attack."},
-    "chorus_behavior": {"priority": 90, "rule": "Describe a perceptible hook lift while retaining the same vocal identity."},
-    "bridge_contrast": {"priority": 95, "rule": "Require at least two audible contrast axes; Anchor tracks require at least three."},
-    "final_payoff": {"priority": 95, "rule": "Design a sustained final payoff; Anchor tracks require strengthened A+B+C or equivalent post section."},
-    "prompt_ordering": {"priority": 90, "rule": "Order prompt atoms: dominant genre, BPM/energy, vocal/phonation, groove, drums/bass, instrumentation/harmony, section behavior, mix."},
-    "redundancy": {"priority": 85, "rule": "Collapse repeated synonyms and duplicated instructions into one precise musical behavior."},
-    "contradiction": {"priority": 100, "rule": "Remove mutually exclusive vocal, energy, genre, instrumentation and positive/exclude instructions."},
-    "exclude_efficiency": {"priority": 85, "rule": "Use 8-16 short semantic failure-mode categories; retain channel hard-lock protections and remove overlapping wording."},
-    "prompt_length": {"priority": 90, "rule": "Keep stylePrompt information-dense, normally 120-900 characters and never above 1000."},
-    "model_specific_behavior": {"priority": 80, "rule": "Adapt syntax only to the explicitly selected target model; do not treat a source JSON version label as a quality signal."},
-    "performance_signature": {"priority": 85, "rule": "Give each track a concrete, track-specific delivery behavior while retaining the recurring vocal identity."},
-    "duration_design": {"priority": 75, "rule": "Specify a duration or section-length target appropriate to the song format and avoid premature endings."},
-    "generation_hint": {"priority": 75, "rule": "Give concise track-specific generation and rejection guidance for the most likely failure mode."},
-    "information_density": {"priority": 85, "rule": "Detect semantically duplicated prompt atoms and retain each distinct musical instruction only once."},
-    "track_specificity": {"priority": 90, "rule": "Require a concrete per-track performance cue; recurring singer identity alone is not track specificity."},
-    "bridge_specificity": {"priority": 95, "rule": "Represent at least two declared audible Bridge change axes in stylePrompt, or three for Anchor tracks."},
-    "final_specificity": {"priority": 95, "rule": "Reflect the track's highlight payoff in its Final instead of repeating a generic set-wide ending."},
-    "template_similarity": {"priority": 90, "rule": "Ignore shared singer identity but detect excessive set-wide reuse of groove, instrumentation, performance, Bridge and Final controls."}
+    "tempo_design": {
+      "priority": 95,
+      "rule": "Choose BPM and energy from the current channel and genre design, then verify the intended role range."
+    },
+    "genre_clarity": {
+      "priority": 100,
+      "rule": "Front-load one dominant genre and allow at most one compatible secondary tint."
+    },
+    "vocal_identity": {
+      "priority": 100,
+      "rule": "State a stable recurring singer identity and preserve each track's gender and solo/duet role."
+    },
+    "phonation": {
+      "priority": 95,
+      "rule": "Specify support, resonance, breath/grain limits, diction, attack and ending behavior without contradictory traits."
+    },
+    "groove": {
+      "priority": 95,
+      "rule": "Describe pocket, subdivision, syncopation and timing feel as audible behavior."
+    },
+    "drums": {
+      "priority": 90,
+      "rule": "Name a compact drum language appropriate to the genre; avoid incompatible kit stacks."
+    },
+    "bass": {
+      "priority": 90,
+      "rule": "Define bass motion, register and rhythmic relationship to kick or backbeat."
+    },
+    "instrumentation": {
+      "priority": 85,
+      "rule": "Choose a focused palette with one or two signature colors instead of an inventory list."
+    },
+    "harmony": {
+      "priority": 85,
+      "rule": "Define harmonic motion, chord color or tension/release while avoiding vague mood-only wording."
+    },
+    "verse_behavior": {
+      "priority": 90,
+      "rule": "Specify verse density, pitch span, rhythmic delivery, rests and phrase attack."
+    },
+    "chorus_behavior": {
+      "priority": 90,
+      "rule": "Describe a perceptible hook lift while retaining the same vocal identity."
+    },
+    "bridge_contrast": {
+      "priority": 95,
+      "rule": "Require at least two audible contrast axes; Anchor tracks require at least three."
+    },
+    "final_payoff": {
+      "priority": 95,
+      "rule": "Design a sustained final payoff; Anchor tracks require strengthened A+B+C or equivalent post section."
+    },
+    "prompt_ordering": {
+      "priority": 90,
+      "rule": "Order prompt atoms: dominant genre, secondary tint, BPM + groove, singer hard lock, channel phonation / native-language behavior, rap pocket, drums/bass, focused instrumentation, Hook money chord(s), Bridge audible axes + bridge chord(s), Final Highlight + final resolution chord(s), short scene/runtime."
+    },
+    "redundancy": {
+      "priority": 85,
+      "rule": "Collapse repeated synonyms and duplicated instructions into one precise musical behavior."
+    },
+    "contradiction": {
+      "priority": 100,
+      "rule": "Remove mutually exclusive vocal, energy, genre, instrumentation and positive/exclude instructions."
+    },
+    "exclude_efficiency": {
+      "priority": 85,
+      "rule": "Use 8-16 short semantic failure-mode categories; retain channel hard-lock protections and remove overlapping wording."
+    },
+    "prompt_length": {
+      "priority": 90,
+      "rule": "Keep stylePrompt information-dense, normally 120-900 characters and never above 1000."
+    },
+    "model_specific_behavior": {
+      "priority": 80,
+      "rule": "Adapt syntax only to the explicitly selected target model; do not treat a source JSON version label as a quality signal."
+    },
+    "performance_signature": {
+      "priority": 85,
+      "rule": "Give each track a concrete, track-specific delivery behavior while retaining the recurring vocal identity."
+    },
+    "duration_design": {
+      "priority": 75,
+      "rule": "Specify a duration or section-length target appropriate to the song format and avoid premature endings."
+    },
+    "generation_hint": {
+      "priority": 75,
+      "rule": "Give concise track-specific generation and rejection guidance for the most likely failure mode."
+    },
+    "information_density": {
+      "priority": 85,
+      "rule": "Detect semantically duplicated prompt atoms and retain each distinct musical instruction only once."
+    },
+    "track_specificity": {
+      "priority": 90,
+      "rule": "Require a concrete per-track performance cue; recurring singer identity alone is not track specificity."
+    },
+    "bridge_specificity": {
+      "priority": 95,
+      "rule": "Represent at least two declared audible Bridge change axes in stylePrompt, or three for Anchor tracks."
+    },
+    "final_specificity": {
+      "priority": 95,
+      "rule": "Reflect the track's highlight payoff in its Final instead of repeating a generic set-wide ending."
+    },
+    "template_similarity": {
+      "priority": 90,
+      "rule": "Ignore shared singer identity but detect excessive set-wide reuse of groove, instrumentation, performance, Bridge and Final controls."
+    },
+    "money_chord_engine": {
+      "priority": 112,
+      "rule": "Require moneyChordDesign and actual stylePrompt to state section-functional Hook, Bridge and Final progressions. Each section may contain one or multiple progressions; arrays/lists are valid."
+    },
+    "bridge_money_chord": {
+      "priority": 110,
+      "rule": "Bridge must combine its money-chord/harmonic progression with at least two audible contrast axes, or three for Anchor tracks, in the actual stylePrompt."
+    },
+    "final_highlight_engine": {
+      "priority": 112,
+      "rule": "Final Highlight must be sustained, not a one-bar swell: General A+B, Anchor A+B+C, full-pocket/groove return, root-bass/cadence motion, and explicit final resolution progression(s)."
+    }
   }
 }
