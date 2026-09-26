@@ -43,19 +43,23 @@ def _vocal_role(row: Dict[str, Any]) -> str:
     if explicit:
         if "instrumental" in explicit:
             return "instrumental"
-        if "duet" in explicit or ("male" in explicit and "female" in explicit):
+        has_female = bool(re.search(r"\bfemale\b", explicit))
+        has_male = bool(re.search(r"\bmale\b", explicit))
+        if "duet" in explicit or (has_male and has_female):
             return "duet"
-        if "female" in explicit:
+        if has_female:
             return "female"
-        if "male" in explicit:
+        if has_male:
             return "male"
 
     blob = _text(row.get("vocalDesign", "")).casefold()
-    if "duet" in blob or ("male" in blob and "female" in blob):
+    has_female = bool(re.search(r"\bfemale\b", blob))
+    has_male = bool(re.search(r"\bmale\b", blob))
+    if "duet" in blob or (has_male and has_female):
         return "duet"
-    if "female" in blob:
+    if has_female:
         return "female"
-    if "male" in blob:
+    if has_male:
         return "male"
     if "instrumental" in blob:
         return "instrumental"
@@ -95,7 +99,7 @@ def is_female_only_track(
             pass
     # Per-track Female Solo is sufficient when the set-level allocation is
     # absent. Explicit vocalType already outranks negative wording in designs.
-    return "female" in str(row.get("vocalType", "")).casefold()
+    return bool(re.search(r"\bfemale\b", str(row.get("vocalType", "")).casefold()))
 
 
 def female_single_voice_controls(style_prompt: str) -> Dict[str, bool]:
