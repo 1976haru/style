@@ -16,7 +16,7 @@ REQUIRED_AREAS = {
     "contradiction", "exclude_efficiency", "prompt_length", "model_specific_behavior",
     "tempo_design", "performance_signature", "duration_design", "generation_hint",
     "information_density", "track_specificity", "bridge_specificity", "final_specificity",
-    "template_similarity", "jp_native_positive_controls", "vocal_design_consistency",
+    "template_similarity", "jp_native_positive_controls", "vocal_design_consistency", "female_voice_isolation",
 }
 
 MASTER = """CHILI LAB Male Solo ONLY
@@ -84,7 +84,7 @@ def _attach_audits(source, result):
     for old, new in zip(source["songs"], result["songs"]):
         changed = [
             field for field in (
-                "BPM", "genreId", "genreText", "vocalDesign", "harmonicDesign", "stylePrompt", "excludePrompt",
+                "BPM", "genreId", "genreText", "voicePalette", "vocalDesign", "phonationDesign", "harmonicDesign", "moneyChordDesign", "stylePrompt", "excludePrompt",
                 "negativeStyleText", "performanceSignature", "generationRunHint", "bridgeDesign", "highlightDesign",
                 "finalDesign", "durationDesign", "grooveDesign", "drumDesign", "bassDesign",
                 "instrumentationDesign", "verseBehavior", "chorusBehavior",
