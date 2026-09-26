@@ -1,6 +1,14 @@
 # Changelog
 
 ## 0.6.1-dev — Channel Consistency Finalizer
+### Female Voice Isolation Gate
+- Added female-only positive-prompt isolation checks after real Suno renders produced unintended male voices.
+- Female Solo positive fields now reject male/duet/self-response/self-answer/self-double/vocal-stack cues.
+- Added affirmative single-female continuity requirement across Verse/Chorus/Bridge/Final.
+- Wrong-gender terms stay in dedicated negative fields only.
+- Final merge safely normalizes bracketed `Female Self-Response/Self-Answer/Self-Double` labels to `Same Solo Female Voice` without changing lyric body text.
+- Research A/B/C candidate role locks now use affirmative single-voice wording.
+
 - Added `core/v061_quality_gate.py` for JP-native positive-control checks and stylePrompt↔vocalDesign phonation consistency.
 - Corrected Chill Rap prompt ordering to genre/tint → BPM+groove → singer/phonation → JP-native/rap pocket → arrangement/sections/harmony/runtime.
 - Optimizer instructions now explicitly require close-mic, native Japanese diction, mora timing and natural sentence/pitch-accent behavior in actual Japanese vocal prompts.
