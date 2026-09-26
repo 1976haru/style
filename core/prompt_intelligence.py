@@ -6,7 +6,11 @@ from copy import deepcopy
 from pathlib import Path
 from typing import Any, Dict, List
 
-from .v061_quality_gate import v061_track_findings
+from .v061_quality_gate import (
+    female_section_labels_equivalent,
+    is_female_only_track,
+    v061_track_findings,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -349,14 +353,28 @@ def immutable_snapshot(source: Dict[str, Any]) -> Dict[str, Any]:
 def verify_immutable_fields(source: Dict[str, Any], result: Dict[str, Any]) -> List[Dict[str, Any]]:
     expected = immutable_snapshot(source)
     actual = immutable_snapshot(result)
+    source_rows = {str(row.get("trackNo", i)): row for i, row in enumerate(_songs(source), 1)}
+    source_context = source.get("meta") if isinstance(source.get("meta"), dict) else {}
     issues = []
     for no, fields in expected.items():
         if no not in actual:
             issues.append({"level": "FAIL", "code": "IMMUTABLE_TRACK_MISSING", "trackNo": no})
             continue
         for key, value in fields.items():
-            if actual[no].get(key) != value:
-                issues.append({"level": "FAIL", "code": "IMMUTABLE_CHANGED", "trackNo": no, "field": key})
+            actual_value = actual[no].get(key)
+            if actual_value == value:
+                continue
+            # Narrow v0.6.1 exception: female-only output may normalize a
+            # bracketed vocal-role section label such as
+            # "Female Self-Response" -> "Same Solo Female Voice". The lyric
+            # body itself must remain identical.
+            if (
+                key == "lyrics"
+                and is_female_only_track(source_rows.get(no, {}), source_context)
+                and female_section_labels_equivalent(str(value or ""), str(actual_value or ""))
+            ):
+                continue
+            issues.append({"level": "FAIL", "code": "IMMUTABLE_CHANGED", "trackNo": no, "field": key})
     return issues
 
 
@@ -379,7 +397,7 @@ def build_old_new_comparison(source: Dict[str, Any], result: Dict[str, Any]) -> 
 
 
 OPTIMIZED_MUSIC_FIELDS = (
-    "BPM", "genreId", "genreText", "vocalDesign", "phonationDesign", "harmonicDesign", "stylePrompt",
+    "BPM", "genreId", "genreText", "voicePalette", "vocalDesign", "phonationDesign", "harmonicDesign", "moneyChordDesign", "stylePrompt",
     "excludePrompt", "negativeStyleText", "performanceSignature", "generationRunHint",
     "bridgeDesign", "highlightDesign", "finalDesign", "durationDesign", "grooveDesign",
     "drumDesign", "bassDesign", "instrumentationDesign", "verseBehavior", "chorusBehavior",
@@ -413,6 +431,7 @@ WEAKNESS_FIELDS = {
     "bridge_specificity": {"bridgeDesign", "stylePrompt"},
     "final_specificity": {"highlightDesign", "finalDesign", "stylePrompt"},
     "template_similarity": {"grooveDesign", "instrumentationDesign", "performanceSignature", "bridgeDesign", "highlightDesign", "finalDesign", "stylePrompt"},
+    "female_voice_isolation": {"voicePalette", "vocalDesign", "phonationDesign", "moneyChordDesign", "highlightDesign", "finalDesign", "generationRunHint", "stylePrompt", "excludePrompt", "negativeStyleText"},
 }
 
 
