@@ -126,11 +126,13 @@ def _role_lock(song: Dict[str, Any]) -> str:
     # female-only research prompts.
     vocal_type = _compact(song.get("vocalType"))
     low = vocal_type.casefold()
-    if "female" in low and "male" in low:
+    has_female = bool(re.search(r"\bfemale\b", low))
+    has_male = bool(re.search(r"\bmale\b", low))
+    if "duet" in low or (has_female and has_male):
         return "DUAL LOCK exactly two young-adult leads, one male and one female, fixed alternating roles"
-    if "female" in low:
+    if has_female:
         return "SOLO FEMALE ONLY, one young-adult female singer throughout, same single unlayered lead in every section"
-    if "male" in low:
+    if has_male:
         return "SOLO MALE ONLY, one young-adult male singer throughout, same single unlayered lead in every section"
 
     style = _compact(song.get("stylePrompt"))
@@ -219,7 +221,7 @@ def _sanitize_female_positive_text(text: str) -> str:
 def _final(song: Dict[str, Any]) -> str:
     value = song.get("highlightDesign") or song.get("finalDesign")
     vocal_type = _compact(song.get("vocalType")).casefold()
-    if "female" in vocal_type and "male" not in vocal_type:
+    if re.search(r"\bfemale\b", vocal_type) and not re.search(r"\bmale\b", vocal_type):
         text = _dict_text(value, ("specificCue", "finalHarmony", "structure"))
         return _clip(_sanitize_female_positive_text(text), 170)
     text = _dict_text(value, ("specificCue", "finalHarmony", "structure", "vocalRule"))
