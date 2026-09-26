@@ -116,9 +116,16 @@ def test_candidate_arms_are_distinct_but_preserve_role_lock():
         assert len(prompts) == 3
         source_song = source["songs"][track["trackNo"] - 1]
         if source_song["vocalType"] == "Female Solo":
-            assert all("female lead only" in x["stylePrompt"].lower() for x in track["candidates"])
+            assert all("solo female only" in x["stylePrompt"].lower() for x in track["candidates"])
+            for candidate in track["candidates"]:
+                low = candidate["stylePrompt"].lower()
+                assert " male " not in f" {low} "
+                assert "duet" not in low
+                assert "self-response" not in low
+                assert "self-answer" not in low
+                assert "vocal stack" not in low
         elif source_song["vocalType"] == "Male Solo":
-            assert all("male lead only" in x["stylePrompt"].lower() for x in track["candidates"])
+            assert all("solo male only" in x["stylePrompt"].lower() for x in track["candidates"])
         else:
             assert all("exactly two young-adult leads" in x["stylePrompt"].lower() for x in track["candidates"])
 
