@@ -420,7 +420,18 @@ def analyze_current_prompt(source: Dict[str, Any], rules: Dict[str, Any] | None 
     )
     if len(rows) >= 3 and has_structured_sections:
         styles = [str(row.get("stylePrompt", "")) for row in rows]
-        distinctive = [_quality_tokens(style, omit_singer=True) for style in styles]
+        distinctive = [
+            _quality_tokens(
+                " ".join(
+                    str(row.get(key, "")) for key in (
+                        "stylePrompt", "grooveDesign", "instrumentationDesign",
+                        "performanceSignature", "bridgeDesign", "highlightDesign", "finalDesign",
+                    )
+                ),
+                omit_singer=True,
+            )
+            for row in rows
+        ]
         overly_similar: set[int] = set()
         for i, left in enumerate(distinctive):
             peers = 0
@@ -451,7 +462,12 @@ def analyze_current_prompt(source: Dict[str, Any], rules: Dict[str, Any] | None 
                 highlight = row.get("highlightDesign")
                 payoff = highlight.get("harmonicPayoff", "") if isinstance(highlight, dict) else ""
                 payoff_tokens = _quality_tokens(payoff)
-                if payoff_tokens and not payoff_tokens.intersection(_quality_tokens(section)):
+                section_tokens = _quality_tokens(section)
+                represented = (
+                    len(payoff_tokens & section_tokens) / len(payoff_tokens)
+                    if payoff_tokens else 1.0
+                )
+                if payoff_tokens and represented < 0.5:
                     _append_weakness(
                         tracks[i], "final_specificity",
                         "A repeated generic Final omits this track's declared highlight payoff.",
