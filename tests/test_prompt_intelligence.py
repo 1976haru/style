@@ -175,14 +175,8 @@ def _mature_prompt_source(exclude_count=37):
             "excludePrompt": "; ".join(excludes),
             "performanceSignature": f"pickup{idx:02d} dry attack; articulation{idx:02d}; ending{idx:02d} clipped release",
             "generationRunHint": "reject early ending and preserve native Japanese mora",
-            "bridgeDesign": {
-                "changeAxes": ["drum density", "bass motion", "vocal distance"],
-                "purpose": "drop hats, simplify bass, move vocal closer before Final",
-            },
-            "highlightDesign": {
-                "shape": "Final A+B sustained payoff",
-                "harmonicPayoff": "I–V–vi–IV → ii7–V7–Imaj7",
-            },
+            "bridgeDesign": "drop hats; simplify bass; move vocal closer before Final on IVmaj7–iv6–Imaj7",
+            "highlightDesign": "Final A+B sustained payoff; full-pocket return; root-bass cadence on I–V–vi–IV → ii7–V7–Imaj7",
             "finalDesign": "Final A+B; restore full pocket; root-bass cadence; sustain payoff to ending",
             "durationDesign": "3:00-3:30",
             "grooveDesign": f"groove{idx:02d} relaxed syncopated pocket",
@@ -614,8 +608,8 @@ def test_anchor_requires_three_bridge_axes_and_final_abc():
     row = source["songs"][0]
     row["trackRole"] = "anchor"
     row["stylePrompt"] = row["stylePrompt"].replace(
-        "Bridge drops hats, bass holds roots, vocal moves closer",
-        "Bridge drops hats",
+        "Bridge bridgecue01 drops hats, bass holds roots, vocal moves closer",
+        "Bridge bridgecue01 drops hats",
     ).replace("Final A+B", "Final A+B")
     analysis = analyze_current_prompt(source)
     first = {x["area"] for x in analysis["tracks"][0]["weaknesses"]}
