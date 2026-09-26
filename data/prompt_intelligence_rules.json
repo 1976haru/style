@@ -142,6 +142,10 @@
     "vocal_design_consistency": {
       "priority": 100,
       "rule": "Keep stylePrompt and vocalDesign on one recurring channel fingerprint. Do not mix disjoint breath/grain coordinates across fields; express section contrast through phrasing, density and melodic openness instead."
+    },
+    "female_voice_isolation": {
+      "priority": 110,
+      "rule": "For Female Solo tracks, positive generation fields must use affirmative one-singer female wording only. Keep wrong-gender terms in excludePrompt/negativeStyleText, and replace self-response/self-answer/self-double/vocal-stack cues with identical same-solo-female wording through Final B/Post-Chorus."
     }
   }
 }
