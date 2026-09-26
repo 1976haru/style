@@ -1,0 +1,53 @@
+name: windows-desktop
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [v0.5-dev]
+    paths:
+      - "main.py"
+      - "simple_app.py"
+      - "core/**"
+      - "data/**"
+      - "VERSION.txt"
+      - "SunoMasterPromptStudio.spec"
+      - "build_windows_desktop.bat"
+      - ".github/workflows/windows-desktop.yml"
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install tools
+        run: python -m pip install --upgrade pip pytest pyinstaller
+
+      - name: Tests
+        run: python -m pytest -q
+
+      - name: Compile check
+        run: python -m compileall -q .
+
+      - name: Build desktop app
+        shell: cmd
+        run: pyinstaller --noconfirm --clean --distpath dist --workpath build\SunoMasterPromptStudio SunoMasterPromptStudio.spec
+
+      - name: Prepare portable package
+        shell: pwsh
+        run: |
+          $app = "SunoMasterPromptStudio_v0.5.2"
+          Copy-Item DESKTOP_README.txt "dist/$app/DESKTOP_README.txt" -Force
+          Copy-Item VERSION.txt "dist/$app/VERSION.txt" -Force
+          New-Item -ItemType Directory -Path "dist/$app/user_data" -Force | Out-Null
+          Compress-Archive -Path "dist/$app/*" -DestinationPath "dist/${app}_WINDOWS.zip" -Force
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: SunoMasterPromptStudio_v0.5.2_WINDOWS
+          path: dist/SunoMasterPromptStudio_v0.5.2_WINDOWS.zip
+          if-no-files-found: error
