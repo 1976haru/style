@@ -12,6 +12,32 @@ UI의 `현재 프롬프트 분석`은 곡별 약점과 전체 개선 영역을 �
 
 Chill Rap 보컬 트랙은 `moneyChordDesign` 필드만 채워서는 통과하지 않습니다. 실제 `stylePrompt` 안에 **Hook progression(s) + Bridge progression(s) + Final resolution progression(s)** 이 직접 들어가야 하며, 각 섹션은 머니코드 1개 또는 복수 진행을 허용합니다. Bridge는 일반곡 최소 2축, Anchor 최소 3축의 청감 변화가 필요하고, Final Highlight는 General A+B / Anchor A+B+C(또는 동등한 post-hook) 구조와 full-pocket 복귀, root-bass/cadence resolution을 끝까지 유지해야 합니다.
 
+
+## Windows 데스크탑판
+
+기본 배포 방식은 **설치 없는 portable onedir EXE + ZIP**입니다.
+
+로컬 Windows에서:
+
+```text
+build_windows_desktop.bat
+```
+
+빌드 성공 시:
+
+```text
+dist/SunoMasterPromptStudio_v0.5.2/SunoMasterPromptStudio_v0.5.2.exe
+dist/SunoMasterPromptStudio_v0.5.2_WINDOWS.zip
+```
+
+PyInstaller 빌드에서도 `data/` 리소스는 번들 내부에서 읽고, 등록한 최신 마스터와 사용자 설정은 EXE 폴더의 `user_data/`에 보관합니다. 새 버전으로 교체할 때 기존 `user_data/`를 새 폴더로 복사하면 설정을 이어갈 수 있습니다.
+
+GitHub Actions의 `windows-desktop` workflow도 같은 ZIP을 artifact로 생성합니다.
+
+## Codex로 다음 업그레이드하기
+
+앞으로는 `CODEX_UPGRADE_TEMPLATE.md`를 Codex 작업 시작 지시문으로 사용합니다. 마지막 **Current task** 부분에 새 요청만 붙여넣으면 브랜치 동기화 → 수정 → pytest/compileall/startup-check → Windows desktop build → commit/push → Actions 확인까지 동일 절차로 진행하도록 정의되어 있습니다.
+
 ## v0.4.2 Stable 검증 상태
 
 - Full E2E harness: 기존 directive/JSON → Track Plan → LOCK → 음악 재계산 → 최종 생성 JSON 검증
