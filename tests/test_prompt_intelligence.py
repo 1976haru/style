@@ -103,7 +103,7 @@ def _attach_audits(source, result):
     for old, new in zip(source["songs"], result["songs"]):
         changed = [
             field for field in (
-                "BPM", "genreId", "genreText", "vocalDesign", "harmonicDesign", "stylePrompt", "excludePrompt",
+                "BPM", "genreId", "genreText", "vocalDesign", "harmonicDesign", "moneyChordDesign", "stylePrompt", "excludePrompt",
                 "negativeStyleText", "performanceSignature", "generationRunHint", "bridgeDesign", "highlightDesign",
                 "finalDesign", "durationDesign", "grooveDesign", "drumDesign", "bassDesign",
                 "instrumentationDesign", "verseBehavior", "chorusBehavior",
