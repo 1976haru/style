@@ -1,4 +1,4 @@
-> Current development build: **v0.5-dev** — Prompt Intelligence Optimizer for existing Suno JSON. See `ARCHITECTURE_v05.md`.
+> Current development build: **v0.5.2-dev** — Prompt Intelligence Optimizer with Bridge / Money Chord / Final Highlight hard gates. See `ARCHITECTURE_v05.md`.
 
 # Suno Master Prompt Studio v0.5 — Prompt Intelligence Optimizer
 
@@ -7,6 +7,10 @@
 기존 JSON의 버전명(v14/v15/v16 등)을 품질 근거로 사용하지 않고 현재 음악 설계 자체를 분석합니다. Title/Lyrics/Hook/Story/Scene/relationship boundaries는 강제 보존하며 BPM, Genre, Vocal Design, Style Prompt, Exclude, Performance Signature, Groove, Instrumentation, Harmony, Bridge, Final, Duration, Generation Hint를 개선 대상으로 다룹니다.
 
 UI의 `현재 프롬프트 분석`은 곡별 약점과 전체 개선 영역을 보여주고, `AI 음악 프롬프트 업그레이드`는 Channel Master + Genre Master + `data/prompt_intelligence_rules.json`을 결합한 10단계 제작 지시문을 생성합니다. 결과 JSON에는 곡별 기존/new stylePrompt, 변경 이유, 예상 개선점이 포함되며 최종 저장 전에 immutable 필드를 원본으로 강제 복원하고 검증합니다.
+
+### v0.5.2 Bridge / Money Chord / Final Highlight 강화
+
+Chill Rap 보컬 트랙은 `moneyChordDesign` 필드만 채워서는 통과하지 않습니다. 실제 `stylePrompt` 안에 **Hook progression(s) + Bridge progression(s) + Final resolution progression(s)** 이 직접 들어가야 하며, 각 섹션은 머니코드 1개 또는 복수 진행을 허용합니다. Bridge는 일반곡 최소 2축, Anchor 최소 3축의 청감 변화가 필요하고, Final Highlight는 General A+B / Anchor A+B+C(또는 동등한 post-hook) 구조와 full-pocket 복귀, root-bass/cadence resolution을 끝까지 유지해야 합니다.
 
 ## v0.4.2 Stable 검증 상태
 
