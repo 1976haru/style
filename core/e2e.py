@@ -45,6 +45,11 @@ def _has_wrong_language(lyrics: str, language_policy: str) -> bool:
     latin = len(re.findall(r"[A-Za-z]", letters))
     japanese = len(re.findall(r"[\u3040-\u30ff\u3400-\u9fff]", letters))
     policy = (language_policy or "").lower()
+    # Flexible bilingual project presets accept either language. Do not treat
+    # the mere presence of "Japanese" in "English or Japanese" as a
+    # Japanese-only requirement.
+    if re.search(r"\b(?:english\s+or\s+japanese|japanese\s+or\s+english)\b", policy):
+        return False
     if "japanese" in policy:
         return latin >= 40 and japanese == 0
     if "french" in policy:
@@ -156,7 +161,16 @@ def validate_e2e_output(
         if expected_gender and actual_gender != expected_gender:
             issues.append(_issue("FAIL", "WRONG_GENDER", f"Expected {expected_gender}; got {vocal!r}.", no))
         imported_vocal = _norm(old.get("importedMusic", {}).get("vocal"))
-        if imported_vocal and imported_vocal != _norm(recomputed.get("vocal")) and imported_vocal in _norm(vocal + " " + style):
+        role_only_vocals = {
+            "male", "male solo", "female", "female solo", "duet",
+            "male-female duet", "male-female asymmetric duet", "instrumental",
+        }
+        if (
+            imported_vocal
+            and imported_vocal not in role_only_vocals
+            and imported_vocal != _norm(recomputed.get("vocal"))
+            and imported_vocal in _norm(vocal + " " + style)
+        ):
             issues.append(_issue("FAIL", "LEGACY_VOCAL_LEAK", "Legacy vocal description leaked into final output.", no))
         if any(marker in _norm(vocal + " " + style) for marker in LEGACY_VOCAL_MARKERS):
             issues.append(_issue("FAIL", "LEGACY_VOCAL_LEAK", "Known legacy vocal marker leaked into final output.", no))

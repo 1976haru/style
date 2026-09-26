@@ -1,6 +1,47 @@
-> Current verified build: **v0.4.2 Stable** — full E2E validation + Windows/Linux CI verified. See `STRESS_TEST_REPORT.md` and `core/e2e.py`.
+> Current development build: **v0.6.1-dev** — Research-Driven Prompt Engine + Channel Consistency Finalizer. See `ARCHITECTURE_v06.md`.
 
-# Suno Master Prompt Studio v0.4.2 Stable — Feedback Learning + E2E Validation
+# Suno Master Prompt Studio v0.6.1 — Research + Channel Consistency Finalizer
+
+## v0.6.1 핵심
+### Female Voice Isolation Gate
+
+여성 전용 세트에서 실제 생성 결과에 남성/두 번째 보컬이 섞이는 문제를 막기 위해 v0.6.1 finalizer에 전용 게이트를 추가했습니다.
+
+- Female Solo positive generation fields는 affirmative single-female wording만 허용
+- `male`, `duet`, `self-response`, `self-answer`, `self-double`, `vocal stack` 같은 위험 토큰이 stylePrompt/vocalDesign/Final/generation hint에 남으면 FAIL
+- wrong-gender failure terms는 `excludePrompt` / `negativeStyleText`에만 유지
+- Final B/Post-Chorus는 동일한 single unlayered female voice로 고정
+- 구형 bracket label `Female Self-Response/Self-Answer/Self-Double`은 최종 merge에서 `Same Solo Female Voice`로 자동 정규화하며 가사 본문은 변경하지 않음
+- Research A/B/C female candidates도 legacy negative role wording을 재사용하지 않고 affirmative `SOLO FEMALE ONLY` lock을 생성
+
+
+v0.6에서 발견된 실제 결과 검증 한계를 보완합니다. 프로그램이 이제 stylePrompt만 보는 것이 아니라 **stylePrompt ↔ vocalDesign 내부 일관성**과 **일본어 보컬의 positive controls**까지 검사합니다.
+
+- 일본어 보컬 actual stylePrompt에 close-mic + JP-native/native Japanese diction + mora timing + natural sentence/pitch-accent를 요구
+- stylePrompt와 vocalDesign의 breath/grain 범위가 충돌하면 FAIL
+- Chill Rap compiler 순서를 **genre/tint → BPM+groove → singer hard lock → channel voice/phonation → JP-native/rap pocket → rhythm/instruments → Hook → Bridge → Final → money chord → scene/runtime**로 교정
+- 72-88 words 권장, 65-95 words 허용 목표는 지시문에 반영하되 하드 실패는 기존 char hard max 중심으로 유지
+- ChatGPT 결과 JSON 불러오기 단계에서 위 두 consistency gate를 통과해야 최종 저장 가능
+- Research A/B/C candidate engine도 v0.6.1 버전으로 올리고 일본어 소스에 JP-native positive control을 추가
+
+## v0.6 핵심
+
+v0.5의 안전한 분석/검증 흐름은 유지하면서, 외부 연구 지식과 장르 호환성 데이터를 이용해 각 곡에 **A_CONTROL / B_GROOVE / C_CHARACTER** 3개의 실제 Suno stylePrompt 후보를 만듭니다. 어느 후보도 음원을 듣기 전에 승자로 선언하지 않습니다.
+
+- A_CONTROL: 현재 장르/보컬 정체성 최대 보존 + 고밀도 재구성
+- B_GROOVE: 보컬/스토리/핵심 화성 고정 + groove/secondary tint만 실험
+- C_CHARACTER: 장르/tint/groove 고정 + 곡별 performance habit 강화
+- v6 + Variety 0 + Strong Style Influence + Max Mode 권장 recipe
+- Inspire는 승인곡 3~5곡, Custom Model은 승인곡 6개 이상부터 고려
+- Community GitHub 자료는 실험 가설로만 사용하고 공식 Suno 문서를 우선
+
+UI의 기존 JSON 탭에서 `연구 기반 A/B/C 후보`를 누르면 15곡×3안 후보를 확인할 수 있고, `A 저장 / B 저장 / C 저장`으로 원본의 제목·가사·훅·스토리를 그대로 보존한 실험용 JSON을 각각 저장할 수 있습니다.
+
+## v0.5 기존 JSON workflow
+
+기존 JSON의 버전명(v14/v15/v16 등)을 품질 근거로 사용하지 않고 현재 음악 설계 자체를 분석합니다. Title/Lyrics/Hook/Story/Scene/relationship boundaries는 강제 보존하며 BPM, Genre, Vocal Design, Style Prompt, Exclude, Performance Signature, Groove, Instrumentation, Harmony, Bridge, Final, Duration, Generation Hint를 개선 대상으로 다룹니다.
+
+UI의 `현재 프롬프트 분석`은 곡별 약점과 전체 개선 영역을 보여주고, `AI 음악 프롬프트 업그레이드`는 Channel Master + Genre Master + `data/prompt_intelligence_rules.json`을 결합한 10단계 제작 지시문을 생성합니다. 결과 JSON에는 곡별 기존/new stylePrompt, 변경 이유, 예상 개선점이 포함되며 최종 저장 전에 immutable 필드를 원본으로 강제 복원하고 검증합니다.
 
 ## v0.4.2 Stable 검증 상태
 

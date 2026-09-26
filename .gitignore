@@ -9,4 +9,5 @@ Thumbs.db
 user_data/*.sqlite3
 user_data/*.sqlite3-*
 user_data/exports/
+user_data/master_registry.json
 *.log
